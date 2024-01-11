@@ -28,7 +28,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   if (profile.high_temptarget_raises_sensitivity || profile.exercise_mode || oref2_variables.isEnabled) {
     exerciseSetting = true;
   }
-  if (target >= 118 && exerciseSetting) {
+  if (profile.min_bg >= 118 && exerciseSetting) {
       enable_sigmoidTDD = false;
   }
 
