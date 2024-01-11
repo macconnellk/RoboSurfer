@@ -6,11 +6,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
         return Math.round(value * scale) / scale; 
     }   
 
-// DYNAMIC ISF: SIGMOID WITH ENHANCED TDD RESPONSE
-//Turn on or off
+//Turn RoboSurfer on or off
   var enable_sigmoidTDD = true;
 
-// The Middleware Sigmoid Function will only run if both Dynamic ISF and Sigmoid ISF are ON and the above variable enable_sigmoidTDD is true
+// RoboSurfer will only run if both Dynamic ISF and Sigmoid ISF are ON and the above variable enable_sigmoidTDD is true
 // Initialize Dynamic Status Variables
    const dyn_enabled = profile.useNewFormula;
    const sigmoid_enabled = profile.sigmoid;
@@ -32,6 +31,9 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       enable_sigmoidTDD = false;
   }
 
+// ROBOSURFER ENHANCEMENT #1: DYNAMIC ISF: SIGMOID WITH ENHANCED TDD RESPONSE
+// This enhancement will augment the standard iAPS Sigmoid ISF function with a adjustable response to a comparison between TDD 24hr vs. 2-Week
+   
 //Only use when dynISF setting is ON and Sigmoid is ON and the constant enable_sigmoidTDD = true.
     if (enable_sigmoidTDD && dyn_enabled && sigmoid_enabled) { 
    
@@ -209,7 +211,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 //return "Using Middleware function, the autosens ratio has been adjusted with sigmoid factor using the following data: " + log_past2hoursAverage + log_average_total_data + log_weightedAverage + log_tdd_dev + log_TDD_sigmoid_adjustment_factor + log_TDD_sigmoid_max + log_TDD_sigmoid_min + log_TDD_sigmoid_interval + log_TDD_sigmoid_max_minus_one + log_TDD_sigmoid_fix_offset + log_TDD_sigmoid_exponent + log_tdd_factor + log_tdd_factor_strength_slider + log_modified_tdd_factor + log_myGlucose + log_target + log_isf + log_adjustmentFactor + log_minimumRatio + log_maximumRatio + log_ratioInterval + log_max_minus_one + log_deviation + log_fix_offset + log_exponent + log_sigmoidFactor + log_minmax_sigmoidFactor + log_new_isf;
 
 
-// DYNAMIC SMB DELIVERY RATIO
+// ROBOSURFER ENHANCEMENT #2: DYNAMIC SMB DELIVERY RATIO
+
 //  Initialize function variables
   var smb_delivery_ratio = profile.smb_delivery_ratio;
   
@@ -218,7 +221,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   const smb_delivery_ratio_max = 1;
   const smb_delivery_ratio_bg_range = 65;
 
-// The Scaling Function
+// The SMB Delivery Ratio Scaling Function
 
   // If BG between target and top of BG Range, scale SMB Delivery ratio
   if (myGlucose >= target && myGlucose <= (target+smb_delivery_ratio_bg_range)) {
@@ -229,9 +232,33 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   if (myGlucose > (target + smb_delivery_ratio_bg_range)) {
         smb_delivery_ratio = smb_delivery_ratio_max;
    }
-  
-  profile.smb_delivery_ratio = round(smb_delivery_ratio,2);
+
+   // Set profile to new value
+     profile.smb_delivery_ratio = round(smb_delivery_ratio,2);
+
+// ROBOSURFER ENHANCEMENT #3: SET CONSTANT MINIMUM HOURLY CARB ABSORPTION
+// For this function, the user should enter desired MIN CARB ABSORPTION in the min_5m_carbimpact setting instead of a min_5m_carbimpact.
+// The function will define the min_5m_carbimpact needed for that MIN CARB ABSORPTION based on current ISF and CR. 
+       
+//  Initialize function variables
+  const carb_ratio = profile.carb_ratio;
+  var min_carb_absorption = profile.min_5m_carbimpact;
+   var min_5m_carbabsorption = 0;
+  var min_5m_carbimpact = 0;
+
+// The Constant Carb Absorption Function
+
+  // Reduce hourly carb absorption to 5-minute carb absoorption
+     min_5m_carbabsorption = min_carb_absorption / (60 / 5);
+
+  // Calculate the dynamic min_5m_carbimpact
+   min_5m_carbimpact = (min_5m_carbabsorption * new_isf) / carb_ratio;
+
+   //Set profile to new value
+  profile.min_5m_carbimpact = round(min_5m_carbimpact,2);
+
+// End RoboSurfer Enhancements
                         
- return "Using RoboSurf the autosens ratio has been set to: " + round(autosens.ratio, 2) + ". " + log_protectionmechanism + " New ISF = " + round(new_isf, 2) + ". CR adjusted from " + round(normal_cr,2) + " to " + round(profile.carb_ratio,2) + " 24hr TDD: " + round(past2hoursAverage, 2) + " 2-week TDD: " + round(average_total_data, 2) + " TDD Weighted Average: " + round(weightedAverage, 2) + ". SMB Delivery Ratio set to: " + profile.smb_delivery_ratio;
+ return "Using RoboSurfer the autosens ratio has been set to: " + round(autosens.ratio, 2) + ". " + log_protectionmechanism + " New ISF = " + round(new_isf, 2) + ". CR adjusted from " + round(normal_cr,2) + " to " + round(profile.carb_ratio,2) + " 24hr TDD: " + round(past2hoursAverage, 2) + " 2-week TDD: " + round(average_total_data, 2) + " TDD Weighted Average: " + round(weightedAverage, 2) + ". SMB Delivery Ratio set to: " + profile.smb_delivery_ratio + ". Min_5m_carbimpact set to: " +  profile.min_5m_carbimpact;
    }
 }
