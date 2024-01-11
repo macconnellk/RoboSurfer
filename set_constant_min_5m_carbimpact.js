@@ -25,7 +25,7 @@ function round(value, digits) {
   
   profile.min_5m_carbimpact = round(min_5m_carbimpact,2);
  
-return "Using Middleware function the min_5m_carbimpact has been adjusted to: " + round(profile.profile.min_5m_carbimpact, 2) + ".";
+return "Using RoboSurfer the min_5m_carbimpact has been adjusted to: " + round(profile.profile.min_5m_carbimpact, 2) + ".";
 
 } 
   
