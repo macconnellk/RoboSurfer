@@ -68,7 +68,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var log_minmax_sigmoidFactor = "";
    var log_normal_cr = "";
    var log_new_isf = "";
-   var log_protectionmechanism = "Protection Mechanism is Off";
+   var log_protectionmechanism = "Off";
    
 //  Initialize function variables
   const myGlucose = glucose[0].glucose;
@@ -104,7 +104,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       if (past2hoursAverage = 0) {
          weightedAverage = average_total_data;
       }
-      var log_protectionmechanism = " Sensitivity Protection Mechanism On: Weighted Average TDD adjusted to lowest TDD";
+      var log_protectionmechanism = "On";
    }
     
 // Sigmoid Function
@@ -259,6 +259,6 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
 // End RoboSurfer Enhancements
                         
- return "Using RoboSurfer the autosens ratio has been set to: " + round(autosens.ratio, 2) + ". " + log_protectionmechanism + " New ISF = " + round(new_isf, 2) + ". CR adjusted from " + round(normal_cr,2) + " to " + round(profile.carb_ratio,2) + " 24hr TDD: " + round(past2hoursAverage, 2) + " 2-week TDD: " + round(average_total_data, 2) + " TDD Weighted Average: " + round(weightedAverage, 2) + ". SMB Delivery Ratio set to: " + profile.smb_delivery_ratio + ". Min_5m_carbimpact set to: " +  profile.min_5m_carbimpact;
+ return "Autosens ratios set to: " + round(autosens.ratio, 2) + ". Sens Protect is " + log_protectionmechanism + ". New ISF: " + round(new_isf, 2) + ". CR adjusted from " + round(normal_cr,2) + " to " + round(profile.carb_ratio,2) + " TDD: " + round(past2hoursAverage, 2) + " 2-week TDD: " + round(average_total_data, 2) + " Weighted Average: " + round(weightedAverage, 2) + ". SMB Delivery Ratio: " + profile.smb_delivery_ratio + ". Min_5m_carbimpact: " +  profile.min_5m_carbimpact;
    }
 }
