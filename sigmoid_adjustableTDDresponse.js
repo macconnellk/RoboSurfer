@@ -5,10 +5,36 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
         var scale = Math.pow(10, digits);
         return Math.round(value * scale) / scale; 
     }   
-   
+
+// DYNAMIC ISF: SIGMOID WITH ENHANCED TDD RESPONSE
 //Turn on or off
   var enable_sigmoidTDD = true;
 
+// The Middleware Sigmoid Function will only run if both Dynamic ISF and Sigmoid ISF are ON and the above variable enable_sigmoidTDD is true
+// Initialize Dynamic Status Variables
+   const dyn_enabled = profile.useNewFormula;
+   const sigmoid_enabled = profile.sigmoid;
+   const enableDynCR = profile.enableDynamicCR;
+   const minimumRatio = profile.autosens_min;
+   const maximumRatio = profile.autosens_max;
+         log_dyn_enabled = "Log: dyn_enabled: " + dyn_enabled;
+         log_sigmoid_enabled = ", Log: sigmoid_enabled: " + sigmoid_enabled;
+         log_enableDynCR = ", Log: enableDynCR: " + enableDynCR;
+
+// Establish Guards
+  if (minimumRatio == maximumRatio) {
+     enable_sigmoidTDD = false;
+  }
+  if (profile.high_temptarget_raises_sensitivity || profile.exercise_mode || oref2_variables.isEnabled) {
+    exerciseSetting = true;
+  }
+  if (target >= 118 && exerciseSetting) {
+      enable_sigmoidTDD = false;
+  }
+
+//Only use when dynISF setting is ON and Sigmoid is ON and the constant enable_sigmoidTDD = true.
+    if (enable_sigmoidTDD && dyn_enabled && sigmoid_enabled) { 
+   
    //  Initialize log variables  
    var log_dyn_enabled = "";
    var log_sigmoid_enabled = "";
@@ -42,19 +68,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var log_new_isf = "";
    var log_protectionmechanism = "Protection Mechanism is Off";
    
-   // The Middleware Sigmoid Function will only run if both Dynamic ISF and Sigmoid ISF are OFF and the above variable enable_sigmoidTDD is true
-   // Initialize Dynamic Status Variables
-    const dyn_enabled = profile.useNewFormula;
-    const sigmoid_enabled = profile.sigmoid;
-    const enableDynCR = profile.enableDynamicCR;
-         log_dyn_enabled = "Log: dyn_enabled: " + dyn_enabled;
-         log_sigmoid_enabled = ", Log: sigmoid_enabled: " + sigmoid_enabled;
-         log_enableDynCR = ", Log: enableDynCR: " + enableDynCR;
-   
 //  Initialize function variables
   const myGlucose = glucose[0].glucose;
-  const minimumRatio = profile.autosens_min;
-  const maximumRatio = profile.autosens_max;
   var exerciseSetting = false;
   const target = profile.min_bg;
   const adjustmentFactor = profile.adjustmentFactor;
@@ -78,17 +93,6 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var log_date = ", Log: date: " + date;
          var log_isf = "Profile ISF: " + isf;
          
-
-// Establish Guards
-  if (minimumRatio == maximumRatio) {
-     enable_sigmoidTDD = false;
-  }
-  if (profile.high_temptarget_raises_sensitivity || profile.exercise_mode || oref2_variables.isEnabled) {
-    exerciseSetting = true;
-  }
-  if (target >= 118 && exerciseSetting) {
-      enable_sigmoidTDD = false;
-  }
    
 // Sensitivity Protection Mechanism: If 24hr TDD is less than 2-Week TDD (more sensitive), set weighted average TDD to the 24hr TDD value)
    if (past2hoursAverage < average_total_data) {
@@ -102,10 +106,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    }
     
 // Sigmoid Function
-   
-//Only use when dynISF setting is off and Sigmoid is off and the constant enable_sigmoidTDD = true.
-    if (enable_sigmoidTDD && !dyn_enabled && !sigmoid_enabled) { 
-   
+     
 // DYNISF SIGMOID MODIFICATION #1
 // Account for delta in TDD of insulin. Define a TDD Factor using a Sigmoid curve that approximates the TDD delta effect used in the Chris Wilson DynISF approach.
 // This TDD delta effect is not linear across BGs and requires a curve to mimic.
