@@ -9,7 +9,7 @@ function round(value, digits) {
 // For this function, the user should enter desired MIN CARB ABSORPTION in the min_5m_carbimpact setting instead of a min_5m_carbimpact.
 // The function will define the min_5m_carbimpact needed for that MIN CARB ABSORPTION based on current ISF and CR.   
 //  Initialize function variables
-  const isf = const isf = profile.sens;
+  const isf = profile.sens;
   const carb_factor = profile.carb_ratio;
   var min_carb_absorption = profile.min_5m_carbimpact;
    var min_5m_carbabsorption = 0;
