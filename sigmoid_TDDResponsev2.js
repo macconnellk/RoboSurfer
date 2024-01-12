@@ -97,6 +97,6 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
      autosens.ratio = sigmoidFactor;
         
                    
- return "TDD Factor set to: " + round(TDD_factor, 2) + ". Sigmoid Target set to: " + round(profile.min_bg, 2) + ". Sigmoid ISF set to: " + round(profile.sens, 2) + " 24hr TDD: " + round(past2hoursAverage, 2) + " 2-week TDD: " + round(average_total_data, 2) + " TDD Weighted Average: " + round(weightedAverage, 2) + log_protectionmechanism;
+  return "Autosens ratio set to: " + round(autosens.ratio, 2) + ". Sens Protect is " + log_protectionmechanism + ". New ISF: " + round(new_isf, 2) + " TDD:" + round(past2hoursAverage, 2) + " Two-week TDD:" + round(average_total_data, 2) + " Weighted Average:" + round(weightedAverage, 2);
     } 
 }
