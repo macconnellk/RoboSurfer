@@ -74,11 +74,11 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
         
        
 // Dynamic CR. Use only when the setting 'Enable Dyanmic CR' is on in FAX Dynamic Settings
-       const normal_cr = profile.carb_ratio;
+ //      const normal_cr = profile.carb_ratio;
       
-        if (autosens.ratio > 1 && enableDynCR) {
-            profile.carb_ratio /= ((autosens.ratio - 1) / 2 + 1);
-        } else if (enableDynCR) { profile.carb_ratio /= autosens.ratio; }  
+ //       if (autosens.ratio > 1 && enableDynCR) {
+ //           profile.carb_ratio /= ((autosens.ratio - 1) / 2 + 1);
+ //       } else if (enableDynCR) { profile.carb_ratio /= autosens.ratio; }  
                    
  return "TDD Factor set to: " + round(TDD_factor, 2) + ". Sigmoid Target set to: " + round(profile.min_bg, 2) + ". Sigmoid ISF set to: " + round(profile.sens, 2) + ". CR adjusted from " + round(normal_cr,2) + " to " + round(profile.carb_ratio,2) + " 24hr TDD: " + round(past2hoursAverage, 2) + " 2-week TDD: " + round(average_total_data, 2) + " TDD Weighted Average: " + round(weightedAverage, 2) + log_protectionmechanism;
     } 
