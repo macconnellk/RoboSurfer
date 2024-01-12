@@ -13,8 +13,8 @@ function round(value, digits) {
   
 // User-Defined function settings
   const smb_delivery_ratio_min = profile.smb_delivery_ratio;
-  const smb_delivery_ratio_max = 1;
-  const smb_delivery_ratio_bg_range = 45;
+  const smb_delivery_ratio_max = .75;
+  const smb_delivery_ratio_bg_range = 50;
 
 // The Scaling Function
 
