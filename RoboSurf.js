@@ -150,6 +150,6 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
 // End RoboSurfer Enhancements
                         
- return "Autosens ratio set to: " + round(autosens.ratio, 2) + ". Sens Protect is " + log_protectionmechanism + ". New ISF: " + round(new_isf, 2) + ". CR adjusted from " + round(normal_cr,2) + " to " + round(profile.carb_ratio,2) + " TDD:" + round(past2hoursAverage, 2) + " Two-week TDD:" + round(average_total_data, 2) + " Weighted Average:" + round(weightedAverage, 2) + ". SMB Delivery Ratio: " + profile.smb_delivery_ratio + ". Min_5m_carbimpact: " +  profile.min_5m_carbimpact;
+ return "Autosens ratio set to: " + round(autosens.ratio, 2) + ". Sens Protect is " + log_protectionmechanism + ". ISF set from: " + round(isf, 2) + " to " + profile.sens + " TDD:" + round(past2hoursAverage, 2) + " Two-week TDD:" + round(average_total_data, 2) + " Weighted Average:" + round(weightedAverage, 2) + ". SMB Delivery Ratio: " + profile.smb_delivery_ratio + ". Min_5m_carbimpact: " +  profile.min_5m_carbimpact;
    }
 }
