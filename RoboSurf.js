@@ -104,7 +104,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
       // Sets the new ratio
      autosens.ratio = sigmoidFactor;
-     profile.sens = round(isf/autosens.ratio,0)
+      var new_isf = round(isf/autosens.ratio,0)
+     profile.sens = new_isf
 
 // ROBOSURFER ENHANCEMENT #2: DYNAMIC SMB DELIVERY RATIO
 
