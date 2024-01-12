@@ -26,19 +26,19 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var average_total_data = oref2_variables.average_total_data;
    var weightedAverage = oref2_variables.weightedAverage;
    var isf = profile.sens;
-              
-// Exception logic if past2hoursAverage not calculating
-      if (past2hoursAverage < 1) {
-         weightedAverage = average_total_data;
-         var log_protectionmechanism = "OnZero";
-      }
 
 // Sensitivity Protection Mechanism: If 24hr TDD is less than 2-Week TDD (more sensitive), set weighted average TDD to the 24hr TDD value)
    if (past2hoursAverage < average_total_data) {
       weightedAverage = past2hoursAverage;
       var log_protectionmechanism = "On";
    }
-    
+
+// Exception logic if past2hoursAverage not calculating
+      if (past2hoursAverage < 1) {
+         weightedAverage = average_total_data;
+         var log_protectionmechanism = "OnZero";
+      }
+         
 // TDD-Factor Sigmoid Function
      
 // DYNISF SIGMOID MODIFICATION #1
