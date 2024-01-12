@@ -37,7 +37,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 // This enhancement will augment the standard iAPS Sigmoid ISF function with a adjustable response to a comparison between TDD 24hr vs. 2-Week
    
 //Only use when dynISF setting is ON and Sigmoid is ON and the constant enable_sigmoidTDD = true.
-    if (enable_sigmoidTDD && dyn_enabled && sigmoid_enabled) { 
+    if (enable_sigmoidTDD && dyn_enabled && !sigmoid_enabled) { 
    
    //  Initialize log variables  
    var log_dyn_enabled = "";
