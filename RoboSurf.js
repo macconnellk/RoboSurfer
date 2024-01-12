@@ -192,8 +192,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
      sigmoidFactor = Math.max(Math.min(maximumRatio, sigmoidFactor), sigmoidFactor, minimumRatio);
        log_minmax_sigmoidFactor  = ", Log: sigmoidFactor post min/max: " + sigmoidFactor;
 
-      // Sets the new ratio
+      // Set the new ratio and disable DynamicISF from running/overwriting
      autosens.ratio = sigmoidFactor;
+     profile.useNewFormula = "false";
+     profile.sigmoid = "false";
        
        const normal_cr = profile.carb_ratio;
       log_normal_cr = "Log: normal_cr: " + normal_cr;
