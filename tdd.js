@@ -1,3 +1,11 @@
+function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoir, clock, pumphistory, preferences, basal_profile, oref2_variables) {
+
+   function round(value, digits) {
+        if (! digits) { digits = 0; }
+        var scale = Math.pow(10, digits);
+        return Math.round(value * scale) / scale; 
+    }   
+
 var pumpData = 0;
     var logtdd = "";
     var logBasal = "";
