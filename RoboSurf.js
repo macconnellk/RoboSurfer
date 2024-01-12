@@ -105,7 +105,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       if (past2hoursAverage = 0) {
          weightedAverage = average_total_data;
       }
-      var log_protectionmechanism = "On";
+      log_protectionmechanism = "On";
    }
     
 // Sigmoid Function
