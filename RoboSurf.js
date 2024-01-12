@@ -10,6 +10,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_sigmoidTDD = true;
 
 // RoboSurfer will only run if both Dynamic ISF and Sigmoid ISF are ON and the above variable enable_sigmoidTDD is true
+// Both are disabled in tbe function but mmusy be toggled on to initially calculate TDD
 // Initialize Dynamic Status Variables
    const dyn_enabled = profile.useNewFormula;
    const sigmoid_enabled = profile.sigmoid;
