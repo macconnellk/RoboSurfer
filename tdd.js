@@ -6,7 +6,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
         return Math.round(value * scale) / scale; 
     }   
 
-var pumpData = 0;
+   var pumpData = 0;
     var logtdd = "";
     var logBasal = "";
     var logBolus = "";
@@ -195,7 +195,7 @@ var pumpData = 0;
         // amount of insulin according to pump basal rate schedules
         return totalInsulin;
       
-      / Check that there is enough pump history data (>21 hours) for tdd calculation. Estimate the missing hours (24-pumpData) using hours with scheduled basal rates. Not perfect, but sometimes the
+      // Check that there is enough pump history data (>21 hours) for tdd calculation. Estimate the missing hours (24-pumpData) using hours with scheduled basal rates. Not perfect, but sometimes the
     // pump history in FAX is only 22-23.5 hours, even when you've been looping with FAX for many days. This is to reduce the error from just using pump history as data source as much as possible.
     // AT basal rates are not used for this estimation, instead the basal rates in pump settings.
     
@@ -378,11 +378,9 @@ var pumpData = 0;
         logtdd = " TDD past 24h is: " + tdd.toPrecision(5) + " U"; 
         logOutPut = dataLog + logtdd + logBolus + logTempBasal + logBasal;
 
-
-
-
         tddReason = ", TDD: " + round(tdd,2) + " U, " + round(bolusInsulin/tdd*100,0) + "% Bolus " + round((tempInsulin+scheduledBasalInsulin)/tdd*100,0) +  "% Basal";
     
     } else { tddReason = ", TDD: Not enough pumpData (< 21h)"; }
 
     // --------
+}
