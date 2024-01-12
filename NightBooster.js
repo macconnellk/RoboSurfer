@@ -23,7 +23,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 // If BG > 
 // If BG devatipns > ?
 
-increase SMBs ICF drop delivery goes up
+increase SMBs 
 Increase SMB delivery ratio
 Decrease carb absorption
 Decrease ISF
