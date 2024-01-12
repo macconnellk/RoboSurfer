@@ -7,7 +7,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
     }   
 
 
-// RoboSurfer is a compilation of other individual Middleware capabilites.  RoboSurfer currently includes:
+// RoboSurfer is my own compilation of other individual Middleware capabilites.  RoboSurfer currently includes:
 // 1) Sigmoid with Adjustable TDD Response
 // 2) Scale SMB Delivery Ratio
 // 3) Constant Minimum Carb Absorption
