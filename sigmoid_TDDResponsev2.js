@@ -18,8 +18,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var log_protectionmechanism = "Protection Mechanism is Off";
    
 //  Initialize function variables
-
-
+   var myGlucose = glucose[0].glucose;
    var minimumRatio = profile.autosens_min;
    var maximumRatio = profile.autosens_max;
    var target = profile.min_bg;
