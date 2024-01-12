@@ -64,21 +64,35 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
     // The TDD Factor sigmoid function
     const TDD_factor = TDD_sigmoid_interval / (1 + Math.exp(-TDD_sigmoid_exponent)) + TDD_sigmoid_min;
 
-// DYNISF SIGMOID MODIFICATION #2
-// The TDD delta effect in Chris Wilson (Logarithmic) DynISF approach allows ISF to shift when BG is below target BG (unlike the original Sigmoid DynamicISF approach). 
-// The following math applies the new TTD factor to the target BG to enable this shift.
-// Profile ISF will be applied at target only when Daily TDD = 2 Week TDD. 
+// The Dynamic ISF Sigmoid Code 
 
-       profile.min_bg = target / TDD_factor
-       profile.sens = isf / TDD_factor
-        
+      const ratioInterval = maximumRatio - minimumRatio;
+      var max_minus_one = maximumRatio - 1;
+
+   
+   // DYNISF SIGMOID MODIFICATION #2
+    // The TDD delta effect in Chris Wilson (Logarithmic) DynISF approach allows ISF to shift when BG is below target BG (unlike the original Sigmoid DynamicISF approach). 
+    // The following math applies the new TTD factor to the target BG to this shift.
+    // Like the original Sigmoid approach, Profile ISF will be applied at target but only when Daily TDD = 2 Week TDD.  
+    // ORIGINAL SIGMOID APPROACH: const bg_dev = (current_bg - profile.min_bg) * 0.0555;
+
+    const deviation = (myGlucose - (target / modified_tdd_factor)) * 0.0555; 
        
-// Dynamic CR. Use only when the setting 'Enable Dyanmic CR' is on in FAX Dynamic Settings
- //      const normal_cr = profile.carb_ratio;
-      
- //       if (autosens.ratio > 1 && enableDynCR) {
- //           profile.carb_ratio /= ((autosens.ratio - 1) / 2 + 1);
- //       } else if (enableDynCR) { profile.carb_ratio /= autosens.ratio; }  
+     //Makes sigmoid factor(y) = 1 when BG deviation(x) = 0.
+     const fix_offset = (Math.log10(1/max_minus_one-minimumRatio/max_minus_one) / Math.log10(Math.E));
+       
+     //Exponent used in sigmoid formula
+     const exponent = deviation * adjustmentFactor * modified_tdd_factor + fix_offset;
+    
+     // The sigmoid function
+     var sigmoidFactor = ratioInterval / (1 + Math.exp(-exponent)) + minimumRatio;
+
+     //Respect min/max ratios
+     sigmoidFactor = Math.max(Math.min(maximumRatio, sigmoidFactor), sigmoidFactor, minimumRatio);
+
+      // Sets the new ratio
+     autosens.ratio = sigmoidFactor;
+        
                    
  return "TDD Factor set to: " + round(TDD_factor, 2) + ". Sigmoid Target set to: " + round(profile.min_bg, 2) + ". Sigmoid ISF set to: " + round(profile.sens, 2) + " 24hr TDD: " + round(past2hoursAverage, 2) + " 2-week TDD: " + round(average_total_data, 2) + " TDD Weighted Average: " + round(weightedAverage, 2) + log_protectionmechanism;
     } 
