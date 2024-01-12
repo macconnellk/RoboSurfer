@@ -78,10 +78,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   const adjustmentFactor = profile.adjustmentFactor;
    const past2hoursAverage = oref2_variables.past2hoursAverage;
    const average_total_data = oref2_variables.average_total_data;
-   var weightedAverage = oref2_variables.weightedAverage;
    const duration = oref2_variables.duration;
    const date = oref2_variables.date;
    const isf = profile.sens;
+   var weightedAverage = oref2_variables.weightedAverage;
 
          //  Log function variables
          log_myGlucose = "myGlucose: " + myGlucose + ", ";
@@ -99,7 +99,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    
 // Sensitivity Protection Mechanism: If 24hr TDD is less than 2-Week TDD (more sensitive), set weighted average TDD to the 24hr TDD value)
    if (past2hoursAverage < average_total_data) {
-      weightedAverage = past2hoursAverage;
+      var weightedAverage = past2hoursAverage;
 
       // Exception logic if past2hoursAverage not calculating
       if (past2hoursAverage = 0) {
