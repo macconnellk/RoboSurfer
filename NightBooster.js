@@ -17,3 +17,14 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var myGlucose = glucose[0].glucose;
    var target = profile.min_bg;
    var isf = profile.sens;
+
+// If after 8:30pm
+// If COB > 20
+// If BG > 
+// If BG
+       
+       
+
+   return "_ set to: " + round(_, 2);
+    } 
+}
