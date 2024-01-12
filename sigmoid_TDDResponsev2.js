@@ -14,7 +14,6 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
     if (enable_sigmoidTDD) { 
    
    //  Initialize log variables  
-   var log_new_isf = "";
    var log_protectionmechanism = "Protection Mechanism is Off";
    
 //  Initialize function variables
@@ -95,8 +94,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
       // Sets the new ratio
      autosens.ratio = sigmoidFactor;
+      
+    var new_isf = round(profile.sens/autosens.ratio,0);
         
                    
-  return "Autosens ratio set to: " + round(autosens.ratio, 2) + ". Sens Protect is " + log_protectionmechanism + ". New ISF: " + round(new_isf, 2) + " TDD:" + round(past2hoursAverage, 2) + " Two-week TDD:" + round(average_total_data, 2) + " Weighted Average:" + round(weightedAverage, 2);
+  return "Autosens ratio set to: " + round(autosens.ratio, 2) + ". Sens Protect is " + log_protectionmechanism + ". ISF seet from: " + round(isf, 2) + " to " + round(new_isf, 2) + " TDD:" + round(past2hoursAverage, 2) + " Two-week TDD:" + round(average_total_data, 2) + " Weighted Average:" + round(weightedAverage, 2);
     } 
 }
