@@ -47,6 +47,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var log_target = "";
    var log_adjustmentFactor = "";
    var log_Average = ""; 
+   var log_weightedAverage = "";
    var log_average_total_data = "";
    var log_tdd_dev = "";
    var log_TDD_sigmoid_adjustment_factor = "";
@@ -91,7 +92,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          log_adjustmentFactor = "AdjustmentFactor: " + adjustmentFactor;
          log_past2hoursAverage = "24hr TDD: " + round(past2hoursAverage, 2); 
          log_average_total_data = "2-week TDD: " + round(average_total_data, 2);
-         log_weightedAverage = "TDD Weighted Average: " + round(weightedAverage, 2);
+         var log_weightedAverage = "TDD Weighted Average: " + round(weightedAverage, 2);
          var log_duration = ", Log: duration: " + duration;
          var log_date = ", Log: date: " + date;
          var log_isf = "Profile ISF: " + isf;
