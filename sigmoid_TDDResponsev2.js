@@ -14,7 +14,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
     if (enable_sigmoidTDD) { 
    
    //  Initialize log variables  
-   var log_protectionmechanism = "Protection Mechanism is Off";
+   var log_protectionmechanism = "Off";
    
 //  Initialize function variables
    var myGlucose = glucose[0].glucose;
