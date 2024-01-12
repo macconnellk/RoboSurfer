@@ -195,8 +195,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
       // Set the new ratio and disable DynamicISF from running/overwriting
      autosens.ratio = sigmoidFactor;
-     profile.useNewFormula = "false";
-     profile.sigmoid = "false";
+     profile.useNewFormula = false;
+     profile.sigmoid = false;
        
        const normal_cr = profile.carb_ratio;
       log_normal_cr = "Log: normal_cr: " + normal_cr;
