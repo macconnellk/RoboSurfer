@@ -11,7 +11,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_sigmoidTDD = true;
 
 //Only use when enable_sigmoidTDD = true.
-// Dynamic ISF and Sigmoid must be on in settings with Min and Max both set to 1 (necessary for past2hraverage to calculate
+// Dynamic ISF and Sigmoid must be on in settings with Min at .999 and Max at 1.001 (necessary for past2hraverage to calculate
+// Function outcomes will populate in Middleware pop-up, Sigmoid pop-up values will refelct very minor changes to these outputs
     if (enable_sigmoidTDD) { 
    
    //  Initialize log variables  
