@@ -12,21 +12,31 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
 //Only use when enable_robotune = true.
     if (enable_nightbooster) { 
-   
+
+//  Initialize user-defined settings
+   var NightBoostStartTimeHour = 20; // 8pm
+   var NightBoostStartTimeMinute = 0; // 8:00pm
+   var NightBoostCarbThreshold = 30; // COB
+   var NightBoostBGThreshold = 140; // BG over
+   var NightBoostDeviation = 0; // TBD  
+       
 //  Initialize function variables
    var myGlucose = glucose[0].glucose;
    var target = profile.min_bg;
    var isf = profile.sens;
+   var COB = meal.carbs;    
+   const now = new Date();
+   const StartNightBooster = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 20, 0, 0); // 8:00 PM
 
-// If after 8:30pm
-// If COB > 20
-// If BG > 
-// If BG devatipns > ?
+  if (now > StartNightBooster && COB > NightBoostCarbThreshold && myGlucose > NightBoostBGThreshold) {
+    
+  }
+}
 
-increase SMBs 
-Increase SMB delivery ratio scaling
-Decrease carb absorption
-Decrease ISF
+// increase SMBs 
+// Increase SMB delivery ratio scaling
+// Decrease carb absorption
+// Decrease ISF
 
        
        
