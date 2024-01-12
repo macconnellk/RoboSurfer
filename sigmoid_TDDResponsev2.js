@@ -18,8 +18,9 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    
 //  Initialize function variables
    var myGlucose = glucose[0].glucose;
-   var minimumRatio = profile.autosens_min;
-   var maximumRatio = profile.autosens_max;
+   var minimumRatio = .99;
+   var maximumRatio = 1.25;
+   var adjustmentFactor = .55;
    var target = profile.min_bg;
    var past2hoursAverage = oref2_variables.past2hoursAverage;
    var average_total_data = oref2_variables.average_total_data;
@@ -78,13 +79,13 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
     // Like the original Sigmoid approach, Profile ISF will be applied at target but only when Daily TDD = 2 Week TDD.  
     // ORIGINAL SIGMOID APPROACH: const bg_dev = (current_bg - profile.min_bg) * 0.0555;
 
-    var deviation = (myGlucose - (target / modified_tdd_factor)) * 0.0555; 
+    var deviation = (myGlucose - (target / TDD_factor)) * 0.0555; 
        
      //Makes sigmoid factor(y) = 1 when BG deviation(x) = 0.
      var fix_offset = (Math.log10(1/max_minus_one-minimumRatio/max_minus_one) / Math.log10(Math.E));
        
      //Exponent used in sigmoid formula
-     var exponent = deviation * adjustmentFactor * modified_tdd_factor + fix_offset;
+     var exponent = deviation * adjustmentFactor * TDD_factor + fix_offset;
     
      // The sigmoid function
      var sigmoidFactor = ratioInterval / (1 + Math.exp(-exponent)) + minimumRatio;
@@ -94,10 +95,9 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
       // Sets the new ratio
      autosens.ratio = sigmoidFactor;
-      
-    var new_isf = round(profile.sens/autosens.ratio,0);
-        
-                   
-  return "Autosens ratio set to: " + round(autosens.ratio, 2) + ". Sens Protect is " + log_protectionmechanism + ". ISF seet from: " + round(isf, 2) + " to " + round(new_isf, 2) + " TDD:" + round(past2hoursAverage, 2) + " Two-week TDD:" + round(average_total_data, 2) + " Weighted Average:" + round(weightedAverage, 2);
+     profile.sens = round(isf/autosens.ratio,0)
+   
+                      
+  return "Autosens ratio set to: " + round(autosens.ratio, 2) + ". Sens Protect is " + log_protectionmechanism + ". ISF set from: " + round(isf, 2) + " to " + profile.sens + " TDD:" + round(past2hoursAverage, 2) + " Two-week TDD:" + round(average_total_data, 2) + " Weighted Average:" + round(weightedAverage, 2);
     } 
 }
