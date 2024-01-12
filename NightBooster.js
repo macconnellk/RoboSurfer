@@ -21,7 +21,13 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 // If after 8:30pm
 // If COB > 20
 // If BG > 
-// If BG
+// If BG devatipns > ?
+
+increase SMBs ICF drop delivery goes up
+Increase SMB delivery ratio
+Decrease carb absorption
+Decrease ISF
+
        
        
 
