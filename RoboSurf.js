@@ -101,13 +101,16 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 // Sensitivity Protection Mechanism: If 24hr TDD is less than 2-Week TDD (more sensitive), set weighted average TDD to the 24hr TDD value)
    if (past2hoursAverage < average_total_data) {
       var weightedAverage = past2hoursAverage;
-
+      log_protectionmechanism = "On";
+      }
+      
       // Exception logic if past2hoursAverage not calculating
       if (past2hoursAverage = 0) {
          weightedAverage = average_total_data;
+        log_protectionmechanism = "On";
       }
-      log_protectionmechanism = "On";
-   }
+      
+   
     
 // Sigmoid Function
      
