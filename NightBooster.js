@@ -24,7 +24,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 // If BG devatipns > ?
 
 increase SMBs 
-Increase SMB delivery ratio
+Increase SMB delivery ratio scaling
 Decrease carb absorption
 Decrease ISF
 
