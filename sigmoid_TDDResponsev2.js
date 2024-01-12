@@ -48,28 +48,28 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
     // Define TDD deviation variable for use in TDD Sigmoid curve based on current percent change between Daily TDD deviation and 2 Week Deviation 
     // This approach will normalize this variable for any TDD value to ensure a standard TDD Factor sigmoid curve for all users
-   const tdd_dev = (weightedAverage / average_total_data - 1) * 10;
+   var tdd_dev = (weightedAverage / average_total_data - 1) * 10;
 
     // Hard-code TDD Factor Sigmoid inputs
     // These inputs have been modeled to create a TDD Factor that, when used in the Sigmoid DynISF function, closely approximates the TDD delta effect for ULTRA-RAPID used in the Chris Wilson (Logarithmic) DynISF approach. 
     // These inputs are not expected to require user change for ultra-rapid insulin; instead the strength of this factor can be modified below using the tdd_factor_strength_slider.
     // To model the effects of any changes to these values, or adjust for RAPID insulin, see: https://docs.google.com/spreadsheets/d/1k4sGaZYf2t-FbfY8rViqvUnARx_Gu5K_869AH2wgg_A/edit?usp=sharing
-    const TDD_sigmoid_adjustment_factor = .41;
-    const TDD_sigmoid_max = 3.25;
-    const TDD_sigmoid_min = .7;
+    var TDD_sigmoid_adjustment_factor = .41;
+    var TDD_sigmoid_max = 3.25;
+    var TDD_sigmoid_min = .7;
        
     // Define a TDD Factor Sigmoid curve using same method as the DynISF Sigmoid approach below
-    const TDD_sigmoid_interval = TDD_sigmoid_max - TDD_sigmoid_min;
-    const TDD_sigmoid_max_minus_one = TDD_sigmoid_max - 1;
-    const TDD_sigmoid_fix_offset = (Math.log10(1/TDD_sigmoid_max_minus_one - TDD_sigmoid_min / TDD_sigmoid_max_minus_one) / Math.log10(Math.E));
-    const TDD_sigmoid_exponent = tdd_dev * TDD_sigmoid_adjustment_factor + TDD_sigmoid_fix_offset;
+    var TDD_sigmoid_interval = TDD_sigmoid_max - TDD_sigmoid_min;
+    var TDD_sigmoid_max_minus_one = TDD_sigmoid_max - 1;
+    var TDD_sigmoid_fix_offset = (Math.log10(1/TDD_sigmoid_max_minus_one - TDD_sigmoid_min / TDD_sigmoid_max_minus_one) / Math.log10(Math.E));
+    var TDD_sigmoid_exponent = tdd_dev * TDD_sigmoid_adjustment_factor + TDD_sigmoid_fix_offset;
        
     // The TDD Factor sigmoid function
-    const TDD_factor = TDD_sigmoid_interval / (1 + Math.exp(-TDD_sigmoid_exponent)) + TDD_sigmoid_min;
+    var TDD_factor = TDD_sigmoid_interval / (1 + Math.exp(-TDD_sigmoid_exponent)) + TDD_sigmoid_min;
 
 // The Dynamic ISF Sigmoid Code 
 
-      const ratioInterval = maximumRatio - minimumRatio;
+      var ratioInterval = maximumRatio - minimumRatio;
       var max_minus_one = maximumRatio - 1;
 
    
@@ -79,13 +79,13 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
     // Like the original Sigmoid approach, Profile ISF will be applied at target but only when Daily TDD = 2 Week TDD.  
     // ORIGINAL SIGMOID APPROACH: const bg_dev = (current_bg - profile.min_bg) * 0.0555;
 
-    const deviation = (myGlucose - (target / modified_tdd_factor)) * 0.0555; 
+    var deviation = (myGlucose - (target / modified_tdd_factor)) * 0.0555; 
        
      //Makes sigmoid factor(y) = 1 when BG deviation(x) = 0.
-     const fix_offset = (Math.log10(1/max_minus_one-minimumRatio/max_minus_one) / Math.log10(Math.E));
+     var fix_offset = (Math.log10(1/max_minus_one-minimumRatio/max_minus_one) / Math.log10(Math.E));
        
      //Exponent used in sigmoid formula
-     const exponent = deviation * adjustmentFactor * modified_tdd_factor + fix_offset;
+     var exponent = deviation * adjustmentFactor * modified_tdd_factor + fix_offset;
     
      // The sigmoid function
      var sigmoidFactor = ratioInterval / (1 + Math.exp(-exponent)) + minimumRatio;
