@@ -17,6 +17,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    const enableDynCR = profile.enableDynamicCR;
    const minimumRatio = profile.autosens_min;
    const maximumRatio = profile.autosens_max;
+    var exerciseSetting = false;
          log_dyn_enabled = "Log: dyn_enabled: " + dyn_enabled;
          log_sigmoid_enabled = ", Log: sigmoid_enabled: " + sigmoid_enabled;
          log_enableDynCR = ", Log: enableDynCR: " + enableDynCR;
@@ -73,7 +74,6 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    
 //  Initialize function variables
   const myGlucose = glucose[0].glucose;
-  var exerciseSetting = false;
   const target = profile.min_bg;
   const adjustmentFactor = profile.adjustmentFactor;
    const past2hoursAverage = oref2_variables.past2hoursAverage;
