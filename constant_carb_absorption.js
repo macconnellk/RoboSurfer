@@ -6,13 +6,15 @@ function round(value, digits) {
         return Math.round(value * scale) / scale; 
     }
 
-// For this function, the user should enter desired MIN CARB ABSORPTION in the min_5m_carbimpact setting instead of a min_5m_carbimpact.
-// The function will define the min_5m_carbimpact needed for that MIN CARB ABSORPTION based on current ISF and CR.   
+// The function will define the min_5m_carbimpact needed for the user-defined MIN CARB ABSORPTION based on current ISF and CR.   
+
+//  User-defined function variables        
+var min_carb_absorption = 24;
+        
 //  Initialize function variables
   const isf = profile.sens;
   const carb_factor = profile.carb_ratio;
-  var min_carb_absorption = profile.min_5m_carbimpact;
-   var min_5m_carbabsorption = 0;
+  var min_5m_carbabsorption = 0;
   var min_5m_carbimpact = 0;
 
 // The Constant Carb Absorption Function
