@@ -15,7 +15,6 @@ var min_carb_absorption = 24;
 //  Initialize function variables
   const isf = profile.sens;
   const carb_factor = profile.carb_ratio;
-  var min_5m_carbabsorption = 0;
   var min_5m_carbimpact = 0;
 
 // The Constant Carb Absorption Function
