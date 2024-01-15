@@ -27,7 +27,7 @@ var min_carb_absorption = 24;
   
   profile.min_5m_carbimpact = round(min_5m_carbimpact,2);
  
-return "Using RoboSurfer the min_5m_carbimpact has been adjusted to: " + round(profile.min_5m_carbimpact, 2) + ".";
+return "The min_5m_carbimpact has been adjusted to: " + round(profile.min_5m_carbimpact, 2) + ".";
 
 } 
   
