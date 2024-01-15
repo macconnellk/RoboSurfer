@@ -9,6 +9,7 @@ function round(value, digits) {
 // The function will define the min_5m_carbimpact needed for the user-defined MIN CARB ABSORPTION based on current ISF and CR.   
 
 //  User-defined function variables        
+// Define the minimum amount of carb you wamt iAPS to decay in 1 hour.
 var min_carb_absorption = 24;
         
 //  Initialize function variables
