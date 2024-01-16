@@ -30,7 +30,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var myGlucose = glucose[0].glucose;
    var minimumRatio = .99;
    var maximumRatio = 1.25;
-   var adjustmentFactor = .55;
+   var adjustmentFactor = .65;
    var target = profile.min_bg;
    var past2hoursAverage = oref2_variables.past2hoursAverage;
    var average_total_data = oref2_variables.average_total_data;
