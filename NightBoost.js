@@ -32,7 +32,7 @@ if (enable_nightboost) {
       var COB_Max_Nightboost = 100; // Nightboost COB_Max
            
    //  Initialize function variables
-      var NightBoost_Status = "Off"
+      var NightBoost_Status = "Off";
       var myGlucose = glucose[0].glucose;
       var target = profile.min_bg;
       var isf = profile.sens;
@@ -44,7 +44,7 @@ if (enable_nightboost) {
       var SMBDeliveryRatio = profile.smb_delivery_ratio; 
       var COB = meal.mealCOB; 
       const now = new Date();
-      const NightBoostStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 20, 0, 0); // 8:00 PM
+      const NightBoostStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), NightBoost_StartTimeHour, NightBoost_StartTimeMinute, 0); 
       var ROC = 0;    
 
       //Add BG Rate of Change Function
@@ -54,7 +54,7 @@ if (enable_nightboost) {
           myGlucose > NightBoost_BGThreshold &&
           COB > NightBoost_CarbThreshold &&) {
             
-            var NightBoost_Status = "On"
+            var NightBoost_Status = "On";
             profile.sens = isf - (isf * ISF_CR_NightBoost);
             profile.carb_ratio = (cr / 1 + ISF_CR_NightBoost);  
             var check_csf = profile.sens / profile.carb_ratio;
