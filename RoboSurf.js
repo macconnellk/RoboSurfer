@@ -163,7 +163,54 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    // Set profile to new value
      profile.smb_delivery_ratio = round(smb_delivery_ratio,2);
 
-// ROBOSURFER ENHANCEMENT #3: SET CONSTANT MINIMUM HOURLY CARB ABSORPTION
+
+// ROBOSURFER ENHANCEMENT #3:NIGHTBOOST FUNCTION
+//Turn on or off
+  var enable_nightboost = true;
+
+//Only use when enable_robotune = true
+if (enable_nightboost) { 
+
+   // Initialize Function Variables
+   // User-defined Settings Increases 
+   // Note: To reflect slower digestion and increased impact of carbs, CSF must increase
+   // To do so while ISF strenghtens (decreases), CR must strenghten (decrease) more than ISF
+      var CSF_NightboostStrengthFactor = 1.5; // Used to calculate new CR
+      var ISF_NightBoostStrengthFactor = .25; // Standard Nightboost ISF % Strenghten
+      var SMBUAMMinutes_NightBoostIncrease = 15; // Standard Nightboost SMB/UAM Increase
+      var SMBUAMMinutes_ROC_NightBoostIncrease = 30; // High ROC Nightboost SMB/UAM Increase
+      var SMBDeliveryRatio_NightBoostIncrease = 1; // Nightboost SMB Delivery Ratio  
+      var COB_Max_NightboostIncrease = 100; // Nightboost COB_Max
+
+      //Add BG Rate of Change Function
+
+      if (now >= NightBoostStart && 
+          myGlucose > NightBoost_BGThreshold &&
+          COB > NightBoost_CarbThreshold) {
+            
+            NightBoost_Status = "On";
+            NightBoosted_csf = csf_NightboostStart * CSF_NightboostStrengthFactor
+            NightBoosted_isf = isf_NightBoostStart - (isf_NightBoostStart * ISF_NightBoostStrengthFactor);
+            NightBoosted_cr = NightBoosted_isf /  NightBoosted_csf;
+            profile.sens = NightBoosted_isf;
+            profile.carb_ratio = NightBoosted_cr;  
+            check_csf = profile.sens / profile.carb_ratio;
+            profile.maxSMBBasalMinutes = maxSMB + SMBUAMMinutes_NightBoostIncrease;   
+            profile.maxUAMSMBBasalMinutes = maxUAM + SMBUAMMinutes_NightBoostIncrease;   
+            profile.smb_delivery_ratio = SMBDeliveryRatio_NightBoostIncrease;
+            profile.maxCOB = COB_Max_NightboostIncrease; 
+            var min_carb_absorption = 11; // Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
+            
+          //   if (ROC >= NightBoostROCThreshold) {
+          //      profile.sens = 
+          //      profile.maxSMBBasalMinutes = maxSMB + NightBoostSMBUAMMinutesROC
+          //     profile.maxUAMSMBBasalMinutes = maxUAM + + NightBoostSMBUAMMinutesROC 
+          //    }
+       
+        }       
+       
+       
+// ROBOSURFER ENHANCEMENT #4: SET CONSTANT MINIMUM HOURLY CARB ABSORPTION
 // For this function, the user should enter desired MIN CARB ABSORPTION in the min_5m_carbimpact setting instead of a min_5m_carbimpact.
 // The function will define the min_5m_carbimpact needed for that MIN CARB ABSORPTION based on current ISF and CR. 
        
