@@ -162,14 +162,13 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
        
 //  Initialize function variables
   var carb_ratio = profile.carb_ratio;
-  var min_carb_absorption = profile.min_5m_carbimpact;
    var min_5m_carbabsorption = 0;
   var min_5m_carbimpact = 0;
 
 // The Constant Carb Absorption Function
 
   // Reduce hourly carb absorption to 5-minute carb absoorption
-     min_5m_carbabsorption = min_carb_absorption / (60 / 5);
+     min_5m_carbabsorption = min_hourly_carb_absorption / (60 / 5);
 
   // Calculate the dynamic min_5m_carbimpact
    min_5m_carbimpact = (min_5m_carbabsorption * new_isf) / carb_ratio;
