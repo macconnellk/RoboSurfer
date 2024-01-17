@@ -36,6 +36,14 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var average_total_data = oref2_variables.average_total_data;
    var weightedAverage = oref2_variables.weightedAverage;
    var isf = profile.sens;
+      // NightBoost Variables
+      var isf_NightBoostStart = profile.sens;
+      var cr_NightboostStart = profile.carb_ratio;
+      var max_COB = profile.maxCOB;   
+      var maxSMB = profile.maxSMBBasalMinutes;
+      var maxUAM = profile.maxUAMSMBBasalMinutes;  
+      var SMBDeliveryRatio_NightBoostStart = profile.smb_delivery_ratio; 
+      var COB = meal.mealCOB;    
 
 // Sensitivity Protection Mechanism: If 24hr TDD is less than 2-Week TDD (more sensitive), set weighted average TDD to the 24hr TDD value)
    if (past2hoursAverage < average_total_data) {
@@ -132,7 +140,70 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    // Set profile to new value
      profile.smb_delivery_ratio = round(smb_delivery_ratio,2);
 
-// ROBOSURFER ENHANCEMENT #3: SET CONSTANT MINIMUM HOURLY CARB ABSORPTION
+
+
+// ROBOSURFER ENHANCEMENT #3: NIGHTBOOST       
+
+// NIGHTBOOST FUNCTION
+//Turn on or off
+  var enable_nightboost = true;
+
+//Only use when enable_robotune = true
+if (enable_nightboost) { 
+
+   // Initialize Function Variables
+   // Thresholds
+      var NightBoost_StartTimeHour = 8; // 8pm
+      var NightBoost_StartTimeMinute = 0; // 8:00pm
+      var NightBoost_CarbThreshold = 40; // COB
+      var NightBoost_BGThreshold = 140; // BG over
+      var NightBoost_ROCThreshold = 0; // TBD  
+
+   // User-defined Settings Increases     
+      var ISF_CR_NightBoostIncrease = .25; // Standard Nightboost ISF % Increase
+      var ISF_CR_ROC_NightBoostIncrease = .5; // High ROC Nightboost ISF % Increase    
+      var SMBUAMMinutes_NightBoostIncrease = 15; // Standard Nightboost SMB/UAM Increase
+      var SMBUAMMinutes_ROC_NightBoostIncrease = 30; // High ROC Nightboost SMB/UAM Increase
+      var SMBDeliveryRatio_NightBoostIncrease = 1; // Nightboost SMB Delivery Ratio  
+      var COB_Max_NightboostIncrease = 100; // Nightboost COB_Max
+           
+   //  Initialize function variables
+      var NightBoost_Status = "Off";
+      var csf_NightboostStart = isf_NightBoostStart / cr_NightboostStart; 
+      const now = new Date();
+      const NightBoostStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), NightBoost_StartTimeHour, NightBoost_StartTimeMinute, 0); 
+      var ROC = 0;  
+      var NightBoosted_isf = 0;
+      var NightBoosted_cr = 0;
+      var check_csf = 0;
+
+      //Add BG Rate of Change Function
+
+      if (now >= NightBoostStart && 
+          myGlucose > NightBoost_BGThreshold &&
+          COB > NightBoost_CarbThreshold) {
+            
+            var NightBoost_Status = "On";
+            var NightBoosted_isf = isf_NightBoostStart - (isf_NightBoostStart * ISF_CR_NightBoostIncrease);
+            var NightBoosted_cr = NightBoosted_isf / csf_NightboostStart;
+            profile.sens = NightBoosted_isf;
+            profile.carb_ratio = NightBoosted_cr;  
+            var check_csf = profile.sens / profile.carb_ratio;
+            profile.maxSMBBasalMinutes = maxSMB + SMBUAMMinutes_NightBoostIncrease;   
+            profile.maxUAMSMBBasalMinutes = maxUAM + SMBUAMMinutes_NightBoostIncrease;   
+            profile.smb_delivery_ratio = SMBDeliveryRatio_NightBoostIncrease;
+            profile.maxCOB = COB_Max_NightboostIncrease; 
+            var min_carb_absorption = 12; // Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
+            
+          //   if (ROC >= NightBoostROCThreshold) {
+          //      profile.sens = 
+          //      profile.maxSMBBasalMinutes = maxSMB + NightBoostSMBUAMMinutesROC
+          //     profile.maxUAMSMBBasalMinutes = maxUAM + + NightBoostSMBUAMMinutesROC 
+          //    }
+       
+        }   
+       
+// ROBOSURFER ENHANCEMENT #4: SET CONSTANT MINIMUM HOURLY CARB ABSORPTION
 // For this function, the user should enter desired MIN CARB ABSORPTION in the min_5m_carbimpact setting instead of a min_5m_carbimpact.
 // The function will define the min_5m_carbimpact needed for that MIN CARB ABSORPTION based on current ISF and CR. 
        
