@@ -55,7 +55,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       var NightBoosted_isf = 0;
       var NightBoosted_cr = 0;
       var check_csf = 0;
-
+       
+   //  Initialize Constant Carb Absorption variables        
+      // Define the minimum amount of carb you wamt iAPS to decay in 1 hour.
+      var min_hourly_carb_absorption = 24;
 
 // TDD-Factor Sigmoid Function
      
