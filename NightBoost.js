@@ -52,7 +52,7 @@ if (enable_nightboost) {
 
       if (now >= NightBoostStart && 
           myGlucose > NightBoost_BGThreshold &&
-          COB > NightBoost_CarbThreshold &&) {
+          COB > NightBoost_CarbThreshold) {
             
             var NightBoost_Status = "On";
             profile.sens = isf - (isf * ISF_CR_NightBoost);
