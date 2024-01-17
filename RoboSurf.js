@@ -28,14 +28,17 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    
 //  Initialize RoboSurfer function variables
    var myGlucose = glucose[0].glucose;
-   var minimumRatio = .99;
-   var maximumRatio = 1.25;
-   var adjustmentFactor = .65;
    var target = profile.min_bg;
    var past2hoursAverage = oref2_variables.past2hoursAverage;
    var average_total_data = oref2_variables.average_total_data;
    var weightedAverage = oref2_variables.weightedAverage;
    var isf = profile.sens;
+
+      // Enhanced Sigmoid Variables 
+       var minimumRatio = .99;
+      var maximumRatio = 1.25;
+      var adjustmentFactor = .65;
+       
       // NightBoost Variables
       var isf_NightBoostStart = profile.sens;
       var cr_NightboostStart = profile.carb_ratio;
@@ -43,8 +46,19 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       var maxSMB = profile.maxSMBBasalMinutes;
       var maxUAM = profile.maxUAMSMBBasalMinutes;  
       var SMBDeliveryRatio_NightBoostStart = profile.smb_delivery_ratio; 
-      var COB = meal.mealCOB;    
+      var COB = meal.mealCOB;  
+       
+      // Minimum Carb Absorption Variables
+      // Define the minimum amount of carb you wamt iAPS to decay in 1 hour.
+      var min_hourly_carb_absorption = 24;
 
+// TDD-Factor Sigmoid Function
+     
+// DYNISF SIGMOID MODIFICATION #1
+// Define a TDD Factor using a Sigmoid curve that approximates the TDD delta effect used in the Chris Wilson DynISF approach.
+// This TDD delta effect is not linear across BGs and requires a curve to mimic.
+// ORIGINAL SIGMOID APPROACH: const tdd_factor = tdd_averages.weightedAverage / tdd_averages.average_total_data;
+       
 // Sensitivity Protection Mechanism: If 24hr TDD is less than 2-Week TDD (more sensitive), set weighted average TDD to the 24hr TDD value)
    if (past2hoursAverage < average_total_data) {
       weightedAverage = past2hoursAverage;
@@ -57,13 +71,6 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var log_protectionmechanism = "OnZero";
       }
          
-// TDD-Factor Sigmoid Function
-     
-// DYNISF SIGMOID MODIFICATION #1
-// Define a TDD Factor using a Sigmoid curve that approximates the TDD delta effect used in the Chris Wilson DynISF approach.
-// This TDD delta effect is not linear across BGs and requires a curve to mimic.
-// ORIGINAL SIGMOID APPROACH: const tdd_factor = tdd_averages.weightedAverage / tdd_averages.average_total_data;
-
     // Define TDD deviation variable for use in TDD Sigmoid curve based on current percent change between Daily TDD deviation and 2 Week Deviation 
     // This approach will normalize this variable for any TDD value to ensure a standard TDD Factor sigmoid curve for all users
    var tdd_dev = (weightedAverage / average_total_data - 1) * 10;
@@ -207,21 +214,21 @@ if (enable_nightboost) {
 // For this function, the user should enter desired MIN CARB ABSORPTION in the min_5m_carbimpact setting instead of a min_5m_carbimpact.
 // The function will define the min_5m_carbimpact needed for that MIN CARB ABSORPTION based on current ISF and CR. 
        
+         
 //  Initialize function variables
-  var carb_ratio = profile.carb_ratio;
-  var min_carb_absorption = profile.min_5m_carbimpact;
-   var min_5m_carbabsorption = 0;
+  const isf = profile.sens;
+  const carb_factor = profile.carb_ratio;
+  var min_5m_carbabsorption = 0;
   var min_5m_carbimpact = 0;
 
 // The Constant Carb Absorption Function
 
   // Reduce hourly carb absorption to 5-minute carb absoorption
-     min_5m_carbabsorption = min_carb_absorption / (60 / 5);
+     min_5m_carbabsorption = min_hourly_carb_absorption / (60 / 5);
 
   // Calculate the dynamic min_5m_carbimpact
-   min_5m_carbimpact = (min_5m_carbabsorption * new_isf) / carb_ratio;
-
-   //Set profile to new value
+   min_5m_carbimpact = (min_5m_carbabsorption * isf) / carb_factor;
+  
   profile.min_5m_carbimpact = round(min_5m_carbimpact,2);
 
 // End RoboSurfer Enhancements
