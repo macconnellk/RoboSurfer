@@ -45,7 +45,10 @@ if (enable_nightboost) {
       var COB = meal.mealCOB; 
       const now = new Date();
       const NightBoostStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), NightBoost_StartTimeHour, NightBoost_StartTimeMinute, 0); 
-      var ROC = 0;    
+      var ROC = 0;  
+      var NightBoosted_isf = 0;
+      var NightBooster_cr = 0;
+      var check_csf = 0;
 
       //Add BG Rate of Change Function
 
@@ -55,14 +58,16 @@ if (enable_nightboost) {
           COB > NightBoost_CarbThreshold) {
             
             var NightBoost_Status = "On";
-            profile.sens = isf - (isf * ISF_CR_NightBoost);
-            profile.carb_ratio = (cr / (1 + ISF_CR_NightBoost));  
+            var NightBoosted_isf = isf - (isf * ISF_CR_NightBoost);
+            var NightBooster_cr = NightBoosted_isf / csf;
+            profile.sens = NightBoosted_isf;
+            profile.carb_ratio = NightBooster_cr;  
             var check_csf = profile.sens / profile.carb_ratio;
             profile.maxSMBBasalMinutes = maxSMB + SMBUAMMinutes_NightBoost;   
             profile.maxUAMSMBBasalMinutes = maxUAM + SMBUAMMinutes_NightBoost;   
             profile.smb_delivery_ratio = SMBDeliveryRatio_NightBoost;
             profile.maxCOB = COB_Max_Nightboost; 
-            var min_carb_absorption = 11; // Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
+            var min_carb_absorption = 12; // Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
             
           //   if (ROC >= NightBoostROCThreshold) {
           //      profile.sens = 
