@@ -213,8 +213,8 @@ if (enable_nightboost) {
        
          
 //  Initialize function variables
-  const isf = profile.sens;
-  const carb_factor = profile.carb_ratio;
+  const MinAbsorption_isf = profile.sens;
+  const MinAbsorption_carb_factor = profile.carb_ratio;
   var min_5m_carbabsorption = 0;
   var min_5m_carbimpact = 0;
 
@@ -224,7 +224,7 @@ if (enable_nightboost) {
      min_5m_carbabsorption = min_hourly_carb_absorption / (60 / 5);
 
   // Calculate the dynamic min_5m_carbimpact
-   min_5m_carbimpact = (min_5m_carbabsorption * isf) / carb_factor;
+   min_5m_carbimpact = (min_5m_carbabsorption * MinAbsorption_isf) / MinAbsorption_carb_factor;
   
   profile.min_5m_carbimpact = round(min_5m_carbimpact,2);
 
