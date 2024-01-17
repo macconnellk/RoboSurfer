@@ -28,33 +28,54 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    
 //  Initialize RoboSurfer function variables
    var myGlucose = glucose[0].glucose;
+   var target = profile.min_bg;
+   var isf = profile.sens;
+
+//  Initialize Sigmoid function variables
    var minimumRatio = .99;
    var maximumRatio = 1.25;
    var adjustmentFactor = .65;
-   var target = profile.min_bg;
    var past2hoursAverage = oref2_variables.past2hoursAverage;
    var average_total_data = oref2_variables.average_total_data;
    var weightedAverage = oref2_variables.weightedAverage;
-   var isf = profile.sens;
 
+//  Initialize Nightboost function variables
+      var NightBoost_Status = "Off";
+      var isf_NightBoostStart = profile.sens;
+      var cr_NightboostStart = profile.carb_ratio;
+      var csf_NightboostStart = isf_NightBoostStart / cr_NightboostStart; 
+      var max_COB = profile.maxCOB;   
+      var maxSMB = profile.maxSMBBasalMinutes;
+      var maxUAM = profile.maxUAMSMBBasalMinutes;  
+      var SMBDeliveryRatio_NightBoostStart = profile.smb_delivery_ratio; 
+      var COB = meal.mealCOB; 
+      const now = new Date();
+      const NightBoostStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), NightBoost_StartTimeHour, NightBoost_StartTimeMinute, 0);   
+      var NightBoosted_csf = 0;
+      var NightBoosted_isf = 0;
+      var NightBoosted_cr = 0;
+      var check_csf = 0;
+
+
+// TDD-Factor Sigmoid Function
+     
+// DYNISF SIGMOID MODIFICATION #1
+// Define a TDD Factor using a Sigmoid curve that approximates the TDD delta effect used in the Chris Wilson DynISF approach.
+// This TDD delta effect is not linear across BGs and requires a curve to mimic.
+// ORIGINAL SIGMOID APPROACH: const tdd_factor = tdd_averages.weightedAverage / tdd_averages.average_total_data;       
+       
 // Sensitivity Protection Mechanism: If 24hr TDD is less than 2-Week TDD (more sensitive), set weighted average TDD to the 24hr TDD value)
    if (past2hoursAverage < average_total_data) {
       weightedAverage = past2hoursAverage;
       var log_protectionmechanism = "On";
    }
 
-// Exception logic if past2hoursAverage not calculating
+   // Exception logic if past2hoursAverage not calculating
       if (past2hoursAverage < 1) {
          weightedAverage = average_total_data;
          var log_protectionmechanism = "OnZero";
       }
          
-// TDD-Factor Sigmoid Function
-     
-// DYNISF SIGMOID MODIFICATION #1
-// Define a TDD Factor using a Sigmoid curve that approximates the TDD delta effect used in the Chris Wilson DynISF approach.
-// This TDD delta effect is not linear across BGs and requires a curve to mimic.
-// ORIGINAL SIGMOID APPROACH: const tdd_factor = tdd_averages.weightedAverage / tdd_averages.average_total_data;
 
     // Define TDD deviation variable for use in TDD Sigmoid curve based on current percent change between Daily TDD deviation and 2 Week Deviation 
     // This approach will normalize this variable for any TDD value to ensure a standard TDD Factor sigmoid curve for all users
