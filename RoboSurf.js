@@ -40,6 +40,13 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var weightedAverage = oref2_variables.weightedAverage;
 
 //  Initialize Nightboost function variables
+      // NB Thresholds
+      var NightBoost_StartTimeHour = 12; // 8pm
+      var NightBoost_StartTimeMinute = 0; // 8:00pm
+      var NightBoost_CarbThreshold = 40; // COB
+      var NightBoost_BGThreshold = 140; // BG over
+      var NightBoost_ROCThreshold = 0; // TBD 
+      // NB Variables 
       var NightBoost_Status = "Off";
       var isf_NightBoostStart = profile.sens;
       var cr_NightboostStart = profile.carb_ratio;
