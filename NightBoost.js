@@ -56,7 +56,7 @@ if (enable_nightboost) {
             
             var NightBoost_Status = "On";
             profile.sens = isf - (isf * ISF_CR_NightBoost);
-            profile.carb_ratio = (cr / 1 + ISF_CR_NightBoost);  
+            profile.carb_ratio = (cr / (1 + ISF_CR_NightBoost));  
             var check_csf = profile.sens / profile.carb_ratio;
             profile.maxSMBBasalMinutes = maxSMB + SMBUAMMinutes_NightBoost;   
             profile.maxUAMSMBBasalMinutes = maxUAM + SMBUAMMinutes_NightBoost;   
