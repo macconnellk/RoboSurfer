@@ -76,7 +76,7 @@ if (enable_nightboost) {
        
         }
    
-return "Nightboost Status: :" + NightBoost_Status + "Nightboost Start Time: " + NightBoostStart + " ISF: "  + round(profile.sens, 2) + " CR: "  + round(profile.carb_ratio, 2) + " CSF Check: Profile: "  + round(csf, 2) + " New: " + round(check_csf, 2) + " SMB Minutes: "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Minutes: "  + round(profile.maxUAMSMBBasalMinutes, 2) + " SMB Delivery Ratio: "  + round(profile.smb_delivery_ratio, 2) + " Max COB: "  + round(profile.maxCOB, 2) + " Min Absorption: "  + round(min_carb_absorption, 2);
+return "Nightboost Status: :" + NightBoost_Status + "Nightboost Start Time: " + NightBoostStart + " ISF: "  + round(profile.sens, 2) + " CR: "  + round(profile.carb_ratio, 2) + " CSF Check: Profile: "  + round(csf_NightboostStart, 2) + " New: " + round(check_csf, 2) + " SMB Minutes: "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Minutes: "  + round(profile.maxUAMSMBBasalMinutes, 2) + " SMB Delivery Ratio: "  + round(profile.smb_delivery_ratio, 2) + " Max COB: "  + round(profile.maxCOB, 2) + " Min Absorption: "  + round(min_carb_absorption, 2);
 }       
 
   
