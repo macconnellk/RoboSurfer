@@ -42,6 +42,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       // NightBoost Variables
       var isf_NightBoostStart = profile.sens;
       var cr_NightboostStart = profile.carb_ratio;
+      var csf_NightboostStart = isf_NightBoostStart / cr_NightboostStart;
+      var check_csf = 0;
       var max_COB = profile.maxCOB;   
       var maxSMB = profile.maxSMBBasalMinutes;
       var maxUAM = profile.maxUAMSMBBasalMinutes;  
@@ -175,14 +177,13 @@ if (enable_nightboost) {
       var COB_Max_NightboostIncrease = 100; // Nightboost COB_Max
            
    //  Initialize function variables
-      var NightBoost_Status = "Off";
-      var csf_NightboostStart = isf_NightBoostStart / cr_NightboostStart; 
+      var NightBoost_Status = "Off"; 
       const now = new Date();
       const NightBoostStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), NightBoost_StartTimeHour, NightBoost_StartTimeMinute, 0); 
       var ROC = 0;  
       var NightBoosted_isf = 0;
       var NightBoosted_cr = 0;
-      var check_csf = 0;
+      
 
       //Add BG Rate of Change Function
 
@@ -195,7 +196,7 @@ if (enable_nightboost) {
             var NightBoosted_cr = NightBoosted_isf / csf_NightboostStart;
             profile.sens = NightBoosted_isf;
             profile.carb_ratio = NightBoosted_cr;  
-            var check_csf = profile.sens / profile.carb_ratio;
+            check_csf = profile.sens / profile.carb_ratio;
             profile.maxSMBBasalMinutes = maxSMB + SMBUAMMinutes_NightBoostIncrease;   
             profile.maxUAMSMBBasalMinutes = maxUAM + SMBUAMMinutes_NightBoostIncrease;   
             profile.smb_delivery_ratio = SMBDeliveryRatio_NightBoostIncrease;
