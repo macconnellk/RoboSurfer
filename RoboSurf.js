@@ -186,7 +186,7 @@ if (enable_nightboost) {
 
       if (now >= NightBoostStart && 
           myGlucose > NightBoost_BGThreshold &&
-          COB > NightBoost_CarbThreshold) {
+          COB >= NightBoost_CarbThreshold) {
             
             NightBoost_Status = "On";
             NightBoosted_isf = isf_NightBoostStart / NightBoost_Autosens_Ratio;
