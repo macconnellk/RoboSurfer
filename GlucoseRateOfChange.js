@@ -7,13 +7,20 @@ function round(value, digits) {
     }
 
 //  Initialize function variables
-  const myGlucose = glucose[0].glucose;
+  const myGlucose0 = glucose[0].glucose;
+  const myGlucose1 = glucose[1].glucose;
+  const myGlucose2 = glucose[2].glucose;
+  const myGlucose3 = glucose[3].glucose;
+  const myGlucoseTime0 = glucose[0].datestring;
+  const myGlucoseTime1 = glucose[1].datestring;
+  const myGlucoseTime2 = glucose[2].datestring;
+  const myGlucoseTime3 = glucose[3].datestring;
+            
   const target = profile.min_bg;
   var smb_delivery_ratio = profile.smb_delivery_ratio;
   
-
  
-return "Using Middleware function the glucose rate of change is: " + round(profile.smb_delivery_ratio, 2) + ".";
+return "Using Middleware function the glucose rate of change is: " + myGlucose0 + myGlucose1 + myGlucose2 + myGlucose3 + myGlucoseTime0 + myGlucoseTime1 + myGlucoseTime2 + myGlucoseTime3 + round(profile.smb_delivery_ratio, 2) + ".";
 
 } 
   
