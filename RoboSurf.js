@@ -41,10 +41,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
 //  Initialize Nightboost function variables
       // NB Thresholds
-      var NightBoost_StartTimeHour = 12; // 8pm
+      var NightBoost_StartTimeHour = 20; // 8pm
       var NightBoost_StartTimeMinute = 0; // 8:00pm
-      var NightBoost_CarbThreshold = 40; // COB
-      var NightBoost_BGThreshold = 140; // BG over
+      var NightBoost_CarbThreshold = 20; // COB
+      var NightBoost_BGThreshold = 120; // BG over
       var NightBoost_ROCThreshold = 0; // TBD 
       // NB Variables 
       var NightBoost_Status = "Off";
@@ -176,7 +176,7 @@ if (enable_nightboost) {
    // Note: To reflect slower digestion and increased impact of carbs, CSF must increase
    // To do so while ISF strenghtens (decreases), CR must strenghten (decrease) more than ISF
       var CSF_NightboostStrengthFactor = 1.5; // Used to calculate new CR
-      var ISF_NightBoostStrengthFactor = .25; // Standard Nightboost ISF % Strenghten
+      var ISF_NightBoostStrengthFactor = .4; // Standard Nightboost ISF % Strenghten
       var SMBUAMMinutes_NightBoostIncrease = 15; // Standard Nightboost SMB/UAM Increase
       var SMBUAMMinutes_ROC_NightBoostIncrease = 30; // High ROC Nightboost SMB/UAM Increase
       var SMBDeliveryRatio_NightBoostIncrease = 1; // Nightboost SMB Delivery Ratio  
