@@ -208,7 +208,7 @@ if (enable_nightboost) {
           //    }
        
         }       
-       
+      } 
        
 // ROBOSURFER ENHANCEMENT #4: SET CONSTANT MINIMUM HOURLY CARB ABSORPTION
 // For this function, the user should enter desired MIN CARB ABSORPTION in the min_5m_carbimpact setting instead of a min_5m_carbimpact.
