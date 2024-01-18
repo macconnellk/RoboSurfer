@@ -70,7 +70,7 @@ if (enable_nightboost) {
             profile.maxUAMSMBBasalMinutes = maxUAM + SMBUAMMinutes_NightBoostIncrease;   
             profile.smb_delivery_ratio = SMBDeliveryRatio_NightBoostIncrease;
             profile.maxCOB = COB_Max_NightboostIncrease; 
-            var min_carb_absorption = 11; // Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
+            var min_hourly_carb_absorption = 11; // Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
             
           //   if (ROC >= NightBoostROCThreshold) {
           //      profile.sens = 
@@ -80,7 +80,7 @@ if (enable_nightboost) {
        
         }
    
-return "Nightboost Status: " + NightBoost_Status + " Nightboost Start Time: " + NightBoostStart.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " NightBoost ISF: "  + round(profile.sens, 2) + " Nightboost CR: "  + round(profile.carb_ratio, 2) + " CSF Check: Profile CSF: "  + round(csf_NightboostStart, 2) + " Nightboost CSF: " + round(check_csf, 2) + " SMB Minutes: "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Minutes: "  + round(profile.maxUAMSMBBasalMinutes, 2) + " SMB Delivery Ratio: "  + round(profile.smb_delivery_ratio, 2) + " Max COB: "  + round(profile.maxCOB, 2) + " Min Absorption: "  + round(min_carb_absorption, 2);
+return "Nightboost Status: " + NightBoost_Status + " Nightboost Start Time: " + NightBoostStart.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " NightBoost ISF: "  + round(profile.sens, 2) + " Nightboost CR: "  + round(profile.carb_ratio, 2) + " CSF Check: Profile CSF: "  + round(csf_NightboostStart, 2) + " Nightboost CSF: " + round(check_csf, 2) + " SMB Minutes: "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Minutes: "  + round(profile.maxUAMSMBBasalMinutes, 2) + " SMB Delivery Ratio: "  + round(profile.smb_delivery_ratio, 2) + " Max COB: "  + round(profile.maxCOB, 2);
 }       
 
   
