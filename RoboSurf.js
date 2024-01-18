@@ -190,7 +190,7 @@ if (enable_nightboost) {
             
             NightBoost_Status = "On";
             NightBoosted_isf = isf_NightBoostStart / NightBoost_Autosens_Ratio;
-            NightBoosted_csf = csf_NightboostStart * CSF_NightboostStrengthFactor
+            NightBoosted_csf = csf_NightboostStart * CSF_NightboostStrengthFactor;
             NightBoosted_cr = NightBoosted_isf /  NightBoosted_csf;
             profile.sens = NightBoosted_isf;
             profile.carb_ratio = NightBoosted_cr;  
