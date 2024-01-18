@@ -175,8 +175,8 @@ if (enable_nightboost) {
    // User-defined Settings Increases 
    // Note: To reflect slower digestion and increased impact of carbs, CSF must increase
    // To do so while ISF strenghtens (decreases), CR must strenghten (decrease) more than ISF
-      var CSF_NightboostStrengthFactor = 1.35; // Used to calculate new CR
-      var ISF_NightBoostStrengthFactor = 1.4; // Standard Nightboost ISF % Strenghten
+      var CSF_NightboostStrengthFactor = 1.1; // Used to calculate new CR
+      var ISF_NightBoostStrengthFactor = 1.3; // Standard Nightboost ISF % Strenghten
       var SMBUAMMinutes_NightBoostIncrease = 15; // Standard Nightboost SMB/UAM Increase
       var SMBUAMMinutes_ROC_NightBoostIncrease = 30; // High ROC Nightboost SMB/UAM Increase
       var SMBDeliveryRatio_NightBoostIncrease = 1; // Nightboost SMB Delivery Ratio  
