@@ -175,8 +175,8 @@ if (enable_nightboost) {
    // User-defined Settings Increases 
    // Note: To reflect slower digestion and increased impact of carbs, CSF must increase
    // To do so while ISF strenghtens (decreases), CR must strenghten (decrease) more than ISF
-      var CSF_NightboostStrengthFactor = 1.1; // Used to calculate new CR
-      var ISF_NightBoostStrengthFactor = 1.3; // Standard Nightboost ISF % Strenghten
+      var NightBoost_Autosens_Ratio = 1.3; // user-defined autosens ratio for Nightboost
+      var CSF_NightboostStrengthFactor = 1.1; // % change factor used to calculate new CR; 1 = no change to CSF & CR adjusted in line with the ISF change. 1.1 is a change to CR 10% greater than ISF, etc....
       var SMBUAMMinutes_NightBoostIncrease = 15; // Standard Nightboost SMB/UAM Increase
       var SMBUAMMinutes_ROC_NightBoostIncrease = 30; // High ROC Nightboost SMB/UAM Increase
       var SMBDeliveryRatio_NightBoostIncrease = 1; // Nightboost SMB Delivery Ratio  
@@ -189,8 +189,8 @@ if (enable_nightboost) {
           COB > NightBoost_CarbThreshold) {
             
             NightBoost_Status = "On";
+            NightBoosted_isf = isf_NightBoostStart / NightBoost_Autosens_Ratio;
             NightBoosted_csf = csf_NightboostStart * CSF_NightboostStrengthFactor
-            NightBoosted_isf = isf_NightBoostStart - (isf_NightBoostStart * (ISF_NightBoostStrengthFactor-1));
             NightBoosted_cr = NightBoosted_isf /  NightBoosted_csf;
             profile.sens = NightBoosted_isf;
             profile.carb_ratio = NightBoosted_cr;  
