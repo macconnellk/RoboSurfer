@@ -11,10 +11,10 @@ function round(value, digits) {
   const myGlucose1 = glucose[1].glucose;
   const myGlucose2 = glucose[2].glucose;
   const myGlucose3 = glucose[3].glucose;
-  const myGlucoseTime0 = glucose[0].datestring;
-  const myGlucoseTime1 = glucose[1].datestring;
-  const myGlucoseTime2 = glucose[2].datestring;
-  const myGlucoseTime3 = glucose[3].datestring;
+  const myGlucoseTime0 = glucose[0].dateString;
+  const myGlucoseTime1 = glucose[1].dateString;
+  const myGlucoseTime2 = glucose[2].dateString;
+  const myGlucoseTime3 = glucose[3].dateString;
             
   const target = profile.min_bg;
   var smb_delivery_ratio = profile.smb_delivery_ratio;
