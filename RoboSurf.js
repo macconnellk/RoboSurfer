@@ -199,7 +199,7 @@ if (enable_nightboost) {
             profile.maxSMBBasalMinutes = maxSMB + SMBUAMMinutes_NightBoostIncrease;   
             profile.maxUAMSMBBasalMinutes = maxUAM + SMBUAMMinutes_NightBoostIncrease;   
             profile.maxCOB = COB_Max_NightboostIncrease; 
-            var min_carb_absorption = 11; // Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
+            min_hourly_carb_absorption = 11; // Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
             
           //   if (ROC >= NightBoostROCThreshold) {
           //      profile.sens = 
