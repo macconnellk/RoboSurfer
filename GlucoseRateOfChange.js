@@ -34,7 +34,7 @@ const hours = Math.floor((timeDifferenceMillis % (1000 * 60 * 60 * 24)) / (1000 
 const minutes = Math.floor((timeDifferenceMillis % (1000 * 60 * 60)) / (1000 * 60));
 const seconds = Math.floor((timeDifferenceMillis % (1000 * 60)) / 1000);
 
-return "Using Middleware function the glucose rate of change is: " + myGlucose0 + " " + myGlucose1 + " " + myGlucose2 + " " + myGlucose3 + " " + myGlucoseTime0 + " " + myGlucoseTime1 + " " + myGlucoseTime2 + " " + myGlucoseTime3 + " " + minutes + " " + secomds;
+return "Using Middleware function the glucose rate of change is: " + myGlucose0 + " " + myGlucose1 + " " + myGlucose2 + " " + myGlucose3 + " " + myGlucoseTime0 + " " + myGlucoseTime1 + " " + myGlucoseTime2 + " " + myGlucoseTime3 + " " + minutes + " " + seconds;
 
 } 
   
