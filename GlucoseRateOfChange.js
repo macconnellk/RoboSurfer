@@ -18,7 +18,7 @@ function round(value, digits) {
             
 
 // Calculate glucose difference between last 3 glucose readings
-const glucoseDifference = glucose0 - glucose2;
+const glucoseDifference = myGlucose0 - myGlucose2;
                
 // Convert Date strings to Date objects
 const date0 = new Date(myGlucoseTime0);
@@ -32,9 +32,9 @@ const timeDifferenceMillis = date0 - date2;
 // Convert milliseconds to days, hours, minutes, seconds
 const minutes = Math.floor((timeDifferenceMillis % (1000 * 60 * 60)) / (1000 * 60));
 
-var glucoseRateofChange = glucoseDifference / minutes
+var glucoseRateOfChange = glucoseDifference / minutes;
         
-return "Using Middleware function the glucose rate of change is: " + myGlucose0 + " " + myGlucose1 + " " + myGlucose2 + " " + myGlucose3 + " " + myGlucoseTime0 + " " + myGlucoseTime1 + " " + myGlucoseTime2 + " " + myGlucoseTime3 + " " + minutes + ". Glucose Rate of Change: " + glucoseRateofChange + " per minute."; 
+return "Using Middleware function the glucose rate of change is: " + myGlucose0 + " " + myGlucose1 + " " + myGlucose2 + " " + myGlucose3 + " " + myGlucoseTime0 + " " + myGlucoseTime1 + " " + myGlucoseTime2 + " " + myGlucoseTime3 + " " + minutes + ". Glucose Rate of Change: " + glucoseRateOfChange + " per minute."; 
 
 } 
   
