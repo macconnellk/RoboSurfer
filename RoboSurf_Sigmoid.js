@@ -6,23 +6,21 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
         return Math.round(value * scale) / scale; 
     }   
 
-
 // RoboSurfer is my own compilation of other individual Middleware capabilites.  RoboSurfer currently includes:
 // 1) Sigmoid with Adjustable TDD Response
 // 2) Scale SMB Delivery Ratio
 // 3) Constant Minimum Carb Absorption
    
 //Turn RoboSurfer on or off
-  var enable_sigmoidTDD = true;
+  var enable_RoboSurfer = true;
+
+//Only use when enable_RoboSurfer = true.
+    if (enable_RoboSurfer) {
 
 // DYNAMIC ISF: SIGMOID WITH ENHANCED TDD RESPONSE
 //Turn on or off
   var enable_sigmoidTDD = true;
 
-//Only use when enable_sigmoidTDD = true.
-// Dynamic ISF and Sigmoid must be on in settings with Min and Max both set to 1 (necessary for past2hraverage to calculate
-    if (enable_sigmoidTDD) { 
-   
    //  Initialize log variables  
    var log_protectionmechanism = "Off";
    
@@ -67,6 +65,11 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       // Define the minimum amount of carb you wamt iAPS to decay in 1 hour.
       var min_hourly_carb_absorption = 24;
 
+
+//Only use when enable_sigmoidTDD = true.
+// Dynamic ISF and Sigmoid must be on in settings with Min and Max both set to 1 (necessary for past2hraverage to calculate
+    if (enable_sigmoidTDD) {        
+       
 // TDD-Factor Sigmoid Function
      
 // DYNISF SIGMOID MODIFICATION #1
@@ -138,6 +141,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       var new_isf = round(isf/autosens.ratio,0)
      profile.sens = new_isf
 
+}      
+       
 // ROBOSURFER ENHANCEMENT #2: DYNAMIC SMB DELIVERY RATIO
 
 //  Initialize function variables
