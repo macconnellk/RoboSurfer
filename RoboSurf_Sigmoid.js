@@ -48,7 +48,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       // Automation_1 Variables 
       var Automation_Status = "Off";
       const Automation_1_now = new Date();
-      const Automation_1_Start_Time = new Date(now.getFullYear(), now.getMonth(), now.getDate(), Automation_1_StartTimeHour, Automation_1_StartTimeMinute, 0);
+      const Automation_1_Start_Time = new Date(Automation_1_now.getFullYear(), Automation_1_now.getMonth(), Automation_1_now.getDate(), Automation_1_StartTimeHour, Automation_1_StartTimeMinute, 0);
       var Automation_1_isf_Start = profile.sens;
       var Automation_1_cr_Start = profile.carb_ratio;
       var Automation_1_csf_Start = Automation_1_isf_Start / Automation_1_cr_Start; 
