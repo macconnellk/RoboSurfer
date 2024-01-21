@@ -146,7 +146,8 @@ if (enable_Automation_1) {
        
 //Only use when enable_sigmoidTDD = true.
 // Dynamic ISF and Sigmoid must be on in settings with Min and Max both set to 1 (necessary for past2hraverage to calculate
-    if (enable_sigmoidTDD) {        
+function sigmoidFunction(adjustmentFactor, 
+minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage) {        
              
 // Sensitivity Protection Mechanism: If 24hr TDD is less than 2-Week TDD (more sensitive), set weighted average TDD to the 24hr TDD value)
    if (past2hoursAverage < average_total_data) {
