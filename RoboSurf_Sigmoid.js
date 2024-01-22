@@ -39,9 +39,12 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var maxUAM = profile.maxUAMSMBBasalMinutes;  
    var smb_delivery_ratio = profile.smb_delivery_ratio;
    const now = new Date();
-   var new_isf = 0;
-   var new_cr = 0;    
-   var new_autosens_ratio = 0;
+   var new_autosens_ratio = 1;
+   var new_isf = isf;
+   var new_cr = cr;    
+   var new_maxSMB = maxSMB;   
+   var new_maxUAM = maxUAM;   
+   var new_max_COB = max_COB;    
    var check_csf = 0;    
 
 //  Initialize Sigmoid Enhanced with TDD Response function variables
@@ -80,9 +83,9 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       // Automation_1 Initialized Function Variables    
       var Automation_Status = "Off";
       const Automation_1_Start_Time = new Date(now.getFullYear(), now.getMonth(), now.getDate(), Automation_1_StartTimeHour, Automation_1_StartTimeMinute, 0); 
-      var Automation_1_isf_ouput = 0;
-      var Automation_1_cr_output = 0;
-      var Automation_1_csf_output = 0;
+      var Automation_1_isf_ouput = isf;
+      var Automation_1_cr_output = cr;
+      var Automation_1_csf_output = csf;
       
        
 //  Initialize Constant Carb Absorption variables        
@@ -215,9 +218,9 @@ if (enable_Automation_1) {
             Automation_1_csf_output = csf * Automation_1_CSF__StrengthFactor;
             Automation_1_cr_output =  Automation_1_isf_output /  Automation_1_csf_output;
             new_cr = Automation_1_cr_output;  
-            profile.maxSMBBasalMinutes = Automation_1_maxSMB + Automation_1_SMB_UAM_Minutes_Increase;   
-            profile.maxUAMSMBBasalMinutes = Automation_1_maxUAM + Automation_1_SMB_UAM_Minutes_Increase;   
-            profile.maxCOB = Automation_1_COB_Max; 
+            new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase;   
+            new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase;   
+            new_max_COB = Automation_1_COB_Max; 
             min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; // 
             
           //   if (BG_accel >= Automation_1_BG_Accel_Threshold) {
@@ -235,7 +238,6 @@ if (enable_Automation_1) {
 // The function will define the min_5m_carbimpact needed for that MIN CARB ABSORPTION based on current ISF and CR. 
        
 //  Initialize function variables
-  var carb_ratio = profile.carb_ratio;
   var min_5m_carbabsorption = 0;
   var min_5m_carbimpact = 0;
 
@@ -245,12 +247,12 @@ if (enable_Automation_1) {
      min_5m_carbabsorption = min_hourly_carb_absorption / (60 / 5);
 
   // Calculate the dynamic min_5m_carbimpact
-   min_5m_carbimpact = (min_5m_carbabsorption * new_isf) / carb_ratio;
+   min_5m_carbimpact = (min_5m_carbabsorption * new_isf) / new_cr;
 
    //Set profile to new value
   profile.min_5m_carbimpact = round(min_5m_carbimpact,2);
 
-//******************* Set the New ISF *****************************     
+//******************* Set the New Settings *****************************     
     
    // Sets the new ISF 
      new_isf = round(isf / new_autosens_ratio,0);
@@ -259,6 +261,10 @@ if (enable_Automation_1) {
    // Sets the new CR    
       profile.carb_ratio = new_cr; 
       check_csf = profile.sens / profile.carb_ratio; 
+
+      profile.maxSMBBasalMinutes = new_maxSMB;   
+      profile.maxUAMSMBBasalMinutes = new_maxUAM;   
+      profile.maxCOB = new_max_COB;    
 
     // Sets the autosens ratio to 1 for use by native Sigmoid, prevents any further adjustment to ISF
      autosens.ratio = 1;   
