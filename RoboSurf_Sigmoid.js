@@ -250,13 +250,13 @@ if (enable_Automation_1) {
   profile.min_5m_carbimpact = round(min_5m_carbimpact,2);
 
 //******************* Set the New ISF *****************************     
-
-   // Sets the new ratio
-     autosens.ratio = new_autosens_ratio;
-       
+    
    // Sets the new ISF 
      new_isf = round(isf / new_autosens_ratio,0);
      profile.sens = new_isf;  
+
+    // Sets the autosens ratio to 1 for use by native Sigmoid, prevents any further adjustment to ISF
+     autosens.ratio = 1;   
        
 // **************** End RoboSurfer Enhancements ****************
 
