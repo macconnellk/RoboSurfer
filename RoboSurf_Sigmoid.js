@@ -104,7 +104,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
 //  **************** ROBOSURFER ENHANCEMENT #1: Sigmoid Function with TDD-Factor Enhancement  ****************
      
-function sigmoidFunction(adjustmentFactor, 
+function sigmoidFunction(enable_new_sigmoidTDDFactor, adjustmentFactor, 
 minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage) {        
 
    
@@ -176,7 +176,7 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
 
 // **************** Initial call of the Sigmoid function to set a new autosens ratio ****************
 
-    new_autosens_ratio = sigmoidFunction(adjustmentFactor, minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  
+    new_autosens_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, adjustmentFactor, minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  
      
        
 // **************** ROBOSURFER ENHANCEMENT #2: DYNAMIC SMB DELIVERY RATIO ****************
@@ -212,7 +212,7 @@ if (enable_Automation_1) {
           cob >= Automation_1_CarbThreshold) {
             
             Automation_Status = Automation_1_name + " On"; 
-            new_autosens_ratio = sigmoidFunction(Automation_1_adjustmentFactor, Automation_1_minimumRatio, Automation_1_maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
+            new_autosens_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, Automation_1_adjustmentFactor, Automation_1_minimumRatio, Automation_1_maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
             Automation_1_isf_output = round(isf / new_autosens_ratio,0)
             Automation_1_csf_output = csf * Automation_1_CSF__StrengthFactor;
             Automation_1_cr_output =  Automation_1_isf_output /  Automation_1_csf_output;
