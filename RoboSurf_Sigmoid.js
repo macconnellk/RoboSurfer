@@ -93,7 +93,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       // Automation_1 Initialized Function Variables    
       var Automation_Status = "Off";
       const Automation_1_Start_Time = new Date(now.getFullYear(), now.getMonth(), now.getDate(), Automation_1_StartTimeHour, Automation_1_StartTimeMinute, 0); 
-      var Automation_1_isf_ouput = isf;
+      var Automation_1_isf_output = isf;
       var Automation_1_cr_output = cr;
       var Automation_1_csf_output = csf;
       
@@ -213,7 +213,7 @@ if (enable_Automation_1) {
             
             Automation_1_Status = Automation_1_name + "On"; 
             new_autosens_ratio = sigmoidFunction(Automation_1_adjustmentFactor, Automation_1_minimumRatio, Automation_1_maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
-            Automation_1_isf_ouput = round(isf / new_autosens_ratio,0)
+            Automation_1_isf_output = round(isf / new_autosens_ratio,0)
             Automation_1_csf_output = csf * Automation_1_CSF__StrengthFactor;
             Automation_1_cr_output =  Automation_1_isf_output /  Automation_1_csf_output;
             new_cr = Automation_1_cr_output;  
