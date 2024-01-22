@@ -211,7 +211,7 @@ if (enable_Automation_1) {
           myGlucose > Automation_1_BGThreshold &&
           cob >= Automation_1_CarbThreshold) {
             
-            Automation_1_Status = Automation_1_name + "On"; 
+            Automation_Status = Automation_1_name + " On"; 
             new_autosens_ratio = sigmoidFunction(Automation_1_adjustmentFactor, Automation_1_minimumRatio, Automation_1_maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
             Automation_1_isf_output = round(isf / new_autosens_ratio,0)
             Automation_1_csf_output = csf * Automation_1_CSF__StrengthFactor;
