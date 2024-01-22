@@ -14,12 +14,12 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 //    a) Nightboost
 
 //RoboSurfer uses Sigmoid Dynamic ISF.  Settings are made here within the code.  
-//Within iAPS, Dynamic and Sigmoid must be toggled on, AF set to .1 and AS Min/Max set to .999/1.001.     
+//Within iAPS, Dynamic and Sigmoid must be toggled on, AF set to .1 and AS Min/Max set to .999/1.001. This runs the new ISF through the native Sigmoid but with no effect.     
    
 //Turn RoboSurfer and functions on or off
   var enable_RoboSurfer = true;
   var enable_Automation_1 = true; 
-  var enable_sigmoidTDD = true; 
+  var enable_new_sigmoidTDDFactor = true; 
 
 //Only use Middleware when enable_RoboSurfer = true.
     if (enable_RoboSurfer) {
@@ -75,14 +75,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
      
 function sigmoidFunction(adjustmentFactor, 
 minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage) {        
-             
 
-   // DYNISF SIGMOID MODIFICATION #1
-   // Define a TDD Factor using a Sigmoid curve that approximates the TDD delta effect used in the Chris Wilson DynISF approach.
-   // This TDD delta effect is not linear across BGs and requires a curve to mimic.
-   // ORIGINAL SIGMOID APPROACH: const tdd_factor = tdd_averages.weightedAverage / tdd_averages.average_total_data;
-   
-   // Sensitivity Protection Mechanism: If 24hr TDD is less than 2-Week TDD (more sensitive), set weighted average TDD to the 24hr TDD value)
+ // Sensitivity Protection Mechanism: If 24hr TDD is less than 2-Week TDD (more sensitive), set weighted average TDD to the 24hr TDD value)
    if (past2hoursAverage < average_total_data) {
       weightedAverage = past2hoursAverage;
       var log_protectionmechanism = "On";
@@ -93,8 +87,15 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
          weightedAverage = average_total_data;
          var log_protectionmechanism = "OnZero";
       }
-
    
+
+   // DYNISF SIGMOID MODIFICATION #1
+   // Define a TDD Factor using a Sigmoid curve that approximates the TDD delta effect used in the Chris Wilson DynISF approach.
+   // This TDD delta effect is not linear across BGs and requires a curve to mimic.
+   // ORIGINAL SIGMOID APPROACH: const tdd_factor = tdd_averages.weightedAverage / tdd_averages.average_total_data;
+   
+ if (enable_new_sigmoidTDDFactor = true) {
+    
     // Define TDD deviation variable for use in TDD Sigmoid curve based on current percent change between Daily TDD deviation and 2 Week Deviation 
     // This approach will normalize this variable for any TDD value to ensure a standard TDD Factor sigmoid curve
    var tdd_dev = (weightedAverage / average_total_data - 1) * 10;
@@ -114,7 +115,11 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
     var TDD_sigmoid_exponent = tdd_dev * TDD_sigmoid_adjustment_factor + TDD_sigmoid_fix_offset;
        
     // The TDD Factor sigmoid function
-    var TDD_factor = TDD_sigmoid_interval / (1 + Math.exp(-TDD_sigmoid_exponent)) + TDD_sigmoid_min;
+      var TDD_factor = TDD_sigmoid_interval / (1 + Math.exp(-TDD_sigmoid_exponent)) + TDD_sigmoid_min;
+    
+   } else { 
+       var TDD_factor = weightedAverage / average_total_data; // the original Sigmoid approach
+          }
 
 // The Dynamic ISF Sigmoid Code 
 
@@ -127,7 +132,11 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
     // Like the original Sigmoid approach, Profile ISF will be applied at target but only when Daily TDD = 2 Week TDD.  
     // ORIGINAL SIGMOID APPROACH: const bg_dev = (current_bg - profile.min_bg) * 0.0555;
 
-    var deviation = (myGlucose - (target / TDD_factor)) * 0.0555; 
+    if (enable_new_sigmoidTDDFactor = true) {
+       var deviation = (myGlucose - (target / TDD_factor)) * 0.0555; 
+    } else {
+       var deviation = (myGlucose - target) * 0.0555; // the original Sigmoid approach
+          }
        
      //Makes sigmoid factor(y) = 1 when BG deviation(x) = 0.
      var fix_offset = (Math.log10(1/max_minus_one-minimumRatio/max_minus_one) / Math.log10(Math.E));
