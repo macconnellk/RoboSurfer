@@ -7,15 +7,19 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
     }   
 
 // RoboSurfer is my own compilation of other individual Middleware capabilites.  RoboSurfer currently includes:
-// 1) Sigmoid with Adjustable TDD Response
+// 1) Sigmoid with optional Adjustable TDD Response
 // 2) Scale SMB Delivery Ratio
 // 3) Constant Minimum Carb Absorption
 // 4) Settings automations
+//    a) Nightboost
+
+//RoboSurfer uses Sigmoid Dynamic ISF.  Settings are made here within the code.  
+//Within iAPS, Dynamic and Sigmoid must be toggled on, AF set to .1 and AS Min/Max set to .999/1.001.     
    
 //Turn RoboSurfer and functions on or off
   var enable_RoboSurfer = true;
   var enable_Automation_1 = true; 
-  var enable_sigmoidTDD = true;
+  var enable_sigmoidTDD = true; 
 
 //Only use when enable_RoboSurfer = true.
     if (enable_RoboSurfer) {
@@ -27,7 +31,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var myGlucose = glucose[0].glucose;
    var target = profile.min_bg;
    var isf = profile.sens;
-   var cob = meal.mealCOB;    
+   var cob = meal.mealCOB; 
+   const now = new Date();    
 
 //  Initialize Sigmoid Enhanced with TDD Response function variables
    var minimumRatio = .99;
@@ -47,8 +52,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
        
       // Automation_1 Variables 
       var Automation_Status = "Off";
-      const Automation_1_now = new Date();
-      const Automation_1_Start_Time = new Date(Automation_1_now.getFullYear(), Automation_1_now.getMonth(), Automation_1_now.getDate(), Automation_1_StartTimeHour, Automation_1_StartTimeMinute, 0);
+      const Automation_1_Start_Time = new Date(now.getFullYear(), now.getMonth(), now.getDate(), Automation_1_StartTimeHour, Automation_1_StartTimeMinute, 0);
       var Automation_1_isf_Start = profile.sens;
       var Automation_1_cr_Start = profile.carb_ratio;
       var Automation_1_csf_Start = Automation_1_isf_Start / Automation_1_cr_Start; 
@@ -66,6 +70,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       var min_hourly_carb_absorption = 24;
 
 // ROBOSURFER ENHANCEMENT #1: DYNAMIC SMB DELIVERY RATIO
+// Changes the setting SMB Delivery Ratio based on BG         
 
 //  Initialize function variables
   var smb_delivery_ratio = profile.smb_delivery_ratio;
@@ -110,7 +115,7 @@ if (enable_Automation_1) {
 
       //Add BG Rate of Change Function
 
-      if (Automation_1_now >= Automation_1_Start_Time && 
+      if (now >= Automation_1_Start_Time && 
           myGlucose > Automation_1_BGThreshold &&
           cob >= Automation_1_CarbThreshold) {
             
