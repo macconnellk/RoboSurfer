@@ -54,6 +54,16 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var past2hoursAverage = oref2_variables.past2hoursAverage;
    var average_total_data = oref2_variables.average_total_data;
    var weightedAverage = oref2_variables.weightedAverage;
+       // Sensitivity Protection Mechanism: If 24hr TDD is less than 2-Week TDD (more sensitive), set weighted average TDD to the 24hr TDD value)
+         if (past2hoursAverage < average_total_data) {
+            weightedAverage = past2hoursAverage;
+            var log_protectionmechanism = "On";
+         }
+         // Exception logic if past2hoursAverage not calculating
+            if (past2hoursAverage < 1) {
+               weightedAverage = average_total_data;
+               var log_protectionmechanism = "OnZero";
+            }
 
 //  Initialize Automation #1 function variables
       // Automation #1 Thresholds
@@ -97,17 +107,6 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 function sigmoidFunction(adjustmentFactor, 
 minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage) {        
 
- // Sensitivity Protection Mechanism: If 24hr TDD is less than 2-Week TDD (more sensitive), set weighted average TDD to the 24hr TDD value)
-   if (past2hoursAverage < average_total_data) {
-      weightedAverage = past2hoursAverage;
-      var log_protectionmechanism = "On";
-   }
-
-   // Exception logic if past2hoursAverage not calculating
-      if (past2hoursAverage < 1) {
-         weightedAverage = average_total_data;
-         var log_protectionmechanism = "OnZero";
-      }
    
 
    // DYNISF SIGMOID MODIFICATION #1
