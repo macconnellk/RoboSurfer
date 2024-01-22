@@ -17,9 +17,9 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 //Within iAPS, Dynamic and Sigmoid must be toggled on, AF set to .1 and AS Min/Max set to .999/1.001. This runs the new ISF through the native Sigmoid but with no effect.     
    
 //Turn RoboSurfer and functions on or off
-  var enable_RoboSurfer = true;
+  var enable_RoboSurfer = true; 
+  var enable_new_sigmoidTDDFactor = true;
   var enable_Automation_1 = true; 
-  var enable_new_sigmoidTDDFactor = true; 
 
 //Only use Middleware when enable_RoboSurfer = true.
     if (enable_RoboSurfer) {
@@ -31,10 +31,18 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var myGlucose = glucose[0].glucose;
    var target = profile.min_bg;
    var isf = profile.sens;
+   var cr = profile.carb_ratio; 
+   var csf = isf / cr;    
    var cob = meal.mealCOB; 
+   var max_COB = profile.maxCOB;   
+   var maxSMB = profile.maxSMBBasalMinutes;
+   var maxUAM = profile.maxUAMSMBBasalMinutes;  
+   var smb_delivery_ratio = profile.smb_delivery_ratio;
    const now = new Date();
    var new_isf = 0;
-   var new_autosens_ratio = 0;   
+   var new_cr = 0;    
+   var new_autosens_ratio = 0;
+   var check_csf = 0;    
 
 //  Initialize Sigmoid Enhanced with TDD Response function variables
    var minimumRatio = .99;
@@ -52,23 +60,30 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       var Automation_1_CarbThreshold = 0; // COB
       var Automation_1_BG_Accel_Threshold = 0; // TBD
        
-      // Automation_1 Variables 
+      // Automation_1 User-Defined Variables 
+         var Automation_1_name = "Nightboost"; // Give the Automation a Name for use in return string
+          //Automation 1 Sigmoid
+         var Automation_1_minimumRatio = .5;
+         var Automation_1_maximumRatio = 1.4;
+         var Automation_1_adjustmentFactor = .65;
+         //Automation 1 Dynamic CR 
+         var enable_Automation_1_dynamic_cr = true; // this variation of dynamic CR uses CSF to adjust CR in tandem wuth ISF. A CSF_StrengthFactor of 1 maintains the existing CSF and CR will be adjusted with ISF to maintain existing CSF.
+            var Automation_1_CSF__StrengthFactor = 1.1; // % change factor used to calculate new CR; 1 = no change to CSF & CR will be adjusted in line with the ISF change. 1.1 is a 10% increase to CSF (i.e carbs would have a greater impact on BG) and CR will be strengthened more than ISF to achieve this.
+             // Example: To reflect an increased impact of carbs at night (and slower absorption/digestion) during this time period, CSF must increase, CR would be adjusted more than ISF as a result. 
+        //Automation 1 Other Settings
+         var Automation_1_SMB_UAM_Minutes_Increase = 15; // Standard Automation #1 SMB/UAM Increase
+         // var Automation_1_SMB_UAM_Minutes__Increase_ACCEL = 30; // High BG Rate of Change Automation #1 SMB/UAM Increase
+         // var Automation_1_SMB_DeliveryRatio_Increase_ACCEL  = 1; // High BG Rate of Change SMB Delivery Ratio  
+         var Automation_1_COB_Max = 100; // Automation #1 COB_Max
+         var Automation_1_min_hourly_carb_absorption = 11; // Automation #1 min_hourly_carb_absorption. Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
+
+      // Automation_1 Initialized Function Variables    
       var Automation_Status = "Off";
-      const Automation_1_Start_Time = new Date(now.getFullYear(), now.getMonth(), now.getDate(), Automation_1_StartTimeHour, Automation_1_StartTimeMinute, 0);
-      var Automation_1_isf_Start = profile.sens;
-      var Automation_1_cr_Start = profile.carb_ratio;
-      var Automation_1_csf_Start = Automation_1_isf_Start / Automation_1_cr_Start; 
-      var Automation_1_max_COB = profile.maxCOB;   
-      var Automation_1_maxSMB = profile.maxSMBBasalMinutes;
-      var Automation_1_maxUAM = profile.maxUAMSMBBasalMinutes;  
-      var Automation_1_SMBDeliveryRatio_Start = profile.smb_delivery_ratio; 
-      var Automation_1_minimumRatio = .99;
-      var Automation_1_maximumRatio = 1.25;
-      var Automation_1_adjustmentFactor = .65;
+      const Automation_1_Start_Time = new Date(now.getFullYear(), now.getMonth(), now.getDate(), Automation_1_StartTimeHour, Automation_1_StartTimeMinute, 0); 
       var Automation_1_isf_ouput = 0;
       var Automation_1_cr_output = 0;
       var Automation_1_csf_output = 0;
-      var Automation_1_check_csf = 0;
+      
        
 //  Initialize Constant Carb Absorption variables        
       // Define the minimum amount of carb you wamt iAPS to decay in 1 hour.
@@ -164,9 +179,6 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
        
 // **************** ROBOSURFER ENHANCEMENT #2: DYNAMIC SMB DELIVERY RATIO ****************
 // Changes the setting SMB Delivery Ratio based on BG         
-
-//  Initialize function variables
-  var smb_delivery_ratio = profile.smb_delivery_ratio;
   
 // User-Defined function settings
   var smb_delivery_ratio_min = profile.smb_delivery_ratio;
@@ -192,31 +204,17 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
 // **************** ROBOSURFER ENHANCEMENT #3: AUTOMATION #1: "NIGHTBOOST ****************
 //Only use when enable_Automation_1 = true
 if (enable_Automation_1) { 
-
-   // Initialize Function Variables
-   // User-defined Settings Changes 
-        // Note: To reflect slower digestion and increased impact of carbs, CSF must increase
-       // To do so while ISF strenghtens (decreases), CR must strenghten (decrease) as a % more than ISF
-      var Automation_1_Autosens_Ratio = sigmoidFunction(Automation_1_adjustmentFactor, Automation_1_minimumRatio, Automation_1_maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
-      var Automation_1_CSF__StrengthFactor = 1.1; // % change factor used to calculate new CR; 1 = no change to CSF & CR will be adjusted in line with the ISF change. 1.1 is a 10% increase to CSF (carbs would have a ghreater impact on BG) and CR will be strengthened more than ISF to achieve this.
-      var Automation_1_SMB_UAM_Minutes_Increase = 15; // Standard Automation #1 SMB/UAM Increase
-      // var Automation_1_SMB_UAM_Minutes__Increase_ACCEL = 30; // High BG Rate of Change Automation #1 SMB/UAM Increase
-      // var Automation_1_SMB_DeliveryRatio_Increase_ACCEL  = 1; // High BG Rate of Change SMB Delivery Ratio  
-      var Automation_1_COB_Max = 100; // Automation #1 COB_Max
-      var Automation_1_min_hourly_carb_absorption = 11; // Automation #1 min_hourly_carb_absorption. Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
-
-      if (now >= Automation_1_Start_Time && 
+   
+          if (now >= Automation_1_Start_Time && 
           myGlucose > Automation_1_BGThreshold &&
           cob >= Automation_1_CarbThreshold) {
             
-            Automation_1_Status = "Nightboost On"; // Give the Automation a Name for use in return string
-            Automation_1_isf_output = Automation_1_isf_Start / Automation_1_Autosens_Ratio;
-            Automation_1_csf_output = Automation_1_csf_Start * Automation_1_CSF__StrengthFactor;
+            Automation_1_Status = Automation_1_name + "On"; 
+            new_autosens_ratio = sigmoidFunction(Automation_1_adjustmentFactor, Automation_1_minimumRatio, Automation_1_maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
+            Automation_1_isf_ouput = round(isf / new_autosens_ratio,0)
+            Automation_1_csf_output = csf * Automation_1_CSF__StrengthFactor;
             Automation_1_cr_output =  Automation_1_isf_output /  Automation_1_csf_output;
-            autosens.ratio = Automation_1_Autosens_Ratio;
-            profile.sens = Automation_1_isf_output;
-            profile.carb_ratio =  Automation_1_cr_output;  
-            Automation_1_check_csf = profile.sens / profile.carb_ratio;
+            new_cr = Automation_1_cr_output;  
             profile.maxSMBBasalMinutes = Automation_1_maxSMB + Automation_1_SMB_UAM_Minutes_Increase;   
             profile.maxUAMSMBBasalMinutes = Automation_1_maxUAM + Automation_1_SMB_UAM_Minutes_Increase;   
             profile.maxCOB = Automation_1_COB_Max; 
@@ -256,14 +254,18 @@ if (enable_Automation_1) {
     
    // Sets the new ISF 
      new_isf = round(isf / new_autosens_ratio,0);
-     profile.sens = new_isf;  
+     profile.sens = new_isf; 
+
+   // Sets the new CR    
+      profile.carb_ratio = new_cr; 
+      check_csf = profile.sens / profile.carb_ratio; 
 
     // Sets the autosens ratio to 1 for use by native Sigmoid, prevents any further adjustment to ISF
      autosens.ratio = 1;   
        
 // **************** End RoboSurfer Enhancements ****************
 
-return "Autosens ratio: " + round(new_autosens_ratio, 2) + ". ISF set from: " + round(isf, 2) + " to " + round(profile.sens,2) + ". SMB Delivery Ratio: " + profile.smb_delivery_ratio + ". Sens Protect is " + log_protectionmechanism + " TDD:" + round(past2hoursAverage, 2) + " Two-week TDD:" + round(average_total_data, 2) + " Weighted Average:" + round(weightedAverage, 2) + " AUTOMATION STATUS: " + Automation_Status + " Automation Start: " + Automation_1_Start_Time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " Automation ISF: "  + round(profile.sens, 2) + " Automation CR: "  + round(profile.carb_ratio, 2) + " CSF Check: Profile CSF: "  + round(Automation_1_csf_Start, 2) + " Automation CSF: " + round(Automation_1_csf_output, 2) + " SMB Minutes: "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Minutes: "  + round(profile.maxUAMSMBBasalMinutes, 2) + " SMB Delivery Ratio: "  + round(profile.smb_delivery_ratio, 2) + " Max COB: "  + round(profile.maxCOB, 2) + " Min Absorption: "  + round(min_hourly_carb_absorption, 2);
+return "Autosens ratio: " + round(new_autosens_ratio, 2) + ". ISF set from: " + round(isf, 2) + " to " + round(profile.sens,2) + ". SMB Delivery Ratio: " + profile.smb_delivery_ratio + ". Sens Protect is " + log_protectionmechanism + " TDD:" + round(past2hoursAverage, 2) + " Two-week TDD:" + round(average_total_data, 2) + " Weighted Average:" + round(weightedAverage, 2) + " AUTOMATION STATUS: " + Automation_Status + " Automation Start: " + Automation_1_Start_Time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " Automation ISF: "  + round(profile.sens, 2) + " Automation CR: "  + round(profile.carb_ratio, 2) + " CSF Check: Profile CSF: "  + round(Automation_1_csf_Start, 2) + " Automation CSF: " + round(check_csf, 2) + " SMB Minutes: "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Minutes: "  + round(profile.maxUAMSMBBasalMinutes, 2) + " SMB Delivery Ratio: "  + round(profile.smb_delivery_ratio, 2) + " Max COB: "  + round(profile.maxCOB, 2) + " Min Absorption: "  + round(min_hourly_carb_absorption, 2);
    
    }
 }
