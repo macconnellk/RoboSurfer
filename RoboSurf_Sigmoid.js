@@ -61,7 +61,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       var Automation_1_max_COB = profile.maxCOB;   
       var Automation_1_maxSMB = profile.maxSMBBasalMinutes;
       var Automation_1_maxUAM = profile.maxUAMSMBBasalMinutes;  
-      var Automation_1_SMBDeliveryRatio_Start = profile.smb_delivery_ratio;     
+      var Automation_1_SMBDeliveryRatio_Start = profile.smb_delivery_ratio; 
+      var Automation_1_minimumRatio = .99;
+      var Automation_1_maximumRatio = 1.25;
+      var Automation_1_adjustmentFactor = .65;
       var Automation_1_isf_ouput = 0;
       var Automation_1_cr_output = 0;
       var Automation_1_csf_output = 0;
@@ -194,7 +197,7 @@ if (enable_Automation_1) {
    // User-defined Settings Changes 
         // Note: To reflect slower digestion and increased impact of carbs, CSF must increase
        // To do so while ISF strenghtens (decreases), CR must strenghten (decrease) as a % more than ISF
-      var Automation_1_Autosens_Ratio = 1.3; // user-defined autosens ratio for Automation #1 that replaces autosens/dynamic ratio
+      var Automation_1_Autosens_Ratio = sigmoidFunction(Automation_1_adjustmentFactor, Automation_1_minimumRatio, Automation_1_maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
       var Automation_1_CSF__StrengthFactor = 1.1; // % change factor used to calculate new CR; 1 = no change to CSF & CR will be adjusted in line with the ISF change. 1.1 is a 10% increase to CSF (carbs would have a ghreater impact on BG) and CR will be strengthened more than ISF to achieve this.
       var Automation_1_SMB_UAM_Minutes_Increase = 15; // Standard Automation #1 SMB/UAM Increase
       // var Automation_1_SMB_UAM_Minutes__Increase_ACCEL = 30; // High BG Rate of Change Automation #1 SMB/UAM Increase
