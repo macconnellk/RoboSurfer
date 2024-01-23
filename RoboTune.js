@@ -27,7 +27,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
     
     // Assuming 5-minute segments, and you want to measure for 5 hours
     const numSegments = Math.min(myGlucoseTime.length, 5 * 60 / 5); 
-return numSegments;
+return myGlucoseTime[2];
 
     for (let i = 1; i < numSegments - 1; i += 2) {
         if (myGlucose[i] > average_Glucose_target) {
