@@ -35,7 +35,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
     for (let i = 1; i < numSegments - 1; i += 2) {
         if (myGlucose[i] > average_Glucose_target) {
-            const h = myGlucoseTime[i + 1] - myGlucoseTime[i - 1];
+            const h = myGlucoseTime[i - 1] - myGlucoseTime[i + 1];
             const areaSegment = (h / 3) * (myGlucose[i - 1] + 4 * myGlucose[i] + myGlucose[i + 1] - 3 * average_Glucose_target);
             area += Math.max(0, areaSegment); // Ensure area is non-negative
 
