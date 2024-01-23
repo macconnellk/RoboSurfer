@@ -78,7 +78,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
           //Automation 1 Sigmoid
          var Automation_1_minimumRatio = .5;
          var Automation_1_maximumRatio = 1.4;
-         var Automation_1_adjustmentFactor = .65;
+         var Automation_1_adjustmentFactor = .75;
          //Automation 1 Dynamic CR 
          var enable_Automation_1_dynamic_cr = true; // this variation of dynamic CR uses CSF to adjust CR in tandem wuth ISF. A CSF_StrengthFactor of 1 maintains the existing CSF and CR will be adjusted with ISF to maintain existing CSF.
             var Automation_1_CSF__StrengthFactor = 1.1; // % change factor used to calculate new CR; 1 = no change to CSF & CR will be adjusted in line with the ISF change. 1.1 is a 10% increase to CSF (i.e carbs would have a greater impact on BG) and CR will be strengthened more than ISF to achieve this.
