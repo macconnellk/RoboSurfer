@@ -22,16 +22,16 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var isf = profile.sens;
 
 
- function AreaAboveTargetUnderCurve(time, myGlucose, threshold) {
+ function GetAreaAboveTargetUnderCurve(time, myGlucose, average_Glucose_target) {
     let area = 0;
 
     // Assuming 5-minute segments, and you want to measure for 5 hours
     const numSegments = Math.min(time.length, 5 * 60 / 5); 
 
     for (let i = 1; i < numSegments - 1; i += 2) {
-        if (magnitude[i] > threshold) {
+        if (myGlucose[i] > average_Glucose_target) {
             const h = time[i + 1] - time[i - 1];
-            const areaSegment = (h / 3) * (magnitude[i - 1] + 4 * magnitude[i] + magnitude[i + 1] - 3 * threshold);
+            const areaSegment = (h / 3) * (myGlucose[i - 1] + 4 * myGlucose[i] + myGlucose[i + 1] - 3 * average_Glucose_target);
             area += Math.max(0, areaSegment); // Ensure area is non-negative
         }
     }
