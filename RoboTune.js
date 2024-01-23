@@ -22,30 +22,27 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var target = profile.min_bg;
    var isf = profile.sens;
 
- function GetAreaAboveTargetUnderCurve(myGlucoseTime, myGlucose, average_Glucose_target) {
+ //function GetAreaAboveTargetUnderCurve(myGlucoseTime, myGlucose, average_Glucose_target) {
     let area = 0;
     
     // Assuming 5-minute segments, and you want to measure for 5 hours
     const numSegments = Math.min(myGlucoseTime.length, 5 * 60 / 5); 
-console.log(numSegments);
+return numSegments;
 
     for (let i = 1; i < numSegments - 1; i += 2) {
         if (myGlucose[i] > average_Glucose_target) {
             const h = myGlucoseTime[i + 1] - myGlucoseTime[i - 1];
             const areaSegment = (h / 3) * (myGlucose[i - 1] + 4 * myGlucose[i] + myGlucose[i + 1] - 3 * average_Glucose_target);
             area += Math.max(0, areaSegment); // Ensure area is non-negative
-console.log(h);
-console.log(areaSegment);
-console.log(area);
 
         }
     }
 
-    return area;
-   }
+//    return area;
+//   }
 
-const resultArea = GetAreaAboveTargetUnderCurve(myGlucoseTime, myGlucose, average_Glucose_target);
-return 'Area under the curve using Simpson\'s Rule: ' + resultArea;
+//const resultArea = GetAreaAboveTargetUnderCurve(myGlucoseTime, myGlucose, average_Glucose_target);
+//return 'Area under the curve using Simpson\'s Rule: ' + resultArea;
 
        
 }
