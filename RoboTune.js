@@ -14,12 +14,15 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
     if (enable_robotune) { 
    
 //  Initialize function variables
-   var myGlucose = glucose[0].glucose;
+   
+   var myGlucose = glucose.slice(0, 60).map(dataPoint => dataPoint.glucose);
+   // var myGlucose = glucose[0].glucose;
+   var average_Glucose_target = 120
    var target = profile.min_bg;
    var isf = profile.sens;
 
 
- function AreaAboveTargetUnderCurve(time, magnitude, threshold) {
+ function AreaAboveTargetUnderCurve(time, myGlucose, threshold) {
     let area = 0;
 
     // Assuming 5-minute segments, and you want to measure for 5 hours
