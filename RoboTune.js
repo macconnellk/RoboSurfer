@@ -16,9 +16,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 //  Initialize function variables
    
    var myGlucose = glucose.slice(0, 60).map(dataPoint => dataPoint.glucose);
-   return myGlucose
-       
    var myGlucoseTime = glucose.slice(0, 60).map(dataPoint => dataPoint.dateString); 
+
+return myGlucoseTime
+       
    // var myGlucose = glucose[0].glucose;
    var average_Glucose_target = 120
    var target = profile.min_bg;
