@@ -22,10 +22,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var target = profile.min_bg;
    var isf = profile.sens;
 
-   var test1 = myGlucoseTime[2];
-   var test2 = myGlucoseTime[0];
-   var test = myGlucoseTime[2] - myGlucoseTime[0];
-   return test1 + " " + test2 + " " + test;
+   //var test1 = myGlucoseTime[2];
+   //var test2 = myGlucoseTime[0];
+   //var test = myGlucoseTime[2] - myGlucoseTime[0];
+   //return test1 + " " + test2 + " " + test;
        
  function GetAreaAboveTargetUnderCurve(myGlucoseTime, myGlucose, average_Glucose_target) {
     let area = 0;
