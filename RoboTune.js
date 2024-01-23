@@ -16,51 +16,33 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 //  Initialize function variables
    
    var myGlucose = glucose.slice(0, 60).map(dataPoint => dataPoint.glucose);
+   var myGlucoseTime = glucose.slice(0, 60).map(dataPoint => dataPoint.dateString);    
    // var myGlucose = glucose[0].glucose;
    var average_Glucose_target = 120
    var target = profile.min_bg;
    var isf = profile.sens;
 
-
- function GetAreaAboveTargetUnderCurve(time, myGlucose, average_Glucose_target) {
+ function GetAreaAboveTargetUnderCurve(myGlucoseTime, myGlucose, average_Glucose_target) {
     let area = 0;
-
+    
     // Assuming 5-minute segments, and you want to measure for 5 hours
     const numSegments = Math.min(time.length, 5 * 60 / 5); 
 
     for (let i = 1; i < numSegments - 1; i += 2) {
         if (myGlucose[i] > average_Glucose_target) {
-            const h = time[i + 1] - time[i - 1];
+            const h = myGlucoseTime[i + 1] - myGlucoseTime[i - 1];
             const areaSegment = (h / 3) * (myGlucose[i - 1] + 4 * myGlucose[i] + myGlucose[i + 1] - 3 * average_Glucose_target);
             area += Math.max(0, areaSegment); // Ensure area is non-negative
         }
     }
 
     return area;
+   }
+
+const resultArea = simpsonsRule(myGlucoseTime, myGlucose, average_Glucose_target);
+
+return 'Area under the curve using Simpson\'s Rule: ' + resultArea;
+
 }
-
-// Example usage
-const timeData = [/* your time data array */];
-const magnitudeData = [/* your magnitude data array */];
-const thresholdValue = /* your threshold value */;
-const resultArea = simpsonsRule(timeData, magnitudeData, thresholdValue);
-
-console.log('Area under the curve using Simpson\'s Rule:', resultArea);
-
-Simpler approach using rectangles:
-function calculateArea(time, magnitude, threshold) {
-    let area = 0;
-
-    for (let i = 1; i < time.length; i++) {
-        if (magnitude[i] > threshold) {
-            const height = magnitude[i] - threshold;
-            const width = time[i] - time[i - 1];
-            area += height * width;
-        }
-    }
-
-    return area;
 }
-
-
     
