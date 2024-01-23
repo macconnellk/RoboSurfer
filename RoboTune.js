@@ -16,7 +16,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 //  Initialize function variables
    
    var myGlucose = glucose.slice(0, 60).map(dataPoint => dataPoint.glucose);
-   var myGlucoseTime = glucose.slice(0, 60).map(dataPoint => dataPoint.dateString); 
+   var myGlucoseTime = glucose.slice(0, 60).map(dataPoint => new Date(dataPoint.dateString).toISOString()); 
 
 return myGlucoseTime
        
