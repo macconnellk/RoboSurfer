@@ -47,7 +47,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
 const resultArea = GetAreaAboveTargetUnderCurve(myGlucoseTime, myGlucose, average_Glucose_target);
 const totalTime =  myGlucoseTime[0] - myGlucoseTime[myGlucoseTime.length - 1];
-const averageRate = resultArea / totalTime);
+const averageRate = resultArea / totalTime;
 
 return 'Area under the curve using Simpson\'s Rule: ' + averageRate;
 
