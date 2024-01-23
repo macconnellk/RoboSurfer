@@ -15,8 +15,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    
 //  Initialize function variables
    
-   var myGlucose[] = glucose.slice(0, 60).map(dataPoint => dataPoint.glucose);
-   var myGlucoseTime[] = glucose.slice(0, 60).map(dataPoint => dataPoint.dateString);    
+   var myGlucose = glucose.slice(0, 60).map(dataPoint => dataPoint.glucose);
+   var myGlucoseTime = glucose.slice(0, 60).map(dataPoint => dataPoint.dateString);    
    // var myGlucose = glucose[0].glucose;
    var average_Glucose_target = 120
    var target = profile.min_bg;
@@ -42,7 +42,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 //const resultArea = GetAreaAboveTargetUnderCurve(myGlucoseTime, myGlucose, average_Glucose_target);
 
 //return 'Area under the curve using Simpson\'s Rule: ' + resultArea;
-return "1: " +  myGlucoseTime[0] + " " + myGlucose[0] + "2: " +  myGlucoseTime[1] + " " + myGlucose[1]; 
+return myGlucoseTime
        
 }
 }
