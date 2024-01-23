@@ -39,7 +39,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
     return area;
    }
 
-const resultArea = simpsonsRule(myGlucoseTime, myGlucose, average_Glucose_target);
+const resultArea = GetAreaAboveTargetUnderCurve(myGlucoseTime, myGlucose, average_Glucose_target);
 
 return 'Area under the curve using Simpson\'s Rule: ' + resultArea;
 
