@@ -81,7 +81,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var Automation_1_adjustmentFactor = .75;
          //Automation 1 Dynamic CR 
          var enable_Automation_1_dynamic_cr = true; // this variation of dynamic CR uses CSF to adjust CR in tandem wuth ISF. A CSF_StrengthFactor of 1 maintains the existing CSF and CR will be adjusted with ISF to maintain existing CSF.
-            var Automation_1_CSF__StrengthFactor = 1.1; // % change factor used to calculate new CR; 1 = no change to CSF & CR will be adjusted in line with the ISF change. 1.1 is a 10% increase to CSF (i.e carbs would have a greater impact on BG) and CR will be strengthened more than ISF to achieve this.
+            var Automation_1_CSF_StrengthFactor = 1.1; // % change factor used to calculate new CR; 1 = no change to CSF & CR will be adjusted in line with the ISF change. 1.1 is a 10% increase to CSF (i.e carbs would have a greater impact on BG) and CR will be strengthened more than ISF to achieve this.
              // Example: To reflect an increased impact of carbs at night (and slower absorption/digestion) during this time period, CSF must increase, CR would be adjusted more than ISF as a result. 
         //Automation 1 Other Settings
          var Automation_1_SMB_UAM_Minutes_Increase = 15; // Standard Automation #1 SMB/UAM Increase
@@ -214,9 +214,13 @@ if (enable_Automation_1) {
             Automation_Status = Automation_1_name + " On"; 
             new_autosens_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, Automation_1_adjustmentFactor, Automation_1_minimumRatio, Automation_1_maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
             Automation_1_isf_output = round(isf / new_autosens_ratio,0)
-            Automation_1_csf_output = csf * Automation_1_CSF__StrengthFactor;
+            
+            if (enable_Automation_1_dynamic_cr = true) { 
+            Automation_1_csf_output = csf * Automation_1_CSF_StrengthFactor;
             Automation_1_cr_output =  Automation_1_isf_output /  Automation_1_csf_output;
             new_cr = Automation_1_cr_output;  
+            }
+               
             new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase;   
             new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase;   
             new_max_COB = Automation_1_COB_Max; 
@@ -270,7 +274,7 @@ if (enable_Automation_1) {
        
 // **************** End RoboSurfer Enhancements ****************
 
-return "Autosens ratio: " + round(new_autosens_ratio, 2) + ". ISF set from: " + round(isf, 2) + " to " + round(profile.sens,2) + ". SMB Delivery Ratio: " + profile.smb_delivery_ratio + ". Sens Protect is " + log_protectionmechanism + " TDD:" + round(past2hoursAverage, 2) + " Two-week TDD:" + round(average_total_data, 2) + " Weighted Average:" + round(weightedAverage, 2) + " AUTOMATION STATUS: " + Automation_Status + " Automation Start: " + Automation_1_Start_Time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " Automation ISF: "  + round(profile.sens, 2) + " Automation CR: "  + round(profile.carb_ratio, 2) + " CSF Check: Profile CSF: "  + round(csf, 2) + " Automation CSF: " + round(check_csf, 2) + " SMB Minutes: "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Minutes: "  + round(profile.maxUAMSMBBasalMinutes, 2) + " SMB Delivery Ratio: "  + round(profile.smb_delivery_ratio, 2) + " Max COB: "  + round(profile.maxCOB, 2) + " Min Absorption: "  + round(min_hourly_carb_absorption, 2);
+return "Autosens ratio: " + round(new_autosens_ratio, 2) + ". ISF set from: " + round(isf, 2) + " to " + round(profile.sens,2) + ". SMB Delivery Ratio: " + profile.smb_delivery_ratio + ". Sens Protect is " + log_protectionmechanism + " TDD:" + round(past2hoursAverage, 2) + " Two-week TDD:" + round(average_total_data, 2) + " Weighted Average:" + round(weightedAverage, 2) + " AUTOMATION STATUS: " + Automation_Status + ". Automation Start: " + Automation_1_Start_Time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " Automation ISF: "  + round(profile.sens, 2) + " Automation CR: "  + round(profile.carb_ratio, 2) + " CSF Check: Profile CSF: "  + round(csf, 2) + " Automation CSF: " + round(check_csf, 2) + " SMB Minutes: "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Minutes: "  + round(profile.maxUAMSMBBasalMinutes, 2) + " SMB Delivery Ratio: "  + round(profile.smb_delivery_ratio, 2) + " Max COB: "  + round(profile.maxCOB, 2) + " Min Absorption: "  + round(min_hourly_carb_absorption, 2);
    
    }
 }
