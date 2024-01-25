@@ -23,7 +23,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
     myGlucoseTime.push(element.datestring);
       });
 
-return myGlucose and myGlucoseTime;       
+return myGlucose + myGlucoseTime;       
        
        // var myGlucose = glucose[0].glucose;
    var average_Glucose_target = 120
