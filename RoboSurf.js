@@ -69,7 +69,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       // Automation #1 Thresholds
       var Automation_1_StartTimeHour = 20; // 8pm
       var Automation_1_StartTimeMinute = 0; // 8:00pm
-      var Automation_1_BGThreshold = 130; // BG over
+      var Automation_1_BGThreshold = 150; // BG over
       var Automation_1_CarbThreshold = 0; // COB
       var Automation_1_BG_Accel_Threshold = 0; // TBD
        
