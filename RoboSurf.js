@@ -77,7 +77,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var Automation_1_name = "Nightboost"; // Give the Automation a Name for use in return string
           //Automation 1 Sigmoid
          var Automation_1_minimumRatio = .5;
-         var Automation_1_maximumRatio = 1.4;
+         var Automation_1_maximumRatio = 1.45;
          var Automation_1_adjustmentFactor = .75;
          //Automation 1 Dynamic CR 
          var enable_Automation_1_dynamic_cr = true; // this variation of dynamic CR uses CSF to adjust CR in tandem wuth ISF. A CSF_StrengthFactor of 1 maintains the existing CSF and CR will be adjusted with ISF to maintain existing CSF.
