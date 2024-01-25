@@ -20,7 +20,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
    glucose.forEach(element => {
     myGlucose.push(element.glucose);
-    myGlucoseTime.push(element.datestring);
+    myGlucoseTime.push(new Date(element.datestring)); // Parse datestring to date object
       });
 
 return myGlucose + myGlucoseTime;       
