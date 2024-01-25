@@ -13,11 +13,19 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 //Only use when enable_robotune = true.
     if (enable_robotune) { 
    
-//  Initialize function variables
+// Separate glucose and datestring elements into arrays
    
-   var myGlucose = glucose.slice(0, 60).map(dataPoint => dataPoint.glucose);
-   var myGlucoseTime = glucose.slice(0, 60).map(dataPoint => new Date(dataPoint.dateString));        
-   // var myGlucose = glucose[0].glucose;
+   var myGlucose = [];
+   var myGlucoseTime = [];        
+
+   glucose.forEach(element => {
+    myGlucose.push(element.glucose);
+    myGlucoseTime.push(element.datestring);
+      });
+
+return myGlucose and myGlucoseTime;       
+       
+       // var myGlucose = glucose[0].glucose;
    var average_Glucose_target = 120
    var target = profile.min_bg;
    var isf = profile.sens;
