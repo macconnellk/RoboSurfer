@@ -33,7 +33,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var isf = profile.sens;
    var cr = profile.carb_ratio; 
    var csf = isf / cr;    
-   var cob = meal.mealCOB; 
+   var cob = meal.mealCOB;
+   var iob = iob[0].iob    
    var max_COB = profile.maxCOB;   
    var maxSMB = profile.maxSMBBasalMinutes;
    var maxUAM = profile.maxUAMSMBBasalMinutes;  
@@ -69,24 +70,41 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       // Automation #1 Thresholds
       var Automation_1_StartTimeHour = 20; // 8pm
       var Automation_1_StartTimeMinute = 0; // 8:00pm
-      var Automation_1_BGThreshold = 150; // BG over
+      var Automation_1_BGThreshold_1 = 140; // BG over
+      var Automation_1_BGThreshold_2 = 160; // BG over 
+      var Automation_1_BGThreshold_3 = 180; // BG over
+      // var Automation_1_iobThreshold_1 = .5; // 
+      // var Automation_1_iobThreshold_2 = 1; //   
       var Automation_1_CarbThreshold = 0; // COB
       var Automation_1_BG_Accel_Threshold = 0; // TBD
        
       // Automation_1 User-Defined Variables 
          var Automation_1_name = "Nightboost"; // Give the Automation a Name for use in return string
-          //Automation 1 Sigmoid
-         var Automation_1_minimumRatio = .5;
-         var Automation_1_maximumRatio = 1.45;
-         var Automation_1_adjustmentFactor = .75;
-         //Automation 1 Dynamic CR 
+       
+          //Automation 1 Sigmoid - Threshold 1
+         var Automation_1_minimumRatio_1 = .5;
+         var Automation_1_maximumRatio_1 = 1.45;
+         var Automation_1_adjustmentFactor_1 = .75;
+
+         //Automation 1 Sigmoid - Threshold 2
+         var Automation_1_minimumRatio_2 = .5;
+         var Automation_1_maximumRatio_2 = 1.55;
+         var Automation_1_adjustmentFactor_2 = .75;
+
+         //Automation 1 Sigmoid - Threshold 3 
+         var Automation_1_minimumRatio_3 = .5;
+         var Automation_1_maximumRatio_3 = 1.75;
+         var Automation_1_adjustmentFactor_3 = 1;
+       
+          //Automation 1 Dynamic CR 
          var enable_Automation_1_dynamic_cr = true; // this variation of dynamic CR uses CSF to adjust CR in tandem wuth ISF. A CSF_StrengthFactor of 1 maintains the existing CSF and CR will be adjusted with ISF to maintain existing CSF.
             var Automation_1_CSF_StrengthFactor = 1.1; // % change factor used to calculate new CR; 1 = no change to CSF & CR will be adjusted in line with the ISF change. 1.1 is a 10% increase to CSF (i.e carbs would have a greater impact on BG) and CR will be strengthened more than ISF to achieve this.
              // Example: To reflect an increased impact of carbs at night (and slower absorption/digestion) during this time period, CSF must increase, CR would be adjusted more than ISF as a result. 
-        //Automation 1 Other Settings
+       
+       //Automation 1 Other Settings
          var Automation_1_SMB_UAM_Minutes_Increase = 15; // Standard Automation #1 SMB/UAM Increase
-         // var Automation_1_SMB_UAM_Minutes__Increase_ACCEL = 30; // High BG Rate of Change Automation #1 SMB/UAM Increase
-         // var Automation_1_SMB_DeliveryRatio_Increase_ACCEL  = 1; // High BG Rate of Change SMB Delivery Ratio  
+         var Automation_1_SMB_UAM_Minutes__Increase_ACCEL = 30; // High BG Rate of Change Automation #1 SMB/UAM Increase
+         var Automation_1_SMB_DeliveryRatio_Increase_ACCEL  = 1; // High BG Rate of Change SMB Delivery Ratio  
          var Automation_1_COB_Max = 100; // Automation #1 COB_Max
          var Automation_1_min_hourly_carb_absorption = 11; // Automation #1 min_hourly_carb_absorption. Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
 
@@ -208,11 +226,44 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
 if (enable_Automation_1) { 
    
           if (now >= Automation_1_Start_Time && 
-          myGlucose > Automation_1_BGThreshold &&
+          myGlucose > Automation_1_BGThreshold_1 &&
           cob >= Automation_1_CarbThreshold) {
-            
+
+            new_max_COB = Automation_1_COB_Max; 
+            min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; //
+
+               // Determine Nightboost status and response
+             
+                if (myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2) {  
+                      // Set Nightboost Threshold 1 Factors    
+                     var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_1;
+                     var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_1;
+                     var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_1;
+                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase;   
+                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase;   
+                }
+               
+                  if (myGlucose >= Automation_1_BGThreshold_2 && myGlucose < Automation_1_BGThreshold_3) {
+                     // Set Nightboost Threshold 2 Factors    
+                     var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
+                     var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
+                     var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
+                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;   
+                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;
+                  }
+
+                   if (myGlucose >= Automation_1_BGThreshold_3) {
+                     // Set Nightboost Threshold 3 Factors    
+                     var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_3;
+                     var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_3;
+                     var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_3;
+                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;   
+                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_ACCEL; 
+                   }
+             
+            // Run Sigmoid Function 
             Automation_Status = Automation_1_name + " On"; 
-            new_autosens_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, Automation_1_adjustmentFactor, Automation_1_minimumRatio, Automation_1_maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
+            new_autosens_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, NightBoost_Sigmoid_AF, NightBoost_Sigmoid_Min, NightBoost_Sigmoid_Max, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
             Automation_1_isf_output = round(isf / new_autosens_ratio,0)
             
             if (enable_Automation_1_dynamic_cr = true) { 
@@ -221,16 +272,6 @@ if (enable_Automation_1) {
             new_cr = Automation_1_cr_output;  
             }
                
-            new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase;   
-            new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase;   
-            new_max_COB = Automation_1_COB_Max; 
-            min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; // 
-            
-          //   if (BG_accel >= Automation_1_BG_Accel_Threshold) {
-          //     profile.sens = 
-          //     profile.maxSMBBasalMinutes = Automation_1_maxSMB + Automation_1_SMB_UAM_Minutes__Increase_ACCEL
-          //       profile.maxUAMSMBBasalMinutes = Automation_1_maxUAM + Automation_1_SMB_UAM_Minutes__Increase_ACCEL 
-          //    }
        
         }       
       } 
