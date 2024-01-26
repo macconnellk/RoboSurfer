@@ -16,14 +16,14 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 // Initilize function variables
    var myGlucose = [];
    var myGlucoseTime = []; 
-   var average_Glucose_target = 120
+   var average_Glucose_target = 120;
    var target = profile.min_bg;
    var isf = profile.sens;
        
 // Separate glucose and datestring elements into arrays
    glucose.forEach(element => {
     myGlucose.push(element.glucose);
-    myGlucoseTime.push(new Date(element.datestring)); // Parse datestring to date object
+    myGlucoseTime.push(new Date(element.dateString)); // Parse datestring to date object
       });      
        
    var test1 = myGlucose[50];
