@@ -103,7 +103,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
        
        //Automation 1 Other Settings
          var Automation_1_SMB_UAM_Minutes_Increase = 15; // Standard Automation #1 SMB/UAM Increase
-         var Automation_1_SMB_UAM_Minutes__Increase_ACCEL = 30; // High BG Rate of Change Automation #1 SMB/UAM Increase
+         var Automation_1_SMB_UAM_Minutes_Increase_ACCEL = 30; // High BG Rate of Change Automation #1 SMB/UAM Increase
          var Automation_1_SMB_DeliveryRatio_Increase_ACCEL  = 1; // High BG Rate of Change SMB Delivery Ratio  
          var Automation_1_COB_Max = 100; // Automation #1 COB_Max
          var Automation_1_min_hourly_carb_absorption = 11; // Automation #1 min_hourly_carb_absorption. Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
