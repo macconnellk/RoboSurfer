@@ -27,18 +27,17 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       });      
        
        
-// Filter the data based on time ranges
 // Filter the data based on time ranges and interpolate any gaps greater than 5 minutes
-const filterByTimeRange = (timeRange, glucoseData) => {
+const filterByTimeRange = (timeRange, glucose, glucoseTime) => {
     const currentTime = new Date().getTime();
     const timeThreshold = currentTime - (timeRange * 60 * 60 * 1000);
 
     const filteredData = [];
 
-    for (let i = 0; i < glucoseData.length; i++) {
-        const date = new Date(glucoseData[i].datestring).getTime();
+    for (let i = 0; i < glucose.length; i++) {
+        const date = new Date(glucoseTime[i]).getTime();
         if (date >= timeThreshold) {
-            filteredData.push(glucoseData[i]);
+            filteredData.push({ glucose: glucose[i], datestring: glucoseTime[i] });
         }
     }
 
@@ -64,12 +63,12 @@ const filterByTimeRange = (timeRange, glucoseData) => {
 };
 
 // Separate the data into time ranges (last 4 hours, 8 hours, 12 hours, 16 hours, 20 hours, 24 hours)
-const last4HoursData = filterByTimeRange(4, glucose);
-const last8HoursData = filterByTimeRange(8, glucose);
-const last12HoursData = filterByTimeRange(12, glucose);
-const last16HoursData = filterByTimeRange(16, glucose);
-const last20HoursData = filterByTimeRange(20, glucose);
-const last24HoursData = filterByTimeRange(24, glucose);
+const last4HoursData = filterByTimeRange(4, myGlucose, myGlucoseTime);
+const last8HoursData = filterByTimeRange(8, myGlucose, myGlucoseTime);
+const last12HoursData = filterByTimeRange(12, myGlucose, myGlucoseTime);
+const last16HoursData = filterByTimeRange(16, myGlucose, myGlucoseTime);
+const last20HoursData = filterByTimeRange(20, myGlucose, myGlucoseTime);
+const last24HoursData = filterByTimeRange(24, myGlucose, myGlucoseTime);
 
 // Return filtered and interpolated data for different time ranges
       return {
