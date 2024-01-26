@@ -59,10 +59,11 @@ const last4HoursData = filterByTimeRange(4);
 const last8HoursData = filterByTimeRange(8);
 const last12HoursData = filterByTimeRange(12);
 const last16HoursData = filterByTimeRange(16);
+const last20HoursData = filterByTimeRange(20);       
 const last24HoursData = filterByTimeRange(24);
 
 
-return 'Area under the curve using Simpson\'s Rule: ' + averageRate;
+return last4HoursData + last8HoursData + last12HoursData+ last16HoursData + last20HoursData + last24HoursData;
 
        
 }
