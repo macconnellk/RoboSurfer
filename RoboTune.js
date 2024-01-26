@@ -54,7 +54,7 @@ const filterByTimeRange = (timeRange, glucose, glucoseTime) => {
             for (let j = 1; j <= numInterpolatedPoints; j++) {
                 const interpolatedTime = new Date(prevTime + j * 5 * 60 * 1000).toISOString(); // Add 5 minutes
                 const interpolatedGlucose = filteredData[i - 1].glucose + glucoseDiff * j;
-                filteredData.splice(i + (j - 1), 0, { glucose: interpolatedGlucose, datestring: interpolatedTime });
+                filteredData.splice(i + (j - 1), 0, { glucose: interpolatedGlucose, dateString: interpolatedTime });
             }
         }
     }
@@ -71,14 +71,8 @@ const last20HoursData = filterByTimeRange(20, myGlucose, myGlucoseTime);
 const last24HoursData = filterByTimeRange(24, myGlucose, myGlucoseTime);
 
 // Return filtered and interpolated data for different time ranges
-      return {
-          last4HoursData,
-          last8HoursData,
-          last12HoursData,
-          last16HoursData,
-          last20HoursData,
-          last24HoursData
-      };
+      return last4HoursData + " " + last8HoursData + " " + last12HoursData + " " + last16HoursData + " " + last20HoursData + " " + last24HoursData;
+      
 }
 }   
     
