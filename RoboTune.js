@@ -19,6 +19,16 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var average_Glucose_target = 120;
    var target = profile.min_bg;
    var isf = profile.sens;
+
+// User-defined AUC targets for each time period in mg / dl / h (average glucose)
+
+       var target_averageGlucose_Last4Hours = 141;
+       var target_averageGlucose_Last8Hours = 127;
+       var target_averageGlucose_Last12Hours = 117; // TBD
+       var target_averageGlucose_Last16Hours = 117; // TBD
+       var target_averageGlucose_Last20Hours = 117; //TBD
+       var target_averageGlucose_Last24Hours = 117;
+       
        
 // Separate glucose and datestring elements into arrays
    glucose.forEach(element => {
