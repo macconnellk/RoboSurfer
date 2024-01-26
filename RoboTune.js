@@ -92,7 +92,7 @@ const averageGlucose_Last24Hours = calculateAverageGlucose(last24HoursData);
 
 
 // Return filtered and interpolated data for different time ranges
-      return "last4Hours: " + averageLast4Hours + "last8Hours: " + averageLast8Hours + "last12Hours: " + averageLast12Hours + "last16Hours: " + averageLast16Hours + "last20Hours: " + averageLas20Hours + "last24Hours: " + averageLast24Hours;   
+      return "last4Hours: " + averageGlucose_Last4Hours + "last8Hours: " + averageGlucose_Last8Hours + "last12Hours: " + averageGlucose_Last12Hours + "last16Hours: " + averageGlucose_Last16Hours + "last20Hours: " + averageGlucose_Last20Hours + "last24Hours: " + averageGlucose_Last24Hours;   
       
 }
 }   
