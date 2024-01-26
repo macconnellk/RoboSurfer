@@ -72,7 +72,7 @@ const last24HoursData = filterByTimeRange(24, myGlucose, myGlucoseTime);
 
        // return last4HoursData.map(data => data.glucose); // This is a command to print glucose data from the object if needed
 
-// Function to calculate average glucose
+// Function to calculate the average glucose for a given time period.
 function calculateAverageGlucose(timeperiodData) {
     if (timeperiodData.length === 0) {
         return 0;
@@ -82,23 +82,13 @@ function calculateAverageGlucose(timeperiodData) {
     return sum / timeperiodData.length;
 }
 
-// Calculate average glucose for each time range
+// Call the calculateAverageGlucose function to Calculate average glucose for each time range
 const averageGlucose_Last4Hours = calculateAverageGlucose(last4HoursData);
 const averageGlucose_Last8Hours = calculateAverageGlucose(last8HoursData);
 const averageGlucose_Last12Hours = calculateAverageGlucose(last12HoursData);
 const averageGlucose_Last16Hours = calculateAverageGlucose(last16HoursData);
 const averageGlucose_Last20Hours = calculateAverageGlucose(last20HoursData);
 const averageGlucose_Last24Hours = calculateAverageGlucose(last24HoursData);
-
-// Return the averages
-return {
-    last4Hours: averageLast4Hours,
-    last8Hours: averageLast8Hours,
-    last12Hours: averageLast12Hours,
-    last16Hours: averageLast16Hours,
-    last20Hours: averageLast20Hours,
-    last24Hours: averageLast24Hours
-};
 
 
 // Return filtered and interpolated data for different time ranges
