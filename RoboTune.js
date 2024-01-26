@@ -71,7 +71,7 @@ const last20HoursData = filterByTimeRange(20, myGlucose, myGlucoseTime);
 const last24HoursData = filterByTimeRange(24, myGlucose, myGlucoseTime);
 
 // Return filtered and interpolated data for different time ranges
-      return last4HoursData.glucose; // + " " + last8HoursData + " " + last12HoursData + " " + last16HoursData + " " + last20HoursData + " " + last24HoursData;
+      return last4HoursData.map(data => data.glucose); // + " " + last8HoursData + " " + last12HoursData + " " + last16HoursData + " " + last20HoursData + " " + last24HoursData;
       
 }
 }   
