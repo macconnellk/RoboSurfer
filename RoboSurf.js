@@ -72,7 +72,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       var Automation_1_StartTimeMinute = 0; // 8:00pm
       var Automation_1_BGThreshold_1 = 140; // BG over
       var Automation_1_BGThreshold_2 = 160; // BG over 
-      var Automation_1_BGThreshold_3 = 180; // BG over
+      var Automation_1_BGThreshold_3 = 190; // BG over
       // var Automation_1_iobThreshold_1 = .5; // 
       // var Automation_1_iobThreshold_2 = 1; //   
       var Automation_1_CarbThreshold = 0; // COB
@@ -88,12 +88,12 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
          //Automation 1 Sigmoid - Threshold 2
          var Automation_1_minimumRatio_2 = .5;
-         var Automation_1_maximumRatio_2 = 1.55;
+         var Automation_1_maximumRatio_2 = 1.65;
          var Automation_1_adjustmentFactor_2 = .75;
 
          //Automation 1 Sigmoid - Threshold 3 
          var Automation_1_minimumRatio_3 = .5;
-         var Automation_1_maximumRatio_3 = 1.75;
+         var Automation_1_maximumRatio_3 = 1.9;
          var Automation_1_adjustmentFactor_3 = 1;
        
           //Automation 1 Dynamic CR 
