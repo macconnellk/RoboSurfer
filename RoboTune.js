@@ -90,21 +90,21 @@ const averageGlucose_Last8Hours = calculateAverageGlucose(last8HoursData);
 const averageGlucose_Last24Hours = calculateAverageGlucose(last24HoursData);
 
 // Calculate percentage over target for each time period
-const percentageOverTarget_Last4Hours = ((averageGlucose_Last4Hours - target_averageGlucose_Last4Hours) / target_averageGlucose_Last4Hours) * 100;
-const percentageOverTarget_Last8Hours = ((averageGlucose_Last8Hours - target_averageGlucose_Last8Hours) / target_averageGlucose_Last8Hours) * 100;
-const percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_averageGlucose_Last24Hours) / target_averageGlucose_Last24Hours) * 100;
+//const percentageOverTarget_Last4Hours = ((averageGlucose_Last4Hours - target_averageGlucose_Last4Hours) / target_averageGlucose_Last4Hours) * 100;
+//const percentageOverTarget_Last8Hours = ((averageGlucose_Last8Hours - target_averageGlucose_Last8Hours) / target_averageGlucose_Last8Hours) * 100;
+//const percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_averageGlucose_Last24Hours) / target_averageGlucose_Last24Hours) * 100;
 
 // Calculate the trend in change to percentage over target betweeen 8 and 24 hour. The slope is the rate of change.  Positive indicates a increasing BG trend        
-const percentageChange = percentageOverTarget_Last24Hours - percentageOverTarget_Last8Hours;
-const slope = percentageChange / timeDifference;
+//const percentageChange = percentageOverTarget_Last24Hours - percentageOverTarget_Last8Hours;
+//const slope = percentageChange / timeDifference;
 
 
        
 // Return the percentage over target results
-return "Percentage Over Target - Last 4 Hours: " + round(percentageOverTarget_Last4Hours, 2) + "%" + " Percentage Over Target - Last 8 Hours: " + round(percentageOverTarget_Last8Hours, 2) + "%" + " Percentage Over Target - Last 24 Hours: " + round(percentageOverTarget_Last24Hours, 2) + "%";
+//return "Percentage Over Target - Last 4 Hours: " + round(percentageOverTarget_Last4Hours, 2) + "%" + " Percentage Over Target - Last 8 Hours: " + round(percentageOverTarget_Last8Hours, 2) + "%" + " Percentage Over Target - Last 24 Hours: " + round(percentageOverTarget_Last24Hours, 2) + "%";
        
 // Return filtered and interpolated data for different time ranges
-      //return "last4Hours: " + averageGlucose_Last4Hours + "last8Hours: " + averageGlucose_Last8Hours + "last12Hours: " + averageGlucose_Last12Hours + "last16Hours: " + averageGlucose_Last16Hours + "last20Hours: " + averageGlucose_Last20Hours + "last24Hours: " + averageGlucose_Last24Hours;   
+      return "last4Hours: " + averageGlucose_Last4Hours + "last8Hours: " + averageGlucose_Last8Hours + "last12Hours: " + averageGlucose_Last12Hours + "last16Hours: " + averageGlucose_Last16Hours + "last20Hours: " + averageGlucose_Last20Hours + "last24Hours: " + averageGlucose_Last24Hours;   
       
 }
 }   
