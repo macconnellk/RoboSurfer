@@ -95,9 +95,9 @@ const percentageOverTarget_Last8Hours = ((averageGlucose_Last8Hours - target_ave
 const percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_averageGlucose_Last24Hours) / target_averageGlucose_Last24Hours) * 100;
 
 // Calculate the trend in change to percentage over target betweeen 8 and 24 hour. The slope is the rate of change.  Positive indicates a increasing BG trend        
+const timeDifference = 16; // 24 hours - 8 hours
 const percentageChange = percentageOverTarget_Last24Hours - percentageOverTarget_Last8Hours;
 const slope = percentageChange / timeDifference;
-
 
        
 // Return the percentage over target results
