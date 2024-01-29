@@ -18,7 +18,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    
 //Turn RoboSurfer and functions on or off
   var enable_RoboSurfer = true; 
-  var enable_new_sigmoidTDDFactor = true;
+  var enable_new_sigmoidTDDFactor = false;
   var enable_Automation_1 = true; 
 
 //Only use Middleware when enable_RoboSurfer = true.
