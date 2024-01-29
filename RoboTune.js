@@ -14,8 +14,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
     if (enable_robotune) { 
 
 // Initilize function variables
-   var myGlucose = [];
-   var myGlucoseTime = []; 
+   var myGlucose = []; // create array
+   var myGlucoseTime = []; create arrary
    var average_Glucose_target = 120;
    var target = profile.min_bg;
    var isf = profile.sens;
@@ -24,20 +24,15 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
        var target_averageGlucose_Last4Hours = 141;
        var target_averageGlucose_Last8Hours = 127;
-       var target_averageGlucose_Last12Hours = 117; // TBD
-       var target_averageGlucose_Last16Hours = 117; // TBD
-       var target_averageGlucose_Last20Hours = 117; //TBD
        var target_averageGlucose_Last24Hours = 117;
-       
-       
+            
 // Separate glucose and datestring elements into arrays
    glucose.forEach(element => {
     myGlucose.push(element.glucose);
     myGlucoseTime.push(new Date(element.dateString)); // Parse datestring to date object
       });      
        
-       
-// Filter the data based on time ranges and interpolate any gaps greater than 5 minutes
+// Function to filter glucose data based on time ranges and interpolate any gaps greater than 5 minutes
 const filterByTimeRange = (timeRange, glucose, glucoseTime) => {
     const currentTime = new Date().getTime();
     const timeThreshold = currentTime - (timeRange * 60 * 60 * 1000);
@@ -72,12 +67,9 @@ const filterByTimeRange = (timeRange, glucose, glucoseTime) => {
     return filteredData;
 };
 
-// Separate the data into time ranges (last 4 hours, 8 hours, 12 hours, 16 hours, 20 hours, 24 hours)
+// Separate the data into time ranges (last 4 hours, 8 hours, 24 hours) 
 const last4HoursData = filterByTimeRange(4, myGlucose, myGlucoseTime);
 const last8HoursData = filterByTimeRange(8, myGlucose, myGlucoseTime);
-const last12HoursData = filterByTimeRange(12, myGlucose, myGlucoseTime);
-const last16HoursData = filterByTimeRange(16, myGlucose, myGlucoseTime);
-const last20HoursData = filterByTimeRange(20, myGlucose, myGlucoseTime);
 const last24HoursData = filterByTimeRange(24, myGlucose, myGlucoseTime);
 
        // return last4HoursData.map(data => data.glucose); // This is a command to print glucose data from the object if needed
@@ -95,9 +87,6 @@ function calculateAverageGlucose(timeperiodData) {
 // Call the calculateAverageGlucose function to Calculate average glucose for each time range
 const averageGlucose_Last4Hours = calculateAverageGlucose(last4HoursData);
 const averageGlucose_Last8Hours = calculateAverageGlucose(last8HoursData);
-const averageGlucose_Last12Hours = calculateAverageGlucose(last12HoursData);
-const averageGlucose_Last16Hours = calculateAverageGlucose(last16HoursData);
-const averageGlucose_Last20Hours = calculateAverageGlucose(last20HoursData);
 const averageGlucose_Last24Hours = calculateAverageGlucose(last24HoursData);
 
 
