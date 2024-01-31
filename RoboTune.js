@@ -22,61 +22,17 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
 // User-defined AUC targets for each time period in mg / dl / h (average glucose)
 
+// Define target average glucose levels for different time periods
+
        // 4 hour avergae targets
-       var 24_target_averageGlucose_Last4Hours = 114;
-       var 1_target_averageGlucose_Last4Hours = 109;
-       var 2_target_averageGlucose_Last4Hours = 100;
-       var 3_target_averageGlucose_Last4Hours = 95;
-       var 4_target_averageGlucose_Last4Hours = 95;
-       var 5_target_averageGlucose_Last4Hours = 101;
-       var 6_target_averageGlucose_Last4Hours = 104;
-       var 7_target_averageGlucose_Last4Hours = 104;
-       var 8_target_averageGlucose_Last4Hours = 104;
-       var 9_target_averageGlucose_Last4Hours = 114;
-       var 10_target_averageGlucose_Last4Hours = 122;
-       var 11_target_averageGlucose_Last4Hours = 127;
-       var 12_target_averageGlucose_Last4Hours = 127;
-       var 13_target_averageGlucose_Last4Hours = 127;
-       var 14_target_averageGlucose_Last4Hours = 127;
-       var 15_target_averageGlucose_Last4Hours = 138;
-       var 16_target_averageGlucose_Last4Hours = 149;
-       var 17_target_averageGlucose_Last4Hours = 149;
-       var 18_target_averageGlucose_Last4Hours = 149;
-       var 19_target_averageGlucose_Last4Hours = 149;
-       var 20_target_averageGlucose_Last4Hours = 149;
-       var 21_target_averageGlucose_Last4Hours = 138;
-       var 22_target_averageGlucose_Last4Hours = 136;
-       var 23_target_averageGlucose_Last4Hours = 125;
+         const targetGlucoseLast4Hours = {0: 114, 1: 109, 2: 100, 3: 95, 4: 95, 5: 101, 6: 104, 7: 104, 8: 104, 9: 114, 10: 122, 11: 127, 12: 127, 13: 127, 14: 127, 15: 138, 16: 149, 17: 149, 18: 149, 19: 149, 20: 149, 21: 138, 22: 136, 23: 125};
 
        // 8 hour avergae targets
-       var 24_target_averageGlucose_Last8Hours = 132;
-       var 1_target_averageGlucose_Last8Hours = 124;
-       var 2_target_averageGlucose_Last8Hours = 118;
-       var 3_target_averageGlucose_Last8Hours = 110;
-       var 4_target_averageGlucose_Last8Hours = 105;
-       var 5_target_averageGlucose_Last8Hours = 105;
-       var 6_target_averageGlucose_Last8Hours = 102;
-       var 7_target_averageGlucose_Last8Hours = 99;
-       var 8_target_averageGlucose_Last8Hours = 99;
-       var 9_target_averageGlucose_Last8Hours = 108;
-       var 10_target_averageGlucose_Last8Hours = 113;
-       var 11_target_averageGlucose_Last8Hours = 116;
-       var 12_target_averageGlucose_Last8Hours = 116;
-       var 13_target_averageGlucose_Last8Hours = 121;
-       var 14_target_averageGlucose_Last8Hours = 125;
-       var 15_target_averageGlucose_Last8Hours = 133;
-       var 16_target_averageGlucose_Last8Hours = 138;
-       var 17_target_averageGlucose_Last8Hours = 138;
-       var 18_target_averageGlucose_Last8Hours = 138;
-       var 19_target_averageGlucose_Last8Hours = 144;
-       var 20_target_averageGlucose_Last8Hours = 149;
-       var 21_target_averageGlucose_Last8Hours = 144;
-       var 22_target_averageGlucose_Last8Hours = 143;
-       var 23_target_averageGlucose_Last8Hours = 137;
+         const targetGlucoseLast8Hours = {0: 132, 1: 124, 2: 118, 3: 110, 4: 105, 5: 105, 6: 102, 7: 99, 8: 99, 9: 108, 10: 113, 11: 116, 12: 116, 13: 121, 14: 125, 15: 133, 16: 138, 17: 138, 18: 138, 19: 144, 20: 149, 21: 144, 22: 143, 23: 137};
 
        // 12 hour average targets
-       var target_averageGlucose_Last24Hours = 123;
-            
+         const targetAverageGlucoseLast24Hours = 123;
+         
 // Separate glucose and datestring elements into arrays
    glucose.forEach(element => {
     myGlucose.push(element.glucose);
