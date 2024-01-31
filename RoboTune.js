@@ -118,8 +118,10 @@ const slope = percentageChange / timeDifference;
 
        
 // Return the percentage over target results
-return "Percentage Over Target - Last 4 Hours: " + round(percentageOverTarget_Last4Hours, 2) + "%" + " Percentage Over Target - Last 8 Hours: " + round(percentageOverTarget_Last8Hours, 2) + "%" + " Percentage Over Target - Last 24 Hours: " + round(percentageOverTarget_Last24Hours, 2) + "%";
-       
+return "Average Glucose - Last 4 Hours: " + round(averageGlucose_Last4Hours, 2) + ", Target Average Glucose - Last 4 Hours: " + target_averageGlucose_Last4Hours + ", Percentage Over Target - Last 4 Hours: " + round(percentageOverTarget_Last4Hours, 2) + "%" + 
+"\nAverage Glucose - Last 8 Hours: " + round(averageGlucose_Last8Hours, 2) + ", Target Average Glucose - Last 8 Hours: " + target_averageGlucose_Last8Hours + ", Percentage Over Target - Last 8 Hours: " + round(percentageOverTarget_Last8Hours, 2) + "%" + 
+"\nAverage Glucose - Last 24 Hours: " + round(averageGlucose_Last24Hours, 2) + ", Target Average Glucose - Last 24 Hours: " + target_averageGlucose_Last24Hours + ", Percentage Over Target - Last 24 Hours: " + round(percentageOverTarget_Last24Hours, 2) + "%";
+     
 // Return filtered and interpolated data for different time ranges
      // return "last4Hours: " + averageGlucose_Last4Hours + "last8Hours: " + averageGlucose_Last8Hours + "last12Hours: " + averageGlucose_Last12Hours + "last16Hours: " + averageGlucose_Last16Hours + "last20Hours: " + averageGlucose_Last20Hours + "last24Hours: " + averageGlucose_Last24Hours;   
       
