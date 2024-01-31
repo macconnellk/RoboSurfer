@@ -203,7 +203,7 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
 // User-Defined function settings
   var smb_delivery_ratio_min = profile.smb_delivery_ratio;
   var smb_delivery_ratio_max = .8;
-  var smb_delivery_ratio_bg_range = 65;
+  var smb_delivery_ratio_bg_range = 75;
 
 // The SMB Delivery Ratio Scaling Function
 
