@@ -16,33 +16,38 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 // Initilize function variables
    var myGlucose = []; // create array
    var myGlucoseTime = []; // create array
-   var average_Glucose_target = 120;
    var target = profile.min_bg;
-   var isf = profile.sens;
+   var isf = profile.sens;   
 
 // User-defined AUC targets for each time period in mg / dl / h (average glucose)
 
 // Define target average glucose levels for different time periods
        // User-defined targets for 4, 8, 24 lookbacks
        // 4 hour average targets
-         const targetGlucoseLast4Hours = {0: 114, 1: 109, 2: 100, 3: 95, 4: 95, 5: 101, 6: 104, 7: 104, 8: 104, 9: 114, 10: 122, 11: 127, 12: 127, 13: 127, 14: 127, 15: 138, 16: 149, 17: 149, 18: 149, 19: 149, 20: 149, 21: 138, 22: 136, 23: 125};
+         const user_targetGlucoseLast4Hours = {0: 114, 1: 109, 2: 100, 3: 95, 4: 95, 5: 101, 6: 104, 7: 104, 8: 104, 9: 114, 10: 122, 11: 127, 12: 127, 13: 127, 14: 127, 15: 138, 16: 149, 17: 149, 18: 149, 19: 149, 20: 149, 21: 138, 22: 136, 23: 125};
 
        // 8 hour avergae targets
-         const targetGlucoseLast8Hours = {0: 132, 1: 124, 2: 118, 3: 110, 4: 105, 5: 105, 6: 102, 7: 99, 8: 99, 9: 108, 10: 113, 11: 116, 12: 116, 13: 121, 14: 125, 15: 133, 16: 138, 17: 138, 18: 138, 19: 144, 20: 149, 21: 144, 22: 143, 23: 137};
+         const user_targetGlucoseLast8Hours = {0: 132, 1: 124, 2: 118, 3: 110, 4: 105, 5: 105, 6: 102, 7: 99, 8: 99, 9: 108, 10: 113, 11: 116, 12: 116, 13: 121, 14: 125, 15: 133, 16: 138, 17: 138, 18: 138, 19: 144, 20: 149, 21: 144, 22: 143, 23: 137};
 
        // 12 hour average target
-         const targetAverageGlucoseLast24Hours = 123;
+         const user_targetAverageGlucoseLast24Hours = 123;
 
        // Initialize the target variables based on current hour
        // Get the current hour
          const currentHour = new Date().getHours();
 
       // Select the target thresholds
-         var target_averageGlucose_Last4Hours = targetGlucoseLast4Hours[currentHour];
-         var target_averageGlucose_Last8Hours = targetGlucoseLast8Hours[currentHour];
-         var target_averageGlucose_Last24Hours = targetAverageGlucoseLast24Hours;
+         var target_averageGlucose_Last4Hours = user_targetGlucoseLast4Hours[currentHour];
+         var target_averageGlucose_Last8Hours = user_targetGlucoseLast8Hours[currentHour];
+         var target_averageGlucose_Last24Hours = user_targetAverageGlucoseLast24Hours;
 
-// Select current average glucose values for recent 4,8,24 hour periods 
+     //  Initialize basal sigmoid function variables
+         var robosens_minimumRatio = .7;
+         var robosens_maximumRatio = 1.2;
+         var robosens_adjustmentFactor = .5;
+         var robosens_target = target_averageGlucose_Last4Hours;
+
+// Determine current glucose values for recent 4,8,24 hour periods 
    // Separate glucose and datestring elements into arrays
       glucose.forEach(element => {
        myGlucose.push(element.glucose);
@@ -117,10 +122,30 @@ const percentageChange = percentageOverTarget_Last24Hours - percentageOverTarget
 const slope = percentageChange / timeDifference;
 
 //Create the Sigmoid Factor
-       
+// DYNAMIC BASAL SIGMOID
+   
+// Dynamic Basal Sigmoid Function         
 
-
+      var ratioInterval = maximumRatio - minimumRatio;
+      var max_minus_one = maximumRatio - 1;
+      var deviation = (myGlucose - target) * 0.0555; 
        
+     //Makes sigmoid factor(y) = 1 when BG deviation(x) = 0.
+     var fix_offset = (Math.log10(1/max_minus_one-minimumRatio/max_minus_one) / Math.log10(Math.E));
+       
+     //Exponent used in sigmoid formula
+     var exponent = deviation * adjustmentFactor + fix_offset;
+    
+     // The sigmoid function
+     var sigmoidFactor = ratioInterval / (1 + Math.exp(-exponent)) + minimumRatio;
+
+     //Respect min/max ratios
+     sigmoidFactor = Math.max(Math.min(maximumRatio, sigmoidFactor), sigmoidFactor, minimumRatio);
+
+     
+                      
+  return "Sigmoid factor set to: " + round(autosens.ratio, 2) + ". Sens Protect is " + log_protectionmechanism + ". ISF set from: " + round(isf, 2) + " to " + profile.sens + " TDD:" + round(past2hoursAverage, 2) + " Two-week TDD:" + round(average_total_data, 2) + " Weighted Average:" + round(weightedAverage, 2);
+                
        
 // Return the percentage over target results
 return "Average Glucose - Last 4 Hours: " + round(averageGlucose_Last4Hours, 2) + " Target Average Glucose - Last 4 Hours: " + target_averageGlucose_Last4Hours + " Percentage Over Target - Last 4 Hours: " + round(percentageOverTarget_Last4Hours, 2) + "%" + 
