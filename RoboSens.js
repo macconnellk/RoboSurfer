@@ -14,7 +14,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
     if (enable_robosens) { 
 
 // Initilize function variables
-   var myGlucose = 
+   var myGlucose = glucose[0].glucose; 
    var my24hrGlucose = []; // create array
    var my24hrGlucoseTime = []; // create array
    var target = profile.min_bg;
@@ -46,6 +46,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var robosens_minimumRatio = .7;
          var robosens_maximumRatio = 1.2;
          var robosens_adjustmentFactor = .5;
+         var robosens_sens_protect = "Off";
          
 // Determine current glucose values for recent 4,8,24 hour periods 
    // Separate glucose and datestring elements into arrays
@@ -124,10 +125,10 @@ const slope = percentageChange / timeDifference;
 //Create the Sigmoid Factor
 // DYNAMIC BASAL SIGMOID Function
 
-// Sensitivity Protection Mechanism: If 4hr average glucose > target but current BG is under target, no adjustment to basal.
-   if (averageGlucose_Last4Hours > target_averageGlucose_Last4Hours && ) {
-      weightedAverage = past2hoursAverage;
-      var log_protectionmechanism = "On";
+// RoboSens Sensitivity Protection Mechanism: If 4hr average glucose > target but current BG is under target, no adjustment to basal.
+   if (averageGlucose_Last4Hours > target_averageGlucose_Last4Hours && myGlucose <= target_averageGlucose_Last4Hours ) {
+      robosens_sigmoidFactor = 1;
+      var robosens_sens_protect = "On";
    }
        
       var robosens_ratioInterval = robosens_maximumRatio - robosens_minimumRatio;
