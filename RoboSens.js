@@ -6,12 +6,12 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
         return Math.round(value * scale) / scale; 
     }   
 
-// ROBOTUNE
+// ROBOSENS
 //Turn on or off
-  var enable_robotune = true;
+  var enable_robosens = true;
 
-//Only use when enable_robotune = true.
-    if (enable_robotune) { 
+//Only use when enable_robosens = true.
+    if (enable_robosens) { 
 
 // Initilize function variables
    var myGlucose = []; // create array
@@ -116,6 +116,11 @@ const timeDifference = 16; // 24 hours - 8 hours
 const percentageChange = percentageOverTarget_Last24Hours - percentageOverTarget_Last8Hours;
 const slope = percentageChange / timeDifference;
 
+//Create the Sigmoid Factor
+       
+
+
+       
        
 // Return the percentage over target results
 return "Average Glucose - Last 4 Hours: " + round(averageGlucose_Last4Hours, 2) + " Target Average Glucose - Last 4 Hours: " + target_averageGlucose_Last4Hours + " Percentage Over Target - Last 4 Hours: " + round(percentageOverTarget_Last4Hours, 2) + "%" + 
