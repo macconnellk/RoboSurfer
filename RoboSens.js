@@ -133,7 +133,14 @@ const slope = percentageChange / timeDifference;
        
       var robosens_ratioInterval = robosens_maximumRatio - robosens_minimumRatio;
       var robosens_max_minus_one = robosens_maximumRatio - 1;
-      var robosens_deviation = (averageGlucose_Last4Hours - target_averageGlucose_Last4Hours) * 0.0555; 
+      var robosens_deviation = (averageGlucose_Last4Hours - target_averageGlucose_Last4Hours) * 0.0555;
+      
+      //  Increase the sigmoid AF if the 8hr Percent Over Target is high
+      // Increase by .1 per each additional 10%
+      if (percentageOverTarget_Last8Hours > 0 ) {
+         var robosens_AF_adjustment = (percentageOverTarget_Last8Hours / 100);   
+         robosens_adjustmentFactor = robosens_adjustmentFactor + robosens_AF_adjustment;
+         }
        
      //Makes sigmoid factor(y) = 1 when BG deviation(x) = 0.
      var robosens_fix_offset = (Math.log10(1/robosens_max_minus_one - robosens_minimumRatio / robosens_max_minus_one) / Math.log10(Math.E));
@@ -151,7 +158,7 @@ const slope = percentageChange / timeDifference;
 // Return the percentage over target results
 return "Last 4 Hours- Avg:" + round(averageGlucose_Last4Hours, 2) + " Target: " + target_averageGlucose_Last4Hours + " %Over: " + round(percentageOverTarget_Last4Hours, 2) + "%" + 
 " Last 8 Hours- Avg: " + round(averageGlucose_Last8Hours, 2) + " Target: " + target_averageGlucose_Last8Hours + " %Over: " + round(percentageOverTarget_Last8Hours, 2) + "%" + 
-" Last 24 Hours- Avg:" + round(averageGlucose_Last24Hours, 2) + " Target: " + target_averageGlucose_Last24Hours + " %Over: " + round(percentageOverTarget_Last24Hours, 2) + "% 8/24 Slope: " + round(slope, 2) + " BasalRatio: " + round(robosens_sigmoidFactor, 2) + " Basal Sens Protection: " + robosens_sens_protect;
+" Last 24 Hours- Avg:" + round(averageGlucose_Last24Hours, 2) + " Target: " + target_averageGlucose_Last24Hours + " %Over: " + round(percentageOverTarget_Last24Hours, 2) + "% 8/24 Slope: " + round(slope, 2) + " BasalRatio: " + round(robosens_sigmoidFactor, 2) + " Basal Sens Protection: " + robosens_sens_protect + "rs_AF: " + robosens_adjustmentFactor;
      
 // Return filtered and interpolated data for different time ranges
      // return "last4Hours: " + averageGlucose_Last4Hours + "last8Hours: " + averageGlucose_Last8Hours + "last12Hours: " + averageGlucose_Last12Hours + "last16Hours: " + averageGlucose_Last16Hours + "last20Hours: " + averageGlucose_Last20Hours + "last24Hours: " + averageGlucose_Last24Hours;   
