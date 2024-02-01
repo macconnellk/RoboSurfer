@@ -125,9 +125,9 @@ const slope = percentageChange / timeDifference;
 //Create the Sigmoid Factor
 // DYNAMIC BASAL SIGMOID Function
 
-// RoboSens Sensitivity Protection Mechanism: If 4hr average glucose > target but current BG is under target, no adjustment to basal.
+// RoboSens Sensitivity Protection Mechanism: If 4hr average glucose > 4hr target but current BG is under 4hr target, no adjustment to basal.
    if (averageGlucose_Last4Hours > target_averageGlucose_Last4Hours && myGlucose <= target_averageGlucose_Last4Hours ) {
-      robosens_sigmoidFactor = 1;
+      var robosens_sigmoidFactor = 1;
       var robosens_sens_protect = "On";
    } else {
        
@@ -135,13 +135,20 @@ const slope = percentageChange / timeDifference;
       var robosens_max_minus_one = robosens_maximumRatio - 1;
       var robosens_deviation = (averageGlucose_Last4Hours - target_averageGlucose_Last4Hours) * 0.0555;
       
-      //  Increase the sigmoid AF if the 8hr Percent Over Target is high
+      //  Increase the basal sigmoid AF if the 8hr Percent Over Target is high
       // Increase by .1 per each additional 10%
       if (percentageOverTarget_Last8Hours > 0 ) {
-         var robosens_AF_adjustment = (percentageOverTarget_Last8Hours / 100);   
+         var robosens_AF_adjustment = percentageOverTarget_Last8Hours / 100;   
          robosens_adjustmentFactor = robosens_adjustmentFactor + robosens_AF_adjustment;
          }
-       
+
+      //  Increase the basal sigmoid robosens max if the 24hr Percent Over Target is high
+      // Increase by .05 per each additional 10%
+      if (percentageOverTarget_Last24Hours > 0 ) {
+         var robosens_MAX_adjustment = (percentageOverTarget_Last24Hours / 100) / 2;   
+         robosens_maximumRatio = robosens_maximumRatio + robosens_MAX_adjustment;
+         }
+      
      //Makes sigmoid factor(y) = 1 when BG deviation(x) = 0.
      var robosens_fix_offset = (Math.log10(1/robosens_max_minus_one - robosens_minimumRatio / robosens_max_minus_one) / Math.log10(Math.E));
        
