@@ -45,8 +45,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var robosens_minimumRatio = .7;
          var robosens_maximumRatio = 1.2;
          var robosens_adjustmentFactor = .5;
-         var robosens_target = target_averageGlucose_Last4Hours;
-
+         
 // Determine current glucose values for recent 4,8,24 hour periods 
    // Separate glucose and datestring elements into arrays
       glucose.forEach(element => {
@@ -122,27 +121,24 @@ const percentageChange = percentageOverTarget_Last24Hours - percentageOverTarget
 const slope = percentageChange / timeDifference;
 
 //Create the Sigmoid Factor
-// DYNAMIC BASAL SIGMOID
-   
-// Dynamic Basal Sigmoid Function         
+// DYNAMIC BASAL SIGMOID Function
 
-      var ratioInterval = maximumRatio - minimumRatio;
-      var max_minus_one = maximumRatio - 1;
-      var deviation = (myGlucose - target) * 0.0555; 
+      var robosens_ratioInterval = robosens_maximumRatio - robosens_minimumRatio;
+      var robosens_max_minus_one = robosens_maximumRatio - 1;
+      var robosens_deviation = (averageGlucose_Last4Hours - target_averageGlucose_Last4Hours) * 0.0555; 
        
      //Makes sigmoid factor(y) = 1 when BG deviation(x) = 0.
-     var fix_offset = (Math.log10(1/max_minus_one-minimumRatio/max_minus_one) / Math.log10(Math.E));
+     var robosens_fix_offset = (Math.log10(1/robosens_max_minus_one - robosens_minimumRatio / robosens_max_minus_one) / Math.log10(Math.E));
        
      //Exponent used in sigmoid formula
-     var exponent = deviation * adjustmentFactor + fix_offset;
+     var robosens_exponent = robosens_deviation * robosens_adjustmentFactor + robosens_fix_offset;
     
      // The sigmoid function
-     var sigmoidFactor = ratioInterval / (1 + Math.exp(-exponent)) + minimumRatio;
+     var robosens_sigmoidFactor = robosens_ratioInterval / (1 + Math.exp(-robosens_exponent)) + robosens_minimumRatio;
 
      //Respect min/max ratios
-     sigmoidFactor = Math.max(Math.min(maximumRatio, sigmoidFactor), sigmoidFactor, minimumRatio);
+     robosens_sigmoidFactor = Math.max(Math.min(robosens_maximumRatio, robosens_sigmoidFactor), robosens_sigmoidFactor, robosens_minimumRatio);
 
-     
                       
   return "Sigmoid factor set to: " + round(autosens.ratio, 2) + ". Sens Protect is " + log_protectionmechanism + ". ISF set from: " + round(isf, 2) + " to " + profile.sens + " TDD:" + round(past2hoursAverage, 2) + " Two-week TDD:" + round(average_total_data, 2) + " Weighted Average:" + round(weightedAverage, 2);
                 
