@@ -14,8 +14,9 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
     if (enable_robosens) { 
 
 // Initilize function variables
-   var myGlucose = []; // create array
-   var myGlucoseTime = []; // create array
+   var myGlucose = 
+   var my24hrGlucose = []; // create array
+   var my24hrGlucoseTime = []; // create array
    var target = profile.min_bg;
    var isf = profile.sens;   
 
@@ -49,8 +50,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 // Determine current glucose values for recent 4,8,24 hour periods 
    // Separate glucose and datestring elements into arrays
       glucose.forEach(element => {
-       myGlucose.push(element.glucose);
-       myGlucoseTime.push(new Date(element.dateString)); // Parse datestring to date object
+       my24hrGlucose.push(element.glucose);
+       my24hrGlucoseTime.push(new Date(element.dateString)); // Parse datestring to date object
          });      
        
    // Function to filter glucose data based on time ranges and interpolate any gaps greater than 5 minutes
@@ -89,9 +90,9 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    };
 
    // Separate the data into time ranges (last 4 hours, 8 hours, 24 hours) 
-   const last4HoursData = filterByTimeRange(4, myGlucose, myGlucoseTime);
-   const last8HoursData = filterByTimeRange(8, myGlucose, myGlucoseTime);
-   const last24HoursData = filterByTimeRange(24, myGlucose, myGlucoseTime);
+   const last4HoursData = filterByTimeRange(4, my24hrGlucose, my24hrGlucoseTime);
+   const last8HoursData = filterByTimeRange(8, my24hrGlucose, my24hrGlucoseTime);
+   const last24HoursData = filterByTimeRange(24, my24hrGlucose, my24hrGlucoseTime);
 
        // return last4HoursData.map(data => data.glucose); // This is a command to print glucose data from the object if needed
 
@@ -123,6 +124,12 @@ const slope = percentageChange / timeDifference;
 //Create the Sigmoid Factor
 // DYNAMIC BASAL SIGMOID Function
 
+// Sensitivity Protection Mechanism: If 4hr average glucose > target but current BG is under target, no adjustment to basal.
+   if (averageGlucose_Last4Hours > target_averageGlucose_Last4Hours && ) {
+      weightedAverage = past2hoursAverage;
+      var log_protectionmechanism = "On";
+   }
+       
       var robosens_ratioInterval = robosens_maximumRatio - robosens_minimumRatio;
       var robosens_max_minus_one = robosens_maximumRatio - 1;
       var robosens_deviation = (averageGlucose_Last4Hours - target_averageGlucose_Last4Hours) * 0.0555; 
