@@ -161,6 +161,10 @@ const slope = percentageChange / timeDifference;
      //Respect min/max ratios
      robosens_sigmoidFactor = Math.max(Math.min(robosens_maximumRatio, robosens_sigmoidFactor), robosens_sigmoidFactor, robosens_minimumRatio);
    }
+
+ // Basal Adjustment
+   basal = profile.current_basal * robosens_sigmoidFactor;
+   basal = round_basal(basal, profile);
                             
 // Return the percentage over target results
 return "Last 4 Hours- Avg:" + round(averageGlucose_Last4Hours, 2) + " Target: " + target_averageGlucose_Last4Hours + " %Over: " + round(percentageOverTarget_Last4Hours, 2) + "%" + 
