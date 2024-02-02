@@ -1,10 +1,27 @@
 function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoir, clock, pumphistory, preferences, basal_profile, oref2_variables) {
 
-   function round(value, digits) {
-        if (! digits) { digits = 0; }
-        var scale = Math.pow(10, digits);
-        return Math.round(value * scale) / scale; 
-    }   
+   // Define various functions used later on, in the main function
+         // Round Basal
+         function round_basal(basal) {
+             var lowest_rate_scale = 20;
+             var rounded_basal = basal;
+             if (basal < 1) {
+                 rounded_basal = Math.round(basal * lowest_rate_scale) / lowest_rate_scale;
+             }
+             else if (basal < 10) {
+                 rounded_basal = Math.round(basal * 20) / 20; 
+             }
+             else {
+                 rounded_basal = Math.round(basal * 10) / 10; 
+             }
+               return rounded_basal;
+         }
+   
+         function round(value, digits) {
+              if (! digits) { digits = 0; }
+              var scale = Math.pow(10, digits);
+              return Math.round(value * scale) / scale; 
+          }   
 
 // RoboSurfer is my own compilation of other individual Middleware capabilites.  RoboSurfer currently includes:
 // 1) Sigmoid with optional Adjustable TDD Response
