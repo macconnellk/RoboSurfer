@@ -67,7 +67,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var robosens_minimumRatio = .7;
          var robosens_maximumRatio = 1.2;
          var robosens_adjustmentFactor = .5;
+         var robosens_sigmoidFactor = 1;
          var robosens_sens_protect = "Off";
+         var robosens_AF_adjustment = 0;
+         var robosens_MAX_adjustment = 0;
          
 // Determine current glucose values for recent 4,8,24 hour periods 
    // Separate glucose and datestring elements into arrays
@@ -159,14 +162,14 @@ const slope = percentageChange / timeDifference;
       //  Increase the basal sigmoid AF if the 8hr Percent Over Target is high
       // Increase by .1 per each additional 10%
       if (percentageOverTarget_Last8Hours > 0 ) {
-         var robosens_AF_adjustment = percentageOverTarget_Last8Hours / 100;   
+         robosens_AF_adjustment = percentageOverTarget_Last8Hours / 100;   
          robosens_adjustmentFactor = robosens_adjustmentFactor + robosens_AF_adjustment;
          }
 
       //  Increase the basal sigmoid robosens max if the 24hr Percent Over Target is high and 8hr > 24hr (rising resistance)
       // Increase by .05 per each additional 10%
       if (percentageOverTarget_Last24Hours > 0 && percentageOverTarget_Last8Hours > percentageOverTarget_Last24Hours) {
-         var robosens_MAX_adjustment = (percentageOverTarget_Last24Hours / 100) / .1 *.05;   
+         robosens_MAX_adjustment = (percentageOverTarget_Last24Hours / 100) / .1 *.05;   
          robosens_maximumRatio = robosens_maximumRatio + robosens_MAX_adjustment;
          }
       
@@ -177,7 +180,7 @@ const slope = percentageChange / timeDifference;
      var robosens_exponent = robosens_deviation * robosens_adjustmentFactor + robosens_fix_offset;
     
      // The sigmoid function
-     var robosens_sigmoidFactor = robosens_ratioInterval / (1 + Math.exp(-robosens_exponent)) + robosens_minimumRatio;
+     robosens_sigmoidFactor = robosens_ratioInterval / (1 + Math.exp(-robosens_exponent)) + robosens_minimumRatio;
 
      //Respect min/max ratios
      robosens_sigmoidFactor = Math.max(Math.min(robosens_maximumRatio, robosens_sigmoidFactor), robosens_sigmoidFactor, robosens_minimumRatio);
@@ -189,9 +192,9 @@ const slope = percentageChange / timeDifference;
    profile.current_basal = new_basal;    
                             
 // Return the percentage over target results
-return "ROBOSENS: 4 Hours: Trg/Avg/%Over:" + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 2) + "/" + round(percentageOverTarget_Last4Hours, 2) + "%" + 
-" 8 Hours: Trg/Avg/%Over:" + target_averageGlucose_Last8Hours + "/" + round(averageGlucose_Last8Hours, 2) + "/" + round(percentageOverTarget_Last8Hours, 2) + "%" + 
-" 24 Hours: Trg/Avg/%Over:" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 2) + "/" + round(percentageOverTarget_Last24Hours, 2) + "%" + " RoboSens Ratio: " + round(robosens_sigmoidFactor, 2) + "Profile Basal: " + old_basal + " RoboSens Basal: " + profile.current_basal + " RoboSens Protection: " + robosens_sens_protect + " RoboSens AF Adj/Factor: " + robosens_AF_adjustment + "/" + robosens_adjustmentFactor + " RoboSens Max Adj/Max: " + robosens_MAX_adjustment + "/" + robosens_maximumRatio;
+return "ROBOSENS: Trgt/Avg/%Over: 4 Hours: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 2) + "/" + round(percentageOverTarget_Last4Hours, 2) + "%" + 
+" 8 Hours:" + target_averageGlucose_Last8Hours + "/" + round(averageGlucose_Last8Hours, 2) + "/" + round(percentageOverTarget_Last8Hours, 2) + "%" + 
+" 24 Hours:" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 2) + "/" + round(percentageOverTarget_Last24Hours, 2) + "%" + " RoboSens Ratio: " + round(robosens_sigmoidFactor, 2) + "Profile Basal: " + old_basal + " RoboSens Basal: " + profile.current_basal + " RoboSens Protection: " + robosens_sens_protect + " RoboSens AF Adj/Factor: " + robosens_AF_adjustment + "/" + robosens_adjustmentFactor + " RoboSens Max Adj/Max: " + robosens_MAX_adjustment + "/" + robosens_maximumRatio;
      
 // Return filtered and interpolated data for different time ranges
      // return "last4Hours: " + averageGlucose_Last4Hours + "last8Hours: " + averageGlucose_Last8Hours + "last12Hours: " + averageGlucose_Last12Hours + "last16Hours: " + averageGlucose_Last16Hours + "last20Hours: " + averageGlucose_Last20Hours + "last24Hours: " + averageGlucose_Last24Hours;   
