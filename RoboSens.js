@@ -142,10 +142,10 @@ const slope = percentageChange / timeDifference;
          robosens_adjustmentFactor = robosens_adjustmentFactor + robosens_AF_adjustment;
          }
 
-      //  Increase the basal sigmoid robosens max if the 24hr Percent Over Target is high
+      //  Increase the basal sigmoid robosens max if the 24hr Percent Over Target is high and 8hr > 24hr (rising resistance)
       // Increase by .05 per each additional 10%
-      if (percentageOverTarget_Last24Hours > 0 ) {
-         var robosens_MAX_adjustment = (percentageOverTarget_Last24Hours / 100) / 2;   
+      if (percentageOverTarget_Last24Hours > 0 && percentageOverTarget_Last8Hours > percentageOverTarget_Last24Hours) {
+         var robosens_MAX_adjustment = (percentageOverTarget_Last24Hours / 100) / .1 *.05;   
          robosens_maximumRatio = robosens_maximumRatio + robosens_MAX_adjustment;
          }
       
