@@ -360,7 +360,7 @@ if (enable_Automation_1) {
    //Set profile to new value
   profile.min_5m_carbimpact = round(min_5m_carbimpact,2);
 
-//******************* Set the New Settings *****************************     
+//******************* Set the ISF New Settings *****************************     
     
    // Sets the new ISF 
      new_isf = round(isf / new_autosens_ratio,0);
@@ -377,10 +377,10 @@ if (enable_Automation_1) {
     // Sets the autosens ratio to 1 for use by native Sigmoid, prevents any further adjustment to ISF
      autosens.ratio = 1;   
 
-// **************** ROBOSURFER ENHANCEMENT #5: RoboSens ****************
+// **************** ROBOSURFER ENHANCEMENT #5: ROBOSENS ****************
 
 //Only use when enable_robosens = true.
-    if (enable_robosens) { 
+ if (enable_robosens) { 
          
 // Determine current glucose values for recent 4,8,24 hour periods 
    // Separate glucose and datestring elements into arrays
@@ -442,14 +442,14 @@ if (enable_Automation_1) {
    }
 
    // Call the calculateAverageGlucose function to Calculate average glucose for each time range
-   const averageGlucose_Last4Hours = calculateAverageGlucose(last4HoursData);
-   const averageGlucose_Last8Hours = calculateAverageGlucose(last8HoursData);
-   const averageGlucose_Last24Hours = calculateAverageGlucose(last24HoursData);
+   var averageGlucose_Last4Hours = calculateAverageGlucose(last4HoursData);
+   var averageGlucose_Last8Hours = calculateAverageGlucose(last8HoursData);
+   var averageGlucose_Last24Hours = calculateAverageGlucose(last24HoursData);
 
 // Calculate percentage over target for each time period
-const percentageOverTarget_Last4Hours = ((averageGlucose_Last4Hours - target_averageGlucose_Last4Hours) / target_averageGlucose_Last4Hours) * 100;
-const percentageOverTarget_Last8Hours = ((averageGlucose_Last8Hours - target_averageGlucose_Last8Hours) / target_averageGlucose_Last8Hours) * 100;
-const percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_averageGlucose_Last24Hours) / target_averageGlucose_Last24Hours) * 100;
+var percentageOverTarget_Last4Hours = ((averageGlucose_Last4Hours - target_averageGlucose_Last4Hours) / target_averageGlucose_Last4Hours) * 100;
+var percentageOverTarget_Last8Hours = ((averageGlucose_Last8Hours - target_averageGlucose_Last8Hours) / target_averageGlucose_Last8Hours) * 100;
+var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_averageGlucose_Last24Hours) / target_averageGlucose_Last24Hours) * 100;
 
 //Create the Sigmoid Factor
 // DYNAMIC BASAL SIGMOID Function
@@ -498,8 +498,8 @@ const percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_a
                             
 // Return the percentage over target results
 //return "ROBOSENS: Trgt/Avg/%Over: 4 Hours: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
-" 8 Hours:" + target_averageGlucose_Last8Hours + "/" + round(averageGlucose_Last8Hours, 0) + "/" + round(percentageOverTarget_Last8Hours, 0) + "%" + 
-" 24 Hours:" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RoboSens Ratio: " + round(robosens_sigmoidFactor, 2) + "Profile Basal: " + old_basal + " RoboSens Basal: " + profile.current_basal + " RoboSens Protection: " + robosens_sens_protect + " RoboSens AF Adj/Factor: " + robosens_AF_adjustment + "/" + robosens_adjustmentFactor + " RoboSens Max Adj/Max: " + robosens_MAX_adjustment + "/" + robosens_maximumRatio;
+//" 8 Hours:" + target_averageGlucose_Last8Hours + "/" + round(averageGlucose_Last8Hours, 0) + "/" + round(percentageOverTarget_Last8Hours, 0) + "%" + 
+//" 24 Hours:" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RoboSens Ratio: " + round(robosens_sigmoidFactor, 2) + "Profile Basal: " + old_basal + " RoboSens Basal: " + profile.current_basal + " RoboSens Protection: " + robosens_sens_protect + " RoboSens AF Adj/Factor: " + robosens_AF_adjustment + "/" + robosens_adjustmentFactor + " RoboSens Max Adj/Max: " + robosens_MAX_adjustment + "/" + robosens_maximumRatio;
      
 
 }
