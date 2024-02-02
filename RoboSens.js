@@ -6,11 +6,14 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
        var lowest_rate_scale = 20;
        var rounded_basal = basal;
        if (basal < 1) {
-           rounded_basal = Math.round(basal * lowest_rate_scale) / lowest_rate_scale;}
+           rounded_basal = Math.round(basal * lowest_rate_scale) / lowest_rate_scale;
+       }
        else if (basal < 10) {
-           rounded_basal = Math.round(basal * 20) / 20; }
+           rounded_basal = Math.round(basal * 20) / 20; 
+       }
        else {
-           rounded_basal = Math.round(basal * 10) / 10; }
+           rounded_basal = Math.round(basal * 10) / 10; 
+       }
          return rounded_basal;
    }
 
