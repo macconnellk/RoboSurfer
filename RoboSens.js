@@ -1,5 +1,8 @@
 function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoir, clock, pumphistory, preferences, basal_profile, oref2_variables) {
 
+   // Define various functions used later on, in the main function
+   var round_basal = require('../round-basal');
+   
    function round(value, digits) {
         if (! digits) { digits = 0; }
         var scale = Math.pow(10, digits);
@@ -18,7 +21,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var my24hrGlucose = []; // create array
    var my24hrGlucoseTime = []; // create array
    var target = profile.min_bg;
-   var isf = profile.sens;   
+   var isf = profile.sens;
+   var old_basal = profile.current_basal;
+   var new_basal = profile.current_basal;    
+       
 
 // User-defined AUC targets for each time period in mg / dl / h (average glucose)
 
@@ -163,13 +169,14 @@ const slope = percentageChange / timeDifference;
    }
 
  // Basal Adjustment
-   basal = profile.current_basal * robosens_sigmoidFactor;
-   basal = round_basal(basal, profile);
+   new_basal = profile.current_basal * robosens_sigmoidFactor;
+   new_ basal = round_basal(basal, profile);
+   profile.current_basal = new_basal;    
                             
 // Return the percentage over target results
-return "Last 4 Hours- Avg:" + round(averageGlucose_Last4Hours, 2) + " Target: " + target_averageGlucose_Last4Hours + " %Over: " + round(percentageOverTarget_Last4Hours, 2) + "%" + 
-" Last 8 Hours- Avg: " + round(averageGlucose_Last8Hours, 2) + " Target: " + target_averageGlucose_Last8Hours + " %Over: " + round(percentageOverTarget_Last8Hours, 2) + "%" + 
-" Last 24 Hours- Avg:" + round(averageGlucose_Last24Hours, 2) + " Target: " + target_averageGlucose_Last24Hours + " %Over: " + round(percentageOverTarget_Last24Hours, 2) + "% 8/24 Slope: " + round(slope, 2) + " BasalRatio: " + round(robosens_sigmoidFactor, 2) + " Basal Sens Protection: " + robosens_sens_protect + " Rob_AF: " + robosens_adjustmentFactor + " Rob_Max: " + robosens_maximumRatio;
+return "ROBOSENS: 4 Hours: Trg/Avg/%Over:" + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 2) + "/" + " %Over: " + round(percentageOverTarget_Last4Hours, 2) + "%" + 
+8 Hours: Trg/Avg/%Over:" + target_averageGlucose_Last8Hours + "/" + round(averageGlucose_Last8Hours, 2) + "/" + " %Over: " + round(percentageOverTarget_Last8Hours, 2) + "%" + 
+24 Hours: Trg/Avg/%Over:" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 2) + "/" + " %Over: " + round(percentageOverTarget_Last24Hours, 2) + "%" + " RoboSens Ratio: " + round(robosens_sigmoidFactor, 2) + "Profile Basal: " + old_basal + "RoboSens Basal: " + profile.current_basal + " Basal Sens Protection: " + robosens_sens_protect + " RoboSens AF Adj/Factor: " + robosens_AF_adjustment + "/" + robosens_adjustmentFactor + " RoboSens Max Adj/Max: " + robosens_MAX_adjustment + "/" + robosens_maximumRatio;
      
 // Return filtered and interpolated data for different time ranges
      // return "last4Hours: " + averageGlucose_Last4Hours + "last8Hours: " + averageGlucose_Last8Hours + "last12Hours: " + averageGlucose_Last12Hours + "last16Hours: " + averageGlucose_Last16Hours + "last20Hours: " + averageGlucose_Last20Hours + "last24Hours: " + averageGlucose_Last24Hours;   
