@@ -68,8 +68,13 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
 //  Initialize Automation #1 function variables
       // Automation #1 Thresholds
-      var Automation_1_StartTimeHour = 20; // 8pm
-      var Automation_1_StartTimeMinute = 0; // 8:00pm
+      // Define the start time and end time
+      const start_time = new Date(now);
+      start_time.setHours(20, 0, 0); // Assuming the start time is 8:00 PM
+
+      const end_time = new Date(now);
+      end_time.setHours(3, 0, 0); // Assuming the end time is 3:00 AM
+       
       var Automation_1_BGThreshold_1 = 140; // BG over
       var Automation_1_BGThreshold_2 = 160; // BG over 
       var Automation_1_BGThreshold_3 = 190; // BG over
@@ -110,7 +115,6 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
       // Automation_1 Initialized Function Variables    
       var Automation_Status = "Off";
-      const Automation_1_Start_Time = new Date(now.getFullYear(), now.getMonth(), now.getDate(), Automation_1_StartTimeHour, Automation_1_StartTimeMinute, 0); 
       var Automation_1_isf_output = isf;
       var Automation_1_cr_output = cr;
       var Automation_1_csf_output = csf;
@@ -224,10 +228,12 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
 // **************** ROBOSURFER ENHANCEMENT #3: AUTOMATION #1: "NIGHTBOOST ****************
 //Only use when enable_Automation_1 = true
 if (enable_Automation_1) { 
-   
-          if (now >= Automation_1_Start_Time && 
-          myGlucose > Automation_1_BGThreshold_1 &&
-          cob >= Automation_1_CarbThreshold) {
+
+            // Check if the current time is within the specified range, greater than BG threshold and COB threshold
+          if (((now >= start_time && now <= end_time) || (now <= start_time && now <= end_time && start_time > end_time) ||
+             (now >= start_time && now >= end_time && start_time > end_time))
+             && myGlucose > Automation_1_BGThreshold_1 && cob >= Automation_1_CarbThreshold) 
+          {
 
             new_max_COB = Automation_1_COB_Max; 
             min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; //
