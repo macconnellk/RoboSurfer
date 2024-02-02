@@ -165,7 +165,7 @@ const slope = percentageChange / timeDifference;
 // Return the percentage over target results
 return "Last 4 Hours- Avg:" + round(averageGlucose_Last4Hours, 2) + " Target: " + target_averageGlucose_Last4Hours + " %Over: " + round(percentageOverTarget_Last4Hours, 2) + "%" + 
 " Last 8 Hours- Avg: " + round(averageGlucose_Last8Hours, 2) + " Target: " + target_averageGlucose_Last8Hours + " %Over: " + round(percentageOverTarget_Last8Hours, 2) + "%" + 
-" Last 24 Hours- Avg:" + round(averageGlucose_Last24Hours, 2) + " Target: " + target_averageGlucose_Last24Hours + " %Over: " + round(percentageOverTarget_Last24Hours, 2) + "% 8/24 Slope: " + round(slope, 2) + " BasalRatio: " + round(robosens_sigmoidFactor, 2) + " Basal Sens Protection: " + robosens_sens_protect + "rs_AF: " + robosens_adjustmentFactor;
+" Last 24 Hours- Avg:" + round(averageGlucose_Last24Hours, 2) + " Target: " + target_averageGlucose_Last24Hours + " %Over: " + round(percentageOverTarget_Last24Hours, 2) + "% 8/24 Slope: " + round(slope, 2) + " BasalRatio: " + round(robosens_sigmoidFactor, 2) + " Basal Sens Protection: " + robosens_sens_protect + " Rob_AF: " + robosens_adjustmentFactor + " Rob_Max: " + robosens_maximumRatio;
      
 // Return filtered and interpolated data for different time ranges
      // return "last4Hours: " + averageGlucose_Last4Hours + "last8Hours: " + averageGlucose_Last8Hours + "last12Hours: " + averageGlucose_Last12Hours + "last16Hours: " + averageGlucose_Last16Hours + "last20Hours: " + averageGlucose_Last20Hours + "last24Hours: " + averageGlucose_Last24Hours;   
