@@ -132,19 +132,14 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    }
 
    // Call the calculateAverageGlucose function to Calculate average glucose for each time range
-   const averageGlucose_Last4Hours = calculateAverageGlucose(last4HoursData);
-   const averageGlucose_Last8Hours = calculateAverageGlucose(last8HoursData);
-   const averageGlucose_Last24Hours = calculateAverageGlucose(last24HoursData);
+   var averageGlucose_Last4Hours = calculateAverageGlucose(last4HoursData);
+   var averageGlucose_Last8Hours = calculateAverageGlucose(last8HoursData);
+   var averageGlucose_Last24Hours = calculateAverageGlucose(last24HoursData);
 
 // Calculate percentage over target for each time period
-const percentageOverTarget_Last4Hours = ((averageGlucose_Last4Hours - target_averageGlucose_Last4Hours) / target_averageGlucose_Last4Hours) * 100;
-const percentageOverTarget_Last8Hours = ((averageGlucose_Last8Hours - target_averageGlucose_Last8Hours) / target_averageGlucose_Last8Hours) * 100;
-const percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_averageGlucose_Last24Hours) / target_averageGlucose_Last24Hours) * 100;
-
-// Calculate the trend in change to percentage over target betweeen 8 and 24 hour. The slope is the rate of change.  Positive indicates a increasing BG trend        
-const timeDifference = 16; // 24 hours - 8 hours
-const percentageChange = percentageOverTarget_Last24Hours - percentageOverTarget_Last8Hours;
-const slope = percentageChange / timeDifference;
+var percentageOverTarget_Last4Hours = ((averageGlucose_Last4Hours - target_averageGlucose_Last4Hours) / target_averageGlucose_Last4Hours) * 100;
+var percentageOverTarget_Last8Hours = ((averageGlucose_Last8Hours - target_averageGlucose_Last8Hours) / target_averageGlucose_Last8Hours) * 100;
+var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_averageGlucose_Last24Hours) / target_averageGlucose_Last24Hours) * 100;
 
 //Create the Sigmoid Factor
 // DYNAMIC BASAL SIGMOID Function
