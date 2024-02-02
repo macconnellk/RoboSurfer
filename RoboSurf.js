@@ -37,6 +37,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_RoboSurfer = true; 
   var enable_new_sigmoidTDDFactor = false;
   var enable_Automation_1 = true; 
+   var enable_robosens = true; 
 
 //Only use Middleware when enable_RoboSurfer = true.
     if (enable_RoboSurfer) {
@@ -142,9 +143,6 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       var min_hourly_carb_absorption = 34;
 
 //  Initialize ROBOSENS variables
-      //Turn on or off
-         var enable_robosens = true;
-        
        // Initilize function variables
          var my24hrGlucose = []; // create array
          var my24hrGlucoseTime = []; // create array
@@ -194,7 +192,7 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
    // This TDD delta effect is not linear across BGs and requires a curve to mimic.
    // ORIGINAL SIGMOID APPROACH: const tdd_factor = tdd_averages.weightedAverage / tdd_averages.average_total_data;
    
- if (enable_new_sigmoidTDDFactor = true) {
+ if (enable_new_sigmoidTDDFactor) {
     
     // Define TDD deviation variable for use in TDD Sigmoid curve based on current percent change between Daily TDD deviation and 2 Week Deviation 
     // This approach will normalize this variable for any TDD value to ensure a standard TDD Factor sigmoid curve
