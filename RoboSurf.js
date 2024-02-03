@@ -51,9 +51,15 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          const glucoseDiff_Now = prevGlucose1 - currentGlucose;
          const glucoseDiff_Prev = prevGlucose2 - prevGlucose1;
 
-         const currentTime = new Date(glucose[0].datestring).getTime();
-         const prevTime1 = new Date(glucose[1].datestring).getTime();
-         const prevTime2 = new Date(glucose[2].datestring).getTime();
+         var SensorSafetyGlucoseTime = [];
+
+         // Push four new Date objects into the array
+         SensorSafetyGlucoseTime.push(new Date(glucose[0].datestring));
+         SensorSafetyGlucoseTime.push(new Date(glucose[1].datestring));
+         SensorSafetyGlucoseTime.push(new Date(glucose[2].datestring));
+         const currentTime = SensorSafetyGlucoseTime[0].getTime(); 
+         const prevTime1 = SensorSafetyGlucoseTime[1].getTime();
+         const prevTime2 = SensorSafetyGlucoseTime[2].getTime();
          const timeDiff_Now = (currentTime - prevTime1) / (1000 * 60); // Difference in minutes
          const timeDiff_Prev = (currentTime - prevTime2) / (1000 * 60); // Difference in minutes
 
