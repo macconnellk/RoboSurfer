@@ -13,18 +13,19 @@ function round(value, digits) {
   
 // User-Defined function settings
   const smb_delivery_ratio_min = profile.smb_delivery_ratio;
+  const smb_delivery_ratio_scale_start_bg = 160
   const smb_delivery_ratio_max = .75;
   const smb_delivery_ratio_bg_range = 100;
 
 // The Scaling Function
 
-  // If BG between target and top of BG Range, scale SMB Delivery ratio
-  if (myGlucose >= target && myGlucose <= (target+smb_delivery_ratio_bg_range)) {
-        smb_delivery_ratio = (myGlucose - target) * ((smb_delivery_ratio_max - smb_delivery_ratio_min) / smb_delivery_ratio_bg_range) + smb_delivery_ratio_min;
+  // If BG between start bg and top of BG Range, scale SMB Delivery ratio
+  if (myGlucose >= smb_delivery_ratio_scale_start_bg && myGlucose <= (smb_delivery_ratio_scale_start_bg + smb_delivery_ratio_bg_range)) {
+        smb_delivery_ratio = (myGlucose - smb_delivery_ratio_scale_start_bg) * ((smb_delivery_ratio_max - smb_delivery_ratio_min) / smb_delivery_ratio_bg_range) + smb_delivery_ratio_min;
    }
 
   // If BG above user-defined BG range, use SMB ratio max
-  if (myGlucose > (target + smb_delivery_ratio_bg_range)) {
+  if (myGlucose > (smb_delivery_ratio_scale_start_bg + smb_delivery_ratio_bg_range)) {
         smb_delivery_ratio = smb_delivery_ratio_max;
    }
   
