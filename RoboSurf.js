@@ -38,8 +38,15 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_new_sigmoidTDDFactor = false;
   var enable_Automation_1 = true; 
    var enable_robosens = true; 
+   var enable_smb_delivery_ratio_scaling = true;
 
-//Only use Middleware when enable_RoboSurfer = true.
+// Sensor Safety: if data gaps or high BG delta, disable SMBs, UAMs, and smb_delivery_ratio_scaling
+   
+   
+   
+   
+   
+   //Only use Middleware when enable_RoboSurfer = true.
     if (enable_RoboSurfer) {
 
    //  Initialize log variables  
@@ -264,23 +271,24 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
        
 // **************** ROBOSURFER ENHANCEMENT #2: DYNAMIC SMB DELIVERY RATIO ****************
 // Changes the setting SMB Delivery Ratio based on BG         
-  
 
-// The SMB Delivery Ratio Scaling Function
+  if (enable_smb_delivery_ratio_scaling) {      
 
-  // If BG between start bg and top of BG Range, scale SMB Delivery ratio
-  if (myGlucose >= smb_delivery_ratio_scale_start_bg && myGlucose <= (smb_delivery_ratio_scale_start_bg + smb_delivery_ratio_bg_range)) {
+   // The SMB Delivery Ratio Scaling Function
+
+     // If BG between start bg and top of BG Range, scale SMB Delivery ratio
+     if (myGlucose >= smb_delivery_ratio_scale_start_bg && myGlucose <= (smb_delivery_ratio_scale_start_bg + smb_delivery_ratio_bg_range)) {
         smb_delivery_ratio = (myGlucose - smb_delivery_ratio_scale_start_bg) * ((smb_delivery_ratio_max - smb_delivery_ratio_min) / smb_delivery_ratio_bg_range) + smb_delivery_ratio_min;
-   }
+      }
 
-  // If BG above user-defined BG range, use SMB ratio max
-  if (myGlucose > (smb_delivery_ratio_scale_start_bg + smb_delivery_ratio_bg_range)) {
+     // If BG above user-defined BG range, use SMB ratio max
+     if (myGlucose > (smb_delivery_ratio_scale_start_bg + smb_delivery_ratio_bg_range)) {
         smb_delivery_ratio = smb_delivery_ratio_max;
-   }
+      }
 
-   // Set profile to new value
-     profile.smb_delivery_ratio = round(smb_delivery_ratio,2);
-
+      // Set profile to new value
+        profile.smb_delivery_ratio = round(smb_delivery_ratio,2);
+     }
 
 // **************** ROBOSURFER ENHANCEMENT #3: AUTOMATION #1: "NIGHTBOOST ****************
 //Only use when enable_Automation_1 = true
