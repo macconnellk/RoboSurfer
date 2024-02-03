@@ -136,7 +136,12 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       var Automation_1_isf_output = isf;
       var Automation_1_cr_output = cr;
       var Automation_1_csf_output = csf;
-      
+
+// Initialize SMB Delivery Ratio Scaling variables
+  var smb_delivery_ratio_min = profile.smb_delivery_ratio;
+  var smb_delivery_ratio_scale_start_bg = 160;     
+  var smb_delivery_ratio_max = .75;
+  var smb_delivery_ratio_bg_range = 60;       
        
 //  Initialize Constant Carb Absorption variables        
       // Define the minimum amount of carb you wamt iAPS to decay in 1 hour.
@@ -260,20 +265,16 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
 // **************** ROBOSURFER ENHANCEMENT #2: DYNAMIC SMB DELIVERY RATIO ****************
 // Changes the setting SMB Delivery Ratio based on BG         
   
-// User-Defined function settings
-  var smb_delivery_ratio_min = profile.smb_delivery_ratio;
-  var smb_delivery_ratio_max = .8;
-  var smb_delivery_ratio_bg_range = 75;
 
 // The SMB Delivery Ratio Scaling Function
 
-  // If BG between target and top of BG Range, scale SMB Delivery ratio
-  if (myGlucose >= target && myGlucose <= (target+smb_delivery_ratio_bg_range)) {
-        smb_delivery_ratio = (myGlucose - target) * ((smb_delivery_ratio_max - smb_delivery_ratio_min) / smb_delivery_ratio_bg_range) + smb_delivery_ratio_min;
+  // If BG between start bg and top of BG Range, scale SMB Delivery ratio
+  if (myGlucose >= smb_delivery_ratio_scale_start_bg && myGlucose <= (smb_delivery_ratio_scale_start_bg + smb_delivery_ratio_bg_range)) {
+        smb_delivery_ratio = (myGlucose - smb_delivery_ratio_scale_start_bg) * ((smb_delivery_ratio_max - smb_delivery_ratio_min) / smb_delivery_ratio_bg_range) + smb_delivery_ratio_min;
    }
 
   // If BG above user-defined BG range, use SMB ratio max
-  if (myGlucose > (target + smb_delivery_ratio_bg_range)) {
+  if (myGlucose > (smb_delivery_ratio_scale_start_bg + smb_delivery_ratio_bg_range)) {
         smb_delivery_ratio = smb_delivery_ratio_max;
    }
 
