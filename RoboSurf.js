@@ -269,7 +269,7 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
     // Like the original Sigmoid approach, Profile ISF will be applied at target but only when Daily TDD = 2 Week TDD.  
     // ORIGINAL SIGMOID APPROACH: const bg_dev = (current_bg - profile.min_bg) * 0.0555;
 
-    if (enable_new_sigmoidTDDFactor = true) {
+    if (enable_new_sigmoidTDDFactor) {
        var deviation = (myGlucose - (target / TDD_factor)) * 0.0555; 
     } else {
        var deviation = (myGlucose - target) * 0.0555; // the original Sigmoid approach
