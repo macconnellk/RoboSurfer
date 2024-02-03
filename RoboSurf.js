@@ -91,7 +91,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       start_time.setHours(20, 0, 0); // Assuming the start time is 8:00 PM
 
       const end_time = new Date(now);
-      end_time.setHours(3, 0, 0); // Assuming the end time is 3:00 AM
+      end_time.setHours(0, 0, 0); // Assuming the end time is 12:00 AM
        
       var Automation_1_BGThreshold_1 = 140; // BG over
       var Automation_1_BGThreshold_2 = 160; // BG over 
