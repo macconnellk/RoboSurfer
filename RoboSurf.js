@@ -62,14 +62,14 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var timeDiff_Now = (currentTime - prevTime1) / (1000 * 60); // Difference in minutes
          var timeDiff_Prev = (currentTime - prevTime2) / (1000 * 60); // Difference in minutes
 
-           //if (timeDiff_Now >= 12 || timeDiff_Prev >= 17 || glucoseDiff_Now >= maxDeltaTick || glucoseDiff_Prev >= maxDeltaTick ) {      
+         if (timeDiff_Now >= 12 || timeDiff_Prev >= 17 || glucoseDiff_Now >= maxDeltaTick || glucoseDiff_Prev >= maxDeltaTick ) {      
     
                       sensor_safety_status = "On"
                       profile.enableUAM = false;
                       profile.enableSMB_always = false;
                       enable_smb_delivery_ratio_scaling = false;    
-         return sensor_safety_status + profile.enableUAM + enableSMB_always + enable_smb_delivery_ratio_scaling;
-    //           }
+        
+               }
    
    //Only use Middleware when enable_RoboSurfer = true.
     if (enable_RoboSurfer) {
@@ -518,8 +518,8 @@ if (enable_Automation_1) {
        
 // **************** End RoboSurfer Enhancements ****************
 
-return "ISF ratio: " + round(new_autosens_ratio, 2) + ". ISF was: " + round(isf, 2) + " now " + round(profile.sens,2) + ". Basal Ratio: " + round(robosens_sigmoidFactor, 2) + " Basal was: " + old_basal + " now " + profile.current_basal +". SMB Deliv. Ratio: " + profile.smb_delivery_ratio + " AUTOMATION1: " + Automation_Status + " [Start: " + start_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " End: " + end_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + ". New CR: "  + round(profile.carb_ratio, 2) + " CSF was "  + round(csf, 2) + " now " + round(check_csf, 2) + ". SMB Mins: "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Mins: "  + round(profile.maxUAMSMBBasalMinutes, 2) + " Max COB: "  + round(profile.maxCOB, 2) + ". MinAbsorp((CI): "  + round(min_hourly_carb_absorption, 2) + "(" + profile.min_5m_carbimpact + ")" + " ROBOSENS: RSProtect: " + robosens_sens_protect + ". Trg/Av/%Over: 4Hr: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
+return "ISF ratio: " + round(new_autosens_ratio, 2) + ". ISF was: " + round(isf, 2) + " now " + round(profile.sens,2) + ". Basal Ratio: " + round(robosens_sigmoidFactor, 2) + " Basal was: " + old_basal + " now " + profile.current_basal +". SMB Deliv. Ratio: " + profile.smb_delivery_ratio + " AUTOMATION1: " + Automation_Status + ": " + start_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " to " + end_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + ". New CR: "  + round(profile.carb_ratio, 2) + " CSF was "  + round(csf, 2) + " now " + round(check_csf, 2) + ". SMB Mins: "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Mins: "  + round(profile.maxUAMSMBBasalMinutes, 2) + " Max COB: "  + round(profile.maxCOB, 2) + ". MinAbsorp((CI): "  + round(min_hourly_carb_absorption, 2) + "(" + profile.min_5m_carbimpact + ")" + " ROBOSENS: RSProtect: " + robosens_sens_protect + ". Trg/Av/%Over: 4Hr: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
 " 8Hr:" + target_averageGlucose_Last8Hours + "/" + round(averageGlucose_Last8Hours, 0) + "/" + round(percentageOverTarget_Last8Hours, 0) + "%" + 
-" 24Hr:" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RS Adj/AF: " + robosens_AF_adjustment + "/" + robosens_adjustmentFactor + " RS Adj/MAX: " + robosens_MAX_adjustment + "/" + robosens_maximumRatio + " TDD Protect: " + log_protectionmechanism + " TDD:" + round(past2hoursAverage, 2) + " 2week TDD:" + round(average_total_data, 2) + " Wtd Avg:" + round(weightedAverage, 2);
+" 24Hr:" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RS Adj/AF: " + round(robosens_AF_adjustment,2) + "/" + round(robosens_adjustmentFactor,2) + " RS Adj/MAX: " + round(robosens_MAX_adjustment,2) + "/" + round(robosens_maximumRatio,2) + " TDD Protect: " + log_protectionmechanism + " TDD:" + round(past2hoursAverage, 2) + " 2week TDD:" + round(average_total_data, 2) + " Wtd Avg:" + round(weightedAverage, 2) + "Sensor Safety: " + sensor_safety_status;
    }
 }
