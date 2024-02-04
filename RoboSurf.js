@@ -40,34 +40,44 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_Automation_1 = true; 
   var enable_smb_delivery_ratio_scaling = true;
 
-         // Sensor Safety: if data gaps or high BG delta, disable SMBs, UAMs, and smb_delivery_ratio_scaling
+         // Sensor Safety: if data gaps or high BG delta, disable SMBs, UAMs, and smb_delivery_ratio_scaling. Also calculate glucose rate of change per minute
          var sensor_safety_status = "Off";
-         var maxDeltaTick = 35; // single BG tick greater than x
+         var maxDeltaTick = 37; // single BG tick greater than x
          var SensorSafetyGlucoseTime = [];
          var SensorSafetyGlucose_Now = glucose[0].glucose;
          var SensorSafetyGlucose_Prev1 = glucose[1].glucose;
          var SensorSafetyGlucose_Prev2 = glucose[2].glucose;
+         var SensorSafetyGlucose_Prev3 = glucose[3].glucose;
    
          // Separate glucose datestring elements into array
          glucose.forEach(element => {
              SensorSafetyGlucoseTime.push(new Date(element.dateString)); // Parse datestring to date object
          });  
          
-         var glucoseDiff_Now = SensorSafetyGlucose_Now - SensorSafetyGlucose_Prev1;
-         var glucoseDiff_Prev = SensorSafetyGlucose_Prev1 - SensorSafetyGlucose_Prev2;
-   
+         var glucoseDiff_Now = SensorSafetyGlucose_Now - SensorSafetyGlucose_Prev1; // Difference in glucose for current period 
+         var glucoseDiff_PriorPeriod = SensorSafetyGlucose_Prev1 - SensorSafetyGlucose_Prev2;  // Difference in glucose of prior period
+         var glucoseDiff_2Periods = SensorSafetyGlucose_Now - SensorSafetyGlucose_Prev2; // Difference in glucose of last 2 periods
+         var glucoseDiff_3Periods = SensorSafetyGlucose_Now - SensorSafetyGlucose_Prev3; // Difference in glucose of last 3 periods 
+         
          var currentTime = SensorSafetyGlucoseTime[0].getTime(); 
          var prevTime1 = SensorSafetyGlucoseTime[1].getTime();
          var prevTime2 = SensorSafetyGlucoseTime[2].getTime();
-         var timeDiff_Now = (currentTime - prevTime1) / (1000 * 60); // Difference in minutes
-         var timeDiff_Prev = (currentTime - prevTime2) / (1000 * 60); // Difference in minutes
+         var prevTime3 = SensorSafetyGlucoseTime[3].getTime();
+         var timeDiff_Now = (currentTime - prevTime1) / (1000 * 60); // Time elapsed for current period (normal = ~5 minutes)
+         var timeDiff_2Periods = (currentTime - prevTime2) / (1000 * 60); // Time elapsed of last 2 periods (normal = ~10 minutes)
+         var timeDiff_3Periods = (currentTime - prevTime3) / (1000 * 60); //Time elapsed of last 3 periods (normal = ~15 minutes)
 
-         if (timeDiff_Now >= 12 || timeDiff_Prev >= 17 || glucoseDiff_Now >= maxDeltaTick || glucoseDiff_Prev >= maxDeltaTick ) {      
+         var glucoseRateOfChange_Now = glucoseDiff_Now / timeDiff_Now;
+         var glucoseRateOfChange_2Periods = glucoseDiff_2Periods / timeDiff_2Periods;
+         var glucoseRateOfChange_3Periods = glucoseDiff_3Periods / timeDiff_3Periods;
+
+         if (timeDiff_Now >= 12 || timeDiff_timeDiff_2Periods >= 17 || glucoseDiff_Now >= maxDeltaTick || glucoseDiff_PriorPeriod >= maxDeltaTick ) {      
     
                       sensor_safety_status = "On"
                       profile.enableUAM = false;
                       profile.enableSMB_always = false;
-                      enable_smb_delivery_ratio_scaling = false;    
+                      enable_smb_delivery_ratio_scaling = false;
+                      enable_Automation_1 = false;
        
              }
    
