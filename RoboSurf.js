@@ -34,44 +34,39 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 //Within iAPS, Dynamic and Sigmoid must be toggled on, AF set to .1 and AS Min/Max set to .999/1.001. This runs the new ISF through the native Sigmoid but with no effect.     
    
 //Turn RoboSurfer and functions on or off
-  var enable_RoboSurfer = true; 
+  var enable_RoboSurfer = true;
+  var enable_robosens = true;  
   var enable_new_sigmoidTDDFactor = true;
   var enable_Automation_1 = true; 
-   var enable_robosens = true; 
-   var enable_smb_delivery_ratio_scaling = true;
+  var enable_smb_delivery_ratio_scaling = true;
 
          // Sensor Safety: if data gaps or high BG delta, disable SMBs, UAMs, and smb_delivery_ratio_scaling
-         const RSmaxDeltaTick = 35 // single BG tick greater than x
-         const currentGlucose = glucose[0].glucose;
-         const prevGlucose1 = glucose[1].glucose;
-         const prevGlucose2 = glucose[2].glucose;
-         const prevGlucose3 = glucose[3].glucose;
-
-         // BG Difference for current reading and prior reading
-         const glucoseDiff_Now = prevGlucose1 - currentGlucose;
-         const glucoseDiff_Prev = prevGlucose2 - prevGlucose1;
-
+         const maxDeltaTick = 35; // single BG tick greater than x
+         var SensorSafetyGlucose = [];
          var SensorSafetyGlucoseTime = [];
 
-         // Push four new Date objects into the array
-         SensorSafetyGlucoseTime.push(new Date(glucose[0].datestring));
-         SensorSafetyGlucoseTime.push(new Date(glucose[1].datestring));
-         SensorSafetyGlucoseTime.push(new Date(glucose[2].datestring));
+       // Separate glucose and datestring elements into arrays
+         glucose.forEach(element => {
+             SensorSafetyGlucose.push(element.glucose);
+             SensorSafetyGlucoseTime.push(new Date(element.dateString)); // Parse datestring to date object
+         });  
+         
+         const glucoseDiff_Now = SensorSafetyGlucose[0].glucose - SensorSafetyGlucose[1].glucose;
+         const glucoseDiff_Prev = SensorSafetyGlucose[1].glucose - SensorSafetyGlucose[2].glucose;
+   
          const currentTime = SensorSafetyGlucoseTime[0].getTime(); 
          const prevTime1 = SensorSafetyGlucoseTime[1].getTime();
          const prevTime2 = SensorSafetyGlucoseTime[2].getTime();
          const timeDiff_Now = (currentTime - prevTime1) / (1000 * 60); // Difference in minutes
          const timeDiff_Prev = (currentTime - prevTime2) / (1000 * 60); // Difference in minutes
 
-           //if (timeDiff_Now >= 12 || timeDiff_Prev >= 17 || glucoseDiff_Now >= RSmaxDeltaTick || glucoseDiff_Prev >= RSmaxDeltaTick ) {
-               
+           if (timeDiff_Now >= 12 || timeDiff_Prev >= 17 || glucoseDiff_Now >= maxDeltaTick || glucoseDiff_Prev >= maxDeltaTick ) {      
     
                       profile.enableUAM = false;
                       profile.enableSMB_always = false;
                       enable_smb_delivery_ratio_scaling = false;    
          return currentGlucose + " " + prevGlucose1 + " " + prevGlucose2 + " " + prevGlucose3 + " " + glucoseDiff_Now + " " + glucoseDiff_Prev + " " + currentTime + " " + prevTime1 + " " + prevTime2 + " " + timeDiff_Now + " " + timeDiff_Prev;         
-             //  }
-   
+               }
    
    //Only use Middleware when enable_RoboSurfer = true.
     if (enable_RoboSurfer) {
@@ -352,7 +347,6 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
 function sigmoidFunction(enable_new_sigmoidTDDFactor, adjustmentFactor, 
 minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage) {        
 
-   
 
    // DYNISF SIGMOID MODIFICATION #1
    // Use the robosens_sigmoidFactor as the TDD factor
