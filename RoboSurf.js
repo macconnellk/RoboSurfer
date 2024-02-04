@@ -65,7 +65,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
                       profile.enableUAM = false;
                       profile.enableSMB_always = false;
                       enable_smb_delivery_ratio_scaling = false;    
-         return currentGlucose + " " + prevGlucose1 + " " + prevGlucose2 + " " + prevGlucose3 + " " + glucoseDiff_Now + " " + glucoseDiff_Prev + " " + currentTime + " " + prevTime1 + " " + prevTime2 + " " + timeDiff_Now + " " + timeDiff_Prev;         
+         return maxDeltaTick + " " + glucoseDiff_Now + " " + glucoseDiff_Prev + " " + currentTime + " " + prevTime1 + " " + prevTime2 + " " + timeDiff_Now + " " + timeDiff_Prev;         
     //           }
    
    //Only use Middleware when enable_RoboSurfer = true.
