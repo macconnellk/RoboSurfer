@@ -41,7 +41,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_smb_delivery_ratio_scaling = true;
 
          // Sensor Safety: if data gaps or high BG delta, disable SMBs, UAMs, and smb_delivery_ratio_scaling
-         var sensor_safety_status = "On"
+         var sensor_safety_status = "Off";
          var maxDeltaTick = 35; // single BG tick greater than x
          var SensorSafetyGlucoseTime = [];
          var SensorSafetyGlucose_Now = glucose[0].glucose;
