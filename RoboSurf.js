@@ -62,14 +62,14 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var timeDiff_Now = (currentTime - prevTime1) / (1000 * 60); // Difference in minutes
          var timeDiff_Prev = (currentTime - prevTime2) / (1000 * 60); // Difference in minutes
 
-         //if (timeDiff_Now >= 12 || timeDiff_Prev >= 17 || glucoseDiff_Now >= maxDeltaTick || glucoseDiff_Prev >= maxDeltaTick ) {      
+         if (timeDiff_Now >= 12 || timeDiff_Prev >= 17 || glucoseDiff_Now >= maxDeltaTick || glucoseDiff_Prev >= maxDeltaTick ) {      
     
                       sensor_safety_status = "On"
                       profile.enableUAM = false;
                       profile.enableSMB_always = false;
                       enable_smb_delivery_ratio_scaling = false;    
-        return sensor_safety_status +  profile.enableUAM +  profile.enableSMB_always + enable_smb_delivery_ratio_scaling;
-              // }
+       
+             }
    
    //Only use Middleware when enable_RoboSurfer = true.
     if (enable_RoboSurfer) {
