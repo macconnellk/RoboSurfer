@@ -41,7 +41,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_smb_delivery_ratio_scaling = true;
 
          // Sensor Safety: if data gaps or high BG delta, disable SMBs, UAMs, and smb_delivery_ratio_scaling
-         const maxDeltaTick = 35; // single BG tick greater than x
+         var sensor_safety_status = "On"
+         var maxDeltaTick = 35; // single BG tick greater than x
          var SensorSafetyGlucoseTime = [];
          var SensorSafetyGlucose_Now = glucose[0].glucose;
          var SensorSafetyGlucose_Prev1 = glucose[1].glucose;
@@ -52,21 +53,22 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
              SensorSafetyGlucoseTime.push(new Date(element.dateString)); // Parse datestring to date object
          });  
          
-         const glucoseDiff_Now = SensorSafetyGlucose_Now - SensorSafetyGlucose_Prev1;
-         const glucoseDiff_Prev = SensorSafetyGlucose_Prev1 - SensorSafetyGlucose_Prev2;
+         var glucoseDiff_Now = SensorSafetyGlucose_Now - SensorSafetyGlucose_Prev1;
+         var glucoseDiff_Prev = SensorSafetyGlucose_Prev1 - SensorSafetyGlucose_Prev2;
    
-         const currentTime = SensorSafetyGlucoseTime[0].getTime(); 
-         const prevTime1 = SensorSafetyGlucoseTime[1].getTime();
-         const prevTime2 = SensorSafetyGlucoseTime[2].getTime();
-         const timeDiff_Now = (currentTime - prevTime1) / (1000 * 60); // Difference in minutes
-         const timeDiff_Prev = (currentTime - prevTime2) / (1000 * 60); // Difference in minutes
+         var currentTime = SensorSafetyGlucoseTime[0].getTime(); 
+         var prevTime1 = SensorSafetyGlucoseTime[1].getTime();
+         var prevTime2 = SensorSafetyGlucoseTime[2].getTime();
+         var timeDiff_Now = (currentTime - prevTime1) / (1000 * 60); // Difference in minutes
+         var timeDiff_Prev = (currentTime - prevTime2) / (1000 * 60); // Difference in minutes
 
            //if (timeDiff_Now >= 12 || timeDiff_Prev >= 17 || glucoseDiff_Now >= maxDeltaTick || glucoseDiff_Prev >= maxDeltaTick ) {      
     
+                      sensor_safety_status = "On"
                       profile.enableUAM = false;
                       profile.enableSMB_always = false;
                       enable_smb_delivery_ratio_scaling = false;    
-         return maxDeltaTick + " " + glucoseDiff_Now + " " + glucoseDiff_Prev + " " + currentTime + " " + prevTime1 + " " + prevTime2 + " " + timeDiff_Now + " " + timeDiff_Prev;         
+         return sensor_safety_status + profile.enableUAM + enableSMB_always + enable_smb_delivery_ratio_scaling;
     //           }
    
    //Only use Middleware when enable_RoboSurfer = true.
