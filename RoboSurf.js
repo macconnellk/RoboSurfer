@@ -42,17 +42,18 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
          // Sensor Safety: if data gaps or high BG delta, disable SMBs, UAMs, and smb_delivery_ratio_scaling
          const maxDeltaTick = 35; // single BG tick greater than x
-         var SensorSafetyGlucose = [];
          var SensorSafetyGlucoseTime = [];
-
-       // Separate glucose and datestring elements into arrays
+         var SensorSafetyGlucose_Now = glucose[0].glucose;
+         var SensorSafetyGlucose_Prev1 = glucose[1].glucose;
+         var SensorSafetyGlucose_Prev2 = glucose[2].glucose;
+   
+         // Separate glucose datestring elements into array
          glucose.forEach(element => {
-             SensorSafetyGlucose.push(element.glucose);
              SensorSafetyGlucoseTime.push(new Date(element.dateString)); // Parse datestring to date object
          });  
          
-         const glucoseDiff_Now = SensorSafetyGlucose[0].glucose - SensorSafetyGlucose[1].glucose;
-         const glucoseDiff_Prev = SensorSafetyGlucose[1].glucose - SensorSafetyGlucose[2].glucose;
+         const glucoseDiff_Now = SensorSafetyGlucose_Now - SensorSafetyGlucose_Prev1;
+         const glucoseDiff_Prev = SensorSafetyGlucose_Prev1 - SensorSafetyGlucose_Prev2;
    
          const currentTime = SensorSafetyGlucoseTime[0].getTime(); 
          const prevTime1 = SensorSafetyGlucoseTime[1].getTime();
