@@ -552,7 +552,7 @@ if (enable_Automation_1) {
                 }
 
                    // 140 -160 (153% - 185%)
-                  if (myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2) ) {
+                  if (myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2) {
                      // Set Nightboost Threshold 3 Factors with Acceleration    
                      Automation_Status = Automation_1_name + " On ROC3";
                      var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_3;
@@ -564,7 +564,7 @@ if (enable_Automation_1) {
                   }
 
                    //160+ (262% - 350%)
-                if (myGlucose >= Automation_1_BGThreshold_2) ) {
+                if (myGlucose >= Automation_1_BGThreshold_2) {
                      // Set Nightboost Threshold 4 Factors with Acceleration    
                      Automation_Status = Automation_1_name + " On ROC6";
                      var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_6;
