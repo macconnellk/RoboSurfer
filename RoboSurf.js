@@ -73,7 +73,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
          if (timeDiff_Now >= 12 || timeDiff_2Periods >= 17 || glucoseDiff_Now >= maxDeltaTick || glucoseDiff_PriorPeriod >= maxDeltaTick ) {      
     
-                      sensor_safety_status = "On"
+                      sensor_safety_status = "On " + timeDiff_Now + " " + timeDiff_2Periods + " " + glucoseDiff_Now + " " + glucoseDiff_PriorPeriod;
                       profile.enableUAM = false;
                       profile.enableSMB_always = false;
                       enable_smb_delivery_ratio_scaling = false;
