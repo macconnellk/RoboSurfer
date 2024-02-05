@@ -150,10 +150,6 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
       var robosens_sens_protect = "On";
    } else {
        
-      var robosens_ratioInterval = robosens_maximumRatio - robosens_minimumRatio;
-      var robosens_max_minus_one = robosens_maximumRatio - 1;
-      var robosens_deviation = (averageGlucose_Last4Hours - target_averageGlucose_Last4Hours) * 0.0555;
-      
       //  Increase the basal sigmoid AF if the 8hr Percent Over Target is high
       // Increase by .1 per each additional 10%
       if (percentageOverTarget_Last8Hours > 0 ) {
@@ -167,6 +163,10 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
          robosens_MAX_adjustment = (percentageOverTarget_Last24Hours / 100) / .1 *.05;   
          robosens_maximumRatio = robosens_maximumRatio + robosens_MAX_adjustment;
          }
+
+      var robosens_ratioInterval = robosens_maximumRatio - robosens_minimumRatio;
+      var robosens_max_minus_one = robosens_maximumRatio - 1;
+      var robosens_deviation = (averageGlucose_Last4Hours - target_averageGlucose_Last4Hours) * 0.0555;
       
      //Makes sigmoid factor(y) = 1 when BG deviation(x) = 0.
      var robosens_fix_offset = (Math.log10(1/robosens_max_minus_one - robosens_minimumRatio / robosens_max_minus_one) / Math.log10(Math.E));
