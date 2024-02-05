@@ -71,7 +71,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var glucoseRateOfChange_2Periods = glucoseDiff_2Periods / timeDiff_2Periods;  //normally 10 minutes
          var glucoseRateOfChange_3Periods = glucoseDiff_3Periods / timeDiff_3Periods;  //normally 10 minutes
 
-         if (timeDiff_Now >= 12 || timeDiff_timeDiff_2Periods >= 17 || glucoseDiff_Now >= maxDeltaTick || glucoseDiff_PriorPeriod >= maxDeltaTick ) {      
+         if (timeDiff_Now >= 12 || timeDiff_2Periods >= 17 || glucoseDiff_Now >= maxDeltaTick || glucoseDiff_PriorPeriod >= maxDeltaTick ) {      
     
                       sensor_safety_status = "On"
                       profile.enableUAM = false;
