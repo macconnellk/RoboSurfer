@@ -454,6 +454,7 @@ if (enable_Automation_1) {
                //Normal Rate of Change
                 if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
                       // Set Nightboost Threshold 1 Factors    
+                     Automation_Status = Automation_1_name + " On1";   
                      var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_1;
                      var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_1;
                      var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_1;
@@ -463,6 +464,7 @@ if (enable_Automation_1) {
                
                   if (myGlucose >= Automation_1_BGThreshold_2 && myGlucose < Automation_1_BGThreshold_3) {
                      // Set Nightboost Threshold 2 Factors    
+                     Automation_Status = Automation_1_name + " On2";
                      var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
                      var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
                      var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
@@ -472,6 +474,7 @@ if (enable_Automation_1) {
 
                    if (myGlucose >= Automation_1_BGThreshold_3) {
                      // Set Nightboost Threshold 3 Factors    
+                     Automation_Status = Automation_1_name + " On3";
                      var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_3;
                      var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_3;
                      var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_3;
@@ -484,6 +487,7 @@ if (enable_Automation_1) {
 
                   if ((myGlucose >= Automation_1_BGThreshold_1ROC && myGlucose < Automation_1_BGThreshold_1)) {  
                       // Set Nightboost Threshold 1 Factors    
+                     Automation_Status = Automation_1_name + " On ROC1";
                      var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_1;
                      var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_1;
                      var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_1;
@@ -493,6 +497,7 @@ if (enable_Automation_1) {
                
                   if (myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2) {
                      // Set Nightboost Threshold 2 Factors    
+                     Automation_Status = Automation_1_name + " On ROC2";
                      var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
                      var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
                      var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
@@ -504,6 +509,7 @@ if (enable_Automation_1) {
 
                   if (myGlucose >= Automation_1_BGThreshold_2 && myGlucose < Automation_1_BGThreshold_3) {
                      // Set Nightboost Threshold 3 Factors    
+                     Automation_Status = Automation_1_name + " On ROC3";
                      var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_3;
                      var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_3;
                      var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_3;
@@ -514,6 +520,7 @@ if (enable_Automation_1) {
 
                   if (myGlucose >= Automation_1_BGThreshold_3) {
                      // Set Nightboost Threshold 4 Factors    
+                     Automation_Status = Automation_1_name + " On ROC4";
                      var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_4;
                      var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_4;
                      var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_4;
@@ -526,8 +533,7 @@ if (enable_Automation_1) {
                 }
 
              
-            // Run Sigmoid Function 
-            Automation_Status = Automation_1_name + " On"; 
+            // Run Sigmoid Function  
             new_autosens_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, NightBoost_Sigmoid_AF, NightBoost_Sigmoid_Min, NightBoost_Sigmoid_Max, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
             Automation_1_isf_output = round(isf / new_autosens_ratio,0)
             
