@@ -164,7 +164,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
           
           //Automation 1 Sigmoid - Threshold 4 
          var Automation_1_minimumRatio_4 = .5;
-         var Automation_1_maximumRatio_4 = 2.5;
+         var Automation_1_maximumRatio_4 = 3.5;
          var Automation_1_adjustmentFactor_4 = 1;
        
           //Automation 1 Dynamic CR 
@@ -175,7 +175,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
        //Automation 1 Other Settings
          var Automation_1_SMB_UAM_Minutes_Increase = 15; // Standard Automation #1 SMB/UAM Increase
          var Automation_1_SMB_UAM_Minutes_Increase_HIGH = 30; // High BG Automation #1 SMB/UAM Increase
-         var Automation_1_SMB_UAM_Minutes_Increase_ACCEL = 45; // High BG Rate of Change Automation #1 SMB/UAM Increase 
+         var Automation_1_SMB_UAM_Minutes_Increase_ACCEL = 60; // High BG Rate of Change Automation #1 SMB/UAM Increase 
          var Automation_1_SMB_DeliveryRatio_Increase_ACCEL  = 1; // High BG Rate of Change SMB Delivery Ratio  
          var Automation_1_COB_Max = 100; // Automation #1 COB_Max
          var Automation_1_min_hourly_carb_absorption = 11; // Automation #1 min_hourly_carb_absorption. Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
@@ -492,22 +492,11 @@ if (enable_Automation_1) {
                      var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_1;
                      var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_1;
                      new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;   
-                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;   
+                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;
+                     profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
                 }
                
-                  if (myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2) {
-                     // Set Nightboost Threshold 2 Factors    
-                     Automation_Status = Automation_1_name + " On ROC2";
-                     var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
-                     var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
-                     var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
-                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;   
-                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;
-                     Automation_1_SMB_DeliveryRatio_Increase_ACCEL;  
-                  }
-
-
-                  if (myGlucose >= Automation_1_BGThreshold_2 && myGlucose < Automation_1_BGThreshold_3) {
+                  if (myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2) ) {
                      // Set Nightboost Threshold 3 Factors    
                      Automation_Status = Automation_1_name + " On ROC3";
                      var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_3;
@@ -515,10 +504,10 @@ if (enable_Automation_1) {
                      var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_3;
                      new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;   
                      new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;
-                     Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
-                      }
+                     profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
+                  }
 
-                  if (myGlucose >= Automation_1_BGThreshold_3) {
+                if (myGlucose >= Automation_1_BGThreshold_2) ) {
                      // Set Nightboost Threshold 4 Factors    
                      Automation_Status = Automation_1_name + " On ROC4";
                      var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_4;
@@ -526,9 +515,8 @@ if (enable_Automation_1) {
                      var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_4;
                      new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;   
                      new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;
-                     Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
-                      }
-
+                     profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL; 
+                  }
                 
                 }
 
