@@ -63,9 +63,9 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var prevTime1 = SensorSafetyGlucoseTime[1].getTime();
          var prevTime2 = SensorSafetyGlucoseTime[2].getTime();
          var prevTime3 = SensorSafetyGlucoseTime[3].getTime();
-         var timeDiff_Now = (prevTime1 - currentTime) / (1000 * 60); // Time elapsed for current period (normal = ~5 minutes)
-         var timeDiff_2Periods = (prevTime2 - currentTime) / (1000 * 60); // Time elapsed of last 2 periods (normal = ~10 minutes)
-         var timeDiff_3Periods = (prevTime3 - currentTime) / (1000 * 60); //Time elapsed of last 3 periods (normal = ~15 minutes)
+         var timeDiff_Now = (currentTime - prevTime1) / (1000 * 60); // Time elapsed for current period (normal = ~5 minutes)
+         var timeDiff_2Periods = (currentTime - prevTime2) / (1000 * 60); // Time elapsed of last 2 periods (normal = ~10 minutes)
+         var timeDiff_3Periods = (currentTime - prevTime3) / (1000 * 60); //Time elapsed of last 3 periods (normal = ~15 minutes)
 
          var glucoseRateOfChange_Now = glucoseDiff_Now / timeDiff_Now;
          var glucoseRateOfChange_2Periods = glucoseDiff_2Periods / timeDiff_2Periods;  //normally 10 minutes
