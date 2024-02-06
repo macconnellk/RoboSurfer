@@ -246,7 +246,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
                var robosens_maximumRatio = 1.2;
                var robosens_adjustmentFactor = .5;
                var robosens_sigmoidFactor = 1;
-               var robosens_sens_protect = "Off";
+               var robosens_sens_status = "On4hr";
                var robosens_AF_adjustment = 0;
                var robosens_MAX_adjustment = 0;
                var dynamic_deviation_high = 160;
@@ -332,7 +332,7 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
 // RoboSens Sensitivity Protection Mechanism: If 4hr average glucose > 4hr target but current BG is under 4hr target, no adjustment to basal.
 //   if (averageGlucose_Last4Hours < target_averageGlucose_Last4Hours && myGlucose <= target_averageGlucose_Last4Hours ) {
 //      robosens_sigmoidFactor = 1;
-//      robosens_sens_protect = "On";
+//      robosens_sens_status = "Protect";
 //   } else {
        
       //  Increase the basal sigmoid AF if the 8hr Percent Over Target is high
@@ -357,14 +357,23 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
        // This is to tilt towards ongoing periods of resistance (8 or 24 hour) if current BG goes high. 
              var deviation_bg = averageGlucose_Last4Hours;
                     if (myGlucose > dynamic_deviation_high) {
-                           Math.max(averageGlucose_Last4Hours, percentageOverTarget_Last8Hours,percentageOverTarget_Last24Hours);
+                          deviation_bg = Math.max(averageGlucose_Last4Hours, percentageOverTarget_Last8Hours,percentageOverTarget_Last24Hours);
                      }
 
                     if (myGlucose > dynamic_deviation_veryhigh) {
-                           Math.max(myGlucose,averageGlucose_Last4Hours, percentageOverTarget_Last8Hours,percentageOverTarget_Last24Hours);
+                           deviation_bg = Math.max(myGlucose,averageGlucose_Last4Hours, percentageOverTarget_Last8Hours,percentageOverTarget_Last24Hours);
                      }
-    
-          var robosens_deviation = (deviation_bg - target_averageGlucose_Last4Hours) * 0.0555;
+
+                        //Set Status
+                        if (deviation_bg = percentageOverTarget_Last8Hours) {
+                          robosens_sens_status = "On8hr";
+                        } else {(deviation_bg = percentageOverTarget_Last24Hours)
+                             robosens_sens_status = "On24hr";   
+                        } else {(deviation_bg = myGlucose)  
+                            robosens_sens_status = "OnCurrentBG";
+                         }    
+         
+         var robosens_deviation = (deviation_bg - target_averageGlucose_Last4Hours) * 0.0555;
     
      //Makes sigmoid factor(y) = 1 when BG deviation(x) = 0.
      var robosens_fix_offset = (Math.log10(1/robosens_max_minus_one - robosens_minimumRatio / robosens_max_minus_one) / Math.log10(Math.E));
@@ -388,7 +397,7 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
 // Return the percentage over target results
 //return "ROBOSENS: Trgt/Avg/%Over: 4 Hours: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
 //" 8 Hours:" + target_averageGlucose_Last8Hours + "/" + round(averageGlucose_Last8Hours, 0) + "/" + round(percentageOverTarget_Last8Hours, 0) + "%" + 
-//" 24 Hours:" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RoboSens Ratio: " + round(robosens_sigmoidFactor, 2) + "Profile Basal: " + old_basal + " RoboSens Basal: " + profile.current_basal + " RoboSens Protection: " + robosens_sens_protect + " RoboSens AF Adj/Factor: " + robosens_AF_adjustment + "/" + robosens_adjustmentFactor + " RoboSens Max Adj/Max: " + robosens_MAX_adjustment + "/" + robosens_maximumRatio;
+//" 24 Hours:" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RoboSens Ratio: " + round(robosens_sigmoidFactor, 2) + "Profile Basal: " + old_basal + " RoboSens Basal: " + profile.current_basal + " RoboSens Protection: " + robosens_sens_status + " RoboSens AF Adj/Factor: " + robosens_AF_adjustment + "/" + robosens_adjustmentFactor + " RoboSens Max Adj/Max: " + robosens_MAX_adjustment + "/" + robosens_maximumRatio;
      
 
 }
@@ -648,7 +657,7 @@ if (enable_Automation_1) {
        
 // **************** End RoboSurfer Enhancements ****************
 
-return "ISF ratio: " + round(new_autosens_ratio, 2) + ". Basal Ratio: " + round(robosens_sigmoidFactor, 2) + ". ISF was: " + round(isf, 2) + " now " + round(profile.sens,2) + " Basal was: " + old_basal + " now " + profile.current_basal +". SMB Deliv. Ratio: " + profile.smb_delivery_ratio + " ROBOSENS: RSProtect: " + robosens_sens_protect + ". Trg/Av/%Over: 4Hr: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
+return "ISF ratio: " + round(new_autosens_ratio, 2) + ". Basal Ratio: " + round(robosens_sigmoidFactor, 2) + ". ISF was: " + round(isf, 2) + " now " + round(profile.sens,2) + " Basal was: " + old_basal + " now " + profile.current_basal +". SMB Deliv. Ratio: " + profile.smb_delivery_ratio + " ROBOSENS: Status: " + robosens_sens_status + ". Trg/Av/%Over: 4Hr: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
 " 8Hr:" + target_averageGlucose_Last8Hours + "/" + round(averageGlucose_Last8Hours, 0) + "/" + round(percentageOverTarget_Last8Hours, 0) + "%" + 
 " 24Hr:" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RS Adj/AF: " + round(robosens_AF_adjustment,2) + "/" + round(robosens_adjustmentFactor,2) + " RS Adj/MAX: " + round(robosens_MAX_adjustment,2) + "/" + round(robosens_maximumRatio,2) + " AUTOMATION1: " + Automation_Status + ": " + start_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " to " + end_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + ". New CR: "  + round(profile.carb_ratio, 2) + " CSF was "  + round(csf, 2) + " now " + round(check_csf, 2) + ". SMB Mins: "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Mins: "  + round(profile.maxUAMSMBBasalMinutes, 2) + " Max COB: "  + round(profile.maxCOB, 2) + ". MinAbsorp((CI): "  + round(min_hourly_carb_absorption, 2) + "(" + profile.min_5m_carbimpact + ")"  + "Sensor Safety: " + sensor_safety_status + " " + round(glucoseDiff_Now,2) + " " + round(timeDiff_Now,2) + " " + round(glucoseRateOfChange_Now,1) + " TDD Protect: " + log_protectionmechanism + " TDD:" + round(past2hoursAverage, 2) + " 2week TDD:" + round(average_total_data, 2) + " Wtd Avg:" + round(weightedAverage, 2);
    }
