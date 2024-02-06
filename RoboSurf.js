@@ -340,10 +340,10 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
          robosens_adjustmentFactor = robosens_adjustmentFactor + robosens_AF_adjustment;
          }
 
-      //  Increase the basal sigmoid robosens max if the 24hr Percent Over Target is high and 8hr > 24hr (rising resistance)
-      // Increase by .05 per each additional 10%
-      if (percentageOverTarget_Last24Hours > 0 && percentageOverTarget_Last8Hours > percentageOverTarget_Last24Hours) {
-         robosens_MAX_adjustment = (percentageOverTarget_Last24Hours / 100) / .1 *.05;   
+      //  Increase the basal sigmoid robosens max if the 24hr Percent Over Target is high
+      // Increase by .1 per each additional 10%
+      if (percentageOverTarget_Last24Hours > 0) {
+         robosens_MAX_adjustment = percentageOverTarget_Last24Hours / 100;   
          robosens_maximumRatio = robosens_maximumRatio + robosens_MAX_adjustment;
          }
 
