@@ -249,7 +249,9 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
                var robosens_sens_protect = "Off";
                var robosens_AF_adjustment = 0;
                var robosens_MAX_adjustment = 0;
-       
+               var dynamic_deviation_high = 160;
+               var dynamic_deviation_veryhigh = 220;    
+          
 // **************** ROBOSURFER ENHANCEMENT #1: ROBOSENS ****************
 
 //Only use when enable_robosens = true.
@@ -328,10 +330,10 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
 // DYNAMIC ROBOSENS SIGMOID Function
 
 // RoboSens Sensitivity Protection Mechanism: If 4hr average glucose > 4hr target but current BG is under 4hr target, no adjustment to basal.
-   if (averageGlucose_Last4Hours > target_averageGlucose_Last4Hours && myGlucose <= target_averageGlucose_Last4Hours ) {
-      robosens_sigmoidFactor = 1;
-      robosens_sens_protect = "On";
-   } else {
+//   if (averageGlucose_Last4Hours < target_averageGlucose_Last4Hours && myGlucose <= target_averageGlucose_Last4Hours ) {
+//      robosens_sigmoidFactor = 1;
+//      robosens_sens_protect = "On";
+//   } else {
        
       //  Increase the basal sigmoid AF if the 8hr Percent Over Target is high
       // Increase by .1 per each additional 10%
@@ -349,7 +351,20 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
 
       var robosens_ratioInterval = robosens_maximumRatio - robosens_minimumRatio;
       var robosens_max_minus_one = robosens_maximumRatio - 1;
-      var robosens_deviation = (averageGlucose_Last4Hours - target_averageGlucose_Last4Hours) * 0.0555;
+      
+       // Dynamic deviation
+       // Sigmoid is based on 4 hour average bg. If current BG is over 160, use the max of 4,8,24 hour.  If current BG is over 220, use max of now,4,8,24.  
+       // This is to tilt towards ongoing periods of resistance (8 or 24 hour) if current BG goes high. 
+             var deviation_bg = averageGlucose_Last4Hours;
+                    if (myGlucose > dynamic_deviation_high) {
+                           Math.max(averageGlucose_Last4Hours, percentageOverTarget_Last8Hours,percentageOverTarget_Last24Hours);
+                     }
+
+                    if (myGlucose > dynamic_deviation_veryhigh) {
+                           Math.max(myGlucose,averageGlucose_Last4Hours, percentageOverTarget_Last8Hours,percentageOverTarget_Last24Hours);
+                     }
+    
+          var robosens_deviation = (deviation_bg - target_averageGlucose_Last4Hours) * 0.0555;
     
      //Makes sigmoid factor(y) = 1 when BG deviation(x) = 0.
      var robosens_fix_offset = (Math.log10(1/robosens_max_minus_one - robosens_minimumRatio / robosens_max_minus_one) / Math.log10(Math.E));
