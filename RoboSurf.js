@@ -364,14 +364,14 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
                            deviation_bg = Math.max(myGlucose,averageGlucose_Last4Hours, percentageOverTarget_Last8Hours,percentageOverTarget_Last24Hours);
                      }
 
-                        //Set Status
-                        if (deviation_bg == percentageOverTarget_Last8Hours) {
-                          robosens_sens_status = "On8hr";
-                        } else if (deviation_bg == percentageOverTarget_Last24Hours)
-                             robosens_sens_status = "On24hr";   
-                        } else if (deviation_bg == myGlucose)  
-                            robosens_sens_status = "OnCurrentBG";
-                         }    
+                        // Set Status
+if (deviation_bg == percentageOverTarget_Last8Hours) {
+    robosens_sens_status = "On8hr";
+} else if (deviation_bg == percentageOverTarget_Last24Hours) {
+    robosens_sens_status = "On24hr";   
+} else if (deviation_bg == myGlucose) {
+    robosens_sens_status = "OnCurrentBG";
+}      
          
          var robosens_deviation = (deviation_bg - target_averageGlucose_Last4Hours) * 0.0555;
     
