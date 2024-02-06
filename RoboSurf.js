@@ -367,9 +367,9 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
                         //Set Status
                         if (deviation_bg == percentageOverTarget_Last8Hours) {
                           robosens_sens_status = "On8hr";
-                        } else if {(deviation_bg == percentageOverTarget_Last24Hours)
+                        } else if (deviation_bg == percentageOverTarget_Last24Hours)
                              robosens_sens_status = "On24hr";   
-                        } else if {(deviation_bg == myGlucose)  
+                        } else if (deviation_bg == myGlucose)  
                             robosens_sens_status = "OnCurrentBG";
                          }    
          
