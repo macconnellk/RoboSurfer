@@ -365,13 +365,15 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
                      }
 
                         // Set Status
-if (deviation_bg == percentageOverTarget_Last8Hours) {
-    robosens_sens_status = "On8hr";
-} else if (deviation_bg == percentageOverTarget_Last24Hours) {
-    robosens_sens_status = "On24hr";   
-} else if (deviation_bg == myGlucose) {
-    robosens_sens_status = "OnCurrentBG";
-}      
+                           if (deviation_bg == percentageOverTarget_Last8Hours) {
+                                  robosens_sens_status = "On8hr";
+                           } 
+                            if (deviation_bg == percentageOverTarget_Last24Hours) {
+                                  robosens_sens_status = "On24hr";   
+                           } 
+                            if (deviation_bg == myGlucose) {
+                                  robosens_sens_status = "OnCurrentBG";
+                           }      
          
          var robosens_deviation = (deviation_bg - target_averageGlucose_Last4Hours) * 0.0555;
     
@@ -386,7 +388,7 @@ if (deviation_bg == percentageOverTarget_Last8Hours) {
 
      //Respect min/max ratios
      robosens_sigmoidFactor = Math.max(Math.min(robosens_maximumRatio, robosens_sigmoidFactor), robosens_sigmoidFactor, robosens_minimumRatio);
-   }
+   
 
  // Basal Adjustment
    new_basal = profile.current_basal * robosens_sigmoidFactor;
