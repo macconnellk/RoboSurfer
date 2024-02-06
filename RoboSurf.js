@@ -357,18 +357,18 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
        // This is to tilt towards ongoing periods of resistance (8 or 24 hour) if current BG goes high. 
              var deviation_bg = averageGlucose_Last4Hours;
                     if (myGlucose > dynamic_deviation_high) {
-                          deviation_bg = Math.max(averageGlucose_Last4Hours, percentageOverTarget_Last8Hours,percentageOverTarget_Last24Hours);
+                          deviation_bg = Math.max(averageGlucose_Last4Hours, averageGlucose_Last8Hours, averageGlucose_Last24Hours);
                      }
 
                     if (myGlucose > dynamic_deviation_veryhigh) {
-                           deviation_bg = Math.max(myGlucose,averageGlucose_Last4Hours, percentageOverTarget_Last8Hours,percentageOverTarget_Last24Hours);
+                           deviation_bg = Math.max(myGlucose,averageGlucose_Last4Hours, averageGlucose_Last8Hours, averageGlucose_Last24Hours);
                      }
 
                         // Set Status
-                           if (deviation_bg == percentageOverTarget_Last8Hours) {
+                           if (deviation_bg == averageGlucose_Last8Hours) {
                                   robosens_sens_status = "On8hr";
                            } 
-                            if (deviation_bg == percentageOverTarget_Last24Hours) {
+                            if (deviation_bg == averageGlucose_Last24Hours) {
                                   robosens_sens_status = "On24hr";   
                            } 
                             if (deviation_bg == myGlucose) {
