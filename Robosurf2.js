@@ -90,9 +90,12 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 //  Initialize general RoboSurfer function variables
    var myGlucose = glucose[0].glucose;
    var target = profile.min_bg;
-   var isf = profile.sens;
-   var cr = profile.carb_ratio; 
-   var csf = isf / cr;    
+   var initial_isf = profile.sens;
+   var initial_cr = profile.carb_ratio; 
+   var initial_csf = initial_isf / initial_csf; 
+   var robosurfer_isf = initial_isf;
+   var robosurfer_cr = initial_cr; 
+   var robosurfer_csf = initial_csf;    
    var cob = meal.mealCOB;
    var iob = iob[0].iob    
    var max_COB = profile.maxCOB;   
@@ -100,9 +103,9 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var maxUAM = profile.maxUAMSMBBasalMinutes;  
    var smb_delivery_ratio = profile.smb_delivery_ratio;
    const now = new Date();
-   var new_autosens_ratio = 1;
-   var new_isf = isf;
-   var new_cr = cr;    
+   var new_dynISF_ratio = 1;
+   var new_isf = robosurfer_isf;
+   var new_cr = robosurfer_cr;    
    var new_maxSMB = maxSMB;   
    var new_maxUAM = maxUAM;   
    var new_max_COB = max_COB;    
@@ -199,9 +202,6 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
       // Automation_1 Initialized Function Variables    
       var Automation_Status = "Off";
-      var Automation_1_isf_output = isf;
-      var Automation_1_cr_output = cr;
-      var Automation_1_csf_output = csf;
 
 // Initialize SMB Delivery Ratio Scaling variables
   var smb_delivery_ratio_min = profile.smb_delivery_ratio;
@@ -393,8 +393,14 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
  // Basal Adjustment
    new_basal = profile.current_basal * robosens_sigmoidFactor;
    new_basal = round_basal(new_basal);
-   profile.current_basal = new_basal;    
+   profile.current_basal = new_basal;   
 
+ // Robosens ISF and CR Adjustment   
+    robosurfer_isf = robosurfer_isf + (robosurfer_isf * (1-robosens_sigmoidFactor);
+
+    
+    robosurfer_cr = robosurfer_isf / robosurfer_csf; 
+    
                                
 // Return the percentage over target results
 //return "ROBOSENS: Trgt/Avg/%Over: 4 Hours: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
@@ -456,7 +462,7 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
 
 // **************** Initial call of the Sigmoid function to set a new autosens ratio ****************
 
-    new_autosens_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, adjustmentFactor, minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  
+    new_dynISF_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, adjustmentFactor, minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  
      
        
 // **************** ROBOSURFER ENHANCEMENT #3: DYNAMIC SMB DELIVERY RATIO ****************
@@ -602,23 +608,28 @@ if (enable_Automation_1) {
                   }
                 
                 }
-
              
-            // Run Sigmoid Function  
-            new_autosens_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, NightBoost_Sigmoid_AF, NightBoost_Sigmoid_Min, NightBoost_Sigmoid_Max, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
-            Automation_1_isf_output = round(isf / new_autosens_ratio,0)
-            
+            // Run Sigmoid Function to get new_dynISF_ratio for Automation 1  
+            new_dynISF_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, NightBoost_Sigmoid_AF, NightBoost_Sigmoid_Min, NightBoost_Sigmoid_Max, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
+
+            // Define the new automation 1 CSF 
             if (enable_Automation_1_dynamic_cr == true) { 
-            Automation_1_csf_output = csf * Automation_1_CSF_StrengthFactor;
-            Automation_1_cr_output =  Automation_1_isf_output /  Automation_1_csf_output;
-            new_cr = Automation_1_cr_output;  
-            }
-               
+            robosurfer_csf = robosurfer_csf * Automation_1_CSF_StrengthFactor;
+            }           
        
         }       
       } 
 
-             
+//******************* Calculates the New ISF and CR Settings *****************************     
+    
+   // Calculates the new ISF and CR using dynISF ratio (standard or automation-adjusted); if Robosens is enabled, will further adjust the Robosens adjusted ISF and CR
+       new_isf = robosurfer_isf + (robosurfer_isf * (1 - new_dynISF_ratio);
+       new_isf = round(new_isf,0);
+
+       new_cr = robosurfer_isf / robosurfer_csf;
+       new_cr = round(new_cr,1);
+     
+       
 // **************** ROBOSURFER ENHANCEMENT #4: SET CONSTANT MINIMUM HOURLY CARB ABSORPTION ****************
 // For this function, the user should enter desired MIN CARB ABSORPTION in the min_5m_carbimpact setting instead of a min_5m_carbimpact.
 // The function will define the min_5m_carbimpact needed for that MIN CARB ABSORPTION based on current ISF and CR. 
@@ -638,16 +649,11 @@ if (enable_Automation_1) {
    //Set profile to new value
   profile.min_5m_carbimpact = round(min_5m_carbimpact,2);
 
-//******************* Set the ISF New Settings *****************************     
-    
-   // Sets the new ISF 
-     new_isf = round(isf / new_autosens_ratio,0);
-     profile.sens = new_isf; 
-
-   // Sets the new CR    
-      profile.carb_ratio = new_cr; 
+//******************* Set the Profile with the New ISF and CR Settings *****************************
+       
+      profile.sens = new_isf;    
+      profile.carb_ratio = new_cr;
       check_csf = profile.sens / profile.carb_ratio; 
-
       profile.maxSMBBasalMinutes = new_maxSMB;   
       profile.maxUAMSMBBasalMinutes = new_maxUAM;   
       profile.maxCOB = new_max_COB;    
@@ -655,12 +661,11 @@ if (enable_Automation_1) {
     // Sets the autosens ratio to 1 for use by native Sigmoid, prevents any further adjustment to ISF
      autosens.ratio = 1;   
 
-
        
 // **************** End RoboSurfer Enhancements ****************
 
-return "ISF ratio: " + round(new_autosens_ratio, 2) + ". Basal Ratio: " + round(robosens_sigmoidFactor, 2) + ". ISF was: " + round(isf, 2) + " now " + round(profile.sens,2) + " Basal was: " + old_basal + " now " + profile.current_basal +". SMB Deliv. Ratio: " + profile.smb_delivery_ratio + " ROBOSENS: Status: " + robosens_sens_status + ". Trg/Av/%Over: 4Hr: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
+return "ISF ratio: " + round(new_dynISF_ratio, 2) + ". Robosens Ratio: " + round(robosens_sigmoidFactor, 2) + ". ISF was: " + round(initial_isf, 2) + " now " + round(profile.sens,2) + " Basal was: " + old_basal + " now " + profile.current_basal +". SMB Deliv. Ratio: " + profile.smb_delivery_ratio + " ROBOSENS: Status: " + robosens_sens_status + ". Trg/Av/%Over: 4Hr: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
 " 8Hr:" + target_averageGlucose_Last8Hours + "/" + round(averageGlucose_Last8Hours, 0) + "/" + round(percentageOverTarget_Last8Hours, 0) + "%" + 
-" 24Hr:" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RS Adj/AF: " + round(robosens_AF_adjustment,2) + "/" + round(robosens_adjustmentFactor,2) + " RS Adj/MAX: " + round(robosens_MAX_adjustment,2) + "/" + round(robosens_maximumRatio,2) + " AUTOMATION1: " + Automation_Status + ": " + start_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " to " + end_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + ". New CR: "  + round(profile.carb_ratio, 2) + " CSF was "  + round(csf, 2) + " now " + round(check_csf, 2) + ". SMB Mins: "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Mins: "  + round(profile.maxUAMSMBBasalMinutes, 2) + " Max COB: "  + round(profile.maxCOB, 2) + ". MinAbsorp((CI): "  + round(min_hourly_carb_absorption, 2) + "(" + profile.min_5m_carbimpact + ")"  + "Sensor Safety: " + sensor_safety_status + " " + round(glucoseDiff_Now,2) + " " + round(timeDiff_Now,2) + " " + round(glucoseRateOfChange_Now,1) + " TDD Protect: " + log_protectionmechanism + " TDD:" + round(past2hoursAverage, 2) + " 2week TDD:" + round(average_total_data, 2) + " Wtd Avg:" + round(weightedAverage, 2);
+" 24Hr:" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RS Adj/AF: " + round(robosens_AF_adjustment,2) + "/" + round(robosens_adjustmentFactor,2) + " RS Adj/MAX: " + round(robosens_MAX_adjustment,2) + "/" + round(robosens_maximumRatio,2) + " AUTOMATION1: " + Automation_Status + ": " + start_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " to " + end_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + ". New CR: "  + round(profile.carb_ratio, 2) + " CSF was "  + round(initial_csf, 2) + " now " + round(check_csf, 2) + ". SMB Mins: "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Mins: "  + round(profile.maxUAMSMBBasalMinutes, 2) + " Max COB: "  + round(profile.maxCOB, 2) + ". MinAbsorp((CI): "  + round(min_hourly_carb_absorption, 2) + "(" + profile.min_5m_carbimpact + ")"  + "Sensor Safety: " + sensor_safety_status + " " + round(glucoseDiff_Now,2) + " " + round(timeDiff_Now,2) + " " + round(glucoseRateOfChange_Now,1) + " TDD:" + round(past2hoursAverage, 2) + " 2week TDD:" + round(average_total_data, 2);
    }
 }
