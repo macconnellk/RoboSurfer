@@ -615,10 +615,11 @@ if (enable_Automation_1) {
             // Run Sigmoid Function to get new_dynISF_ratio for Automation 1  
             new_dynISF_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, NightBoost_Sigmoid_AF, NightBoost_Sigmoid_Min, NightBoost_Sigmoid_Max, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
 
+            // Commenting out while using dynamic ISF with Robosens 
             // Define the new automation 1 CSF 
-            if (enable_Automation_1_dynamic_cr == true) { 
-            robosurfer_csf = robosurfer_csf * Automation_1_CSF_StrengthFactor;
-            }           
+            //if (enable_Automation_1_dynamic_cr == true) { 
+            //robosurfer_csf = robosurfer_csf * Automation_1_CSF_StrengthFactor;
+            // }           
        
         }       
       } 
