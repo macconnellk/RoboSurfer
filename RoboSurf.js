@@ -552,7 +552,7 @@ if (enable_Automation_1) {
                    }
 
                 // //220+ (345% - 350%)
-                   if (myGlucose >= Automation_1_BGThreshold_5 && myGlucose < Automation_1_BGThreshold_6) {
+                   if (myGlucose >= Automation_1_BGThreshold_6) {
                      // Set Nightboost Threshold 6 Factors    
                      Automation_Status = Automation_1_name + " On6";
                      var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_6;
