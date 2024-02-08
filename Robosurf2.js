@@ -35,7 +35,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    
 //Turn RoboSurfer and functions on or off
   var enable_RoboSurfer = true;
-  var enable_robosens = true;  
+  var enable_robosens = true; 
+  var enable_dynamic_cr = true; 
   var enable_new_sigmoidTDDFactor = true;
   var enable_Automation_1 = true; 
   var enable_smb_delivery_ratio_scaling = true;
@@ -398,9 +399,9 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
  // Robosens ISF and CR Adjustment   
     robosurfer_isf = robosurfer_isf + (robosurfer_isf * (1-robosens_sigmoidFactor);
 
-    
-    robosurfer_cr = robosurfer_isf / robosurfer_csf; 
-    
+    if (enable_dynamic_cr == true) { 
+            robosurfer_cr = robosurfer_isf / robosurfer_csf;
+            }  
                                
 // Return the percentage over target results
 //return "ROBOSENS: Trgt/Avg/%Over: 4 Hours: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
@@ -626,10 +627,12 @@ if (enable_Automation_1) {
        new_isf = robosurfer_isf + (robosurfer_isf * (1 - new_dynISF_ratio);
        new_isf = round(new_isf,0);
 
-       new_cr = robosurfer_isf / robosurfer_csf;
-       new_cr = round(new_cr,1);
-     
+      if (enable_dynamic_cr == true) { 
+             new_cr = robosurfer_isf / robosurfer_csf;
+             new_cr = round(new_cr,1);
+            } 
        
+          
 // **************** ROBOSURFER ENHANCEMENT #4: SET CONSTANT MINIMUM HOURLY CARB ABSORPTION ****************
 // For this function, the user should enter desired MIN CARB ABSORPTION in the min_5m_carbimpact setting instead of a min_5m_carbimpact.
 // The function will define the min_5m_carbimpact needed for that MIN CARB ABSORPTION based on current ISF and CR. 
