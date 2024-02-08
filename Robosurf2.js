@@ -93,7 +93,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var target = profile.min_bg;
    var initial_isf = profile.sens;
    var initial_cr = profile.carb_ratio; 
-   var initial_csf = initial_isf / initial_csf; 
+   var initial_csf = initial_isf / initial_cr; 
    var robosurfer_isf = initial_isf;
    var robosurfer_cr = initial_cr; 
    var robosurfer_csf = initial_csf;    
