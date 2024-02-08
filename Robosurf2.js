@@ -398,6 +398,10 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
 
  // Robosens ISF and CR Adjustment   
     robosurfer_isf = robosurfer_isf + (robosurfer_isf * (1-robosens_sigmoidFactor));
+    if (enable_dynamic_cr == true) { 
+             new_cr = robosurfer_isf / robosurfer_csf;
+             new_cr = round(new_cr,1);
+            } 
 
                                
 // Return the percentage over target results
@@ -618,16 +622,12 @@ if (enable_Automation_1) {
         }       
       } 
 
-//******************* Calculates the New ISF and CR Settings *****************************     
+//******************* Calculates the New ISF Settings *****************************     
     
    // Calculates the new ISF and CR using dynISF ratio (standard or automation-adjusted); if Robosens is enabled, will further adjust the Robosens adjusted ISF and CR
        new_isf = robosurfer_isf + (robosurfer_isf * (1 - new_dynISF_ratio));
        new_isf = round(new_isf,0);
 
-      if (enable_dynamic_cr == true) { 
-             new_cr = robosurfer_isf / robosurfer_csf;
-             new_cr = round(new_cr,1);
-            } 
        
           
 // **************** ROBOSURFER ENHANCEMENT #4: SET CONSTANT MINIMUM HOURLY CARB ABSORPTION ****************
