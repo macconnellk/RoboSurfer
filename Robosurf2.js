@@ -402,7 +402,8 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
              new_cr = robosurfer_isf / robosurfer_csf;
              new_cr = round(new_cr,1);
             } 
-
+     
+    check_csf = robosurfer_isf / new_cr;
                                
 // Return the percentage over target results
 //return "ROBOSENS: Trgt/Avg/%Over: 4 Hours: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
@@ -652,8 +653,7 @@ if (enable_Automation_1) {
 //******************* Set the Profile with the New ISF and CR Settings *****************************
        
       profile.sens = new_isf;    
-      profile.carb_ratio = new_cr;
-      check_csf = profile.sens / profile.carb_ratio; 
+      profile.carb_ratio = new_cr; 
       profile.maxSMBBasalMinutes = new_maxSMB;   
       profile.maxUAMSMBBasalMinutes = new_maxUAM;   
       profile.maxCOB = new_max_COB;    
