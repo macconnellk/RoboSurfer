@@ -399,9 +399,6 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
  // Robosens ISF and CR Adjustment   
     robosurfer_isf = robosurfer_isf + (robosurfer_isf * (1-robosens_sigmoidFactor));
 
-    if (enable_dynamic_cr == true) { 
-            robosurfer_cr = robosurfer_isf / robosurfer_csf;
-            }  
                                
 // Return the percentage over target results
 //return "ROBOSENS: Trgt/Avg/%Over: 4 Hours: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
