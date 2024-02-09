@@ -346,7 +346,7 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
       if (percentageOverTarget_Last24Hours > 0) {
          // robosens_MAX_adjustment = percentageOverTarget_Last24Hours / 100; // Original approach
          // Set RS Max using the exponential curve defined in Sheets, Max will increase exponentially as 24hr BG goes up
-         robosens_MAX_adjustment = .0007 * math.pow(percentageOverTarget_Last24Hours,1.9223); // New approach
+         robosens_MAX_adjustment = .0007 * Math.pow(percentageOverTarget_Last24Hours,1.9223); // New approach
          robosens_maximumRatio = robosens_maximumRatio + robosens_MAX_adjustment;
          }
 
