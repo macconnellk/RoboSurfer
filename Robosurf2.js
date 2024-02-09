@@ -142,9 +142,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
                var target_averageGlucose_Last8Hours = user_targetGlucoseLast8Hours[currentHour];
                var target_averageGlucose_Last24Hours = user_targetAverageGlucoseLast24Hours;
 
-      //  Initialize basal sigmoid function variables
+      //  Initialize user-defined basal sigmoid function variables
                var robosens_minimumRatio = .7;
                var robosens_maximumRatio = 1.2;
+               var robosens_maximumRatio_safety_threshold = 3;  
                var robosens_adjustmentFactor = .5;
                var robosens_sigmoidFactor = 1;
                var robosens_sens_status = "On4hr";
@@ -334,20 +335,22 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
 //Create the ROBOSENS RATIO Sigmoid Factor
 // DYNAMIC ROBOSENS SIGMOID Function
        
-      //  Increase the basal sigmoid AF if the 8hr Percent Over Target is high
+      // SET ROBOSENS ADJUSTMENT FACTOR: Increase the basal sigmoid AF if the 8hr Percent Over Target is high
       // Increase by .1 per each additional 10%
       if (percentageOverTarget_Last8Hours > 0 ) {
          robosens_AF_adjustment = percentageOverTarget_Last8Hours / 100;   
          robosens_adjustmentFactor = robosens_adjustmentFactor + robosens_AF_adjustment;
          }
 
-      //  Increase the basal sigmoid robosens max if the 24hr Percent Over Target is high
+      //  SET ROBOSENS MAX: Increase the basal sigmoid robosens max if the 24hr Percent Over Target is high
       // Increase by .1 per each additional 10%
       if (percentageOverTarget_Last24Hours > 0) {
-         // robosens_MAX_adjustment = percentageOverTarget_Last24Hours / 100; // Original approach
          // Set RS Max using the exponential curve defined in Sheets, Max will increase exponentially as 24hr BG goes up
          robosens_MAX_adjustment = .0007 * Math.pow(percentageOverTarget_Last24Hours,1.9223); // New approach
          robosens_maximumRatio = robosens_maximumRatio + robosens_MAX_adjustment;
+         robosens_maximumRatio = Math.max(robosens_maximumRatio, robosens_maximumRatio_safety_threshold);
+
+         // robosens_MAX_adjustment = percentageOverTarget_Last24Hours / 100; // Original approach
          }
 
       var robosens_ratioInterval = robosens_maximumRatio - robosens_minimumRatio;
@@ -667,7 +670,7 @@ if (enable_Automation_1) {
        
 // **************** End RoboSurfer Enhancements ****************
 
-return "TEST RS MAX ADJUST: " + robosens_MAX_adjustment + "Robosens Ratio: " + round(robosens_sigmoidFactor, 2) + ". dISF ratio: " + round(new_dynISF_ratio, 2) + ". ISF was/now: " + round(initial_isf, 2) + "/ " + round(profile.sens,2) + " Basal was/now: " + old_basal + "/ " + profile.current_basal + ". CR was/now: " + initial_cr + "/ " + round(profile.carb_ratio, 2) + " CSF was/now "  + round(initial_csf, 2) + "/ " + round(check_csf, 2)+ ". SMB Deliv. Ratio: " + profile.smb_delivery_ratio + " ROBOSENS: Status: " + robosens_sens_status + ". Trg/Av/%Over: 4Hr: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
+return "Robosens Ratio: " + round(robosens_sigmoidFactor, 2) + ". dISF ratio: " + round(new_dynISF_ratio, 2) + ". ISF was/now: " + round(initial_isf, 2) + "/ " + round(profile.sens,2) + " Basal was/now: " + old_basal + "/ " + profile.current_basal + ". CR was/now: " + initial_cr + "/ " + round(profile.carb_ratio, 2) + " CSF was/now "  + round(initial_csf, 2) + "/ " + round(check_csf, 2)+ ". SMB Deliv. Ratio: " + profile.smb_delivery_ratio + " ROBOSENS: Status: " + robosens_sens_status + ". Trg/Av/%Over: 4Hr: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
 " 8Hr:" + target_averageGlucose_Last8Hours + "/" + round(averageGlucose_Last8Hours, 0) + "/" + round(percentageOverTarget_Last8Hours, 0) + "%" + 
 " 24Hr:" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RS Adj/AF: " + round(robosens_AF_adjustment,2) + "/" + round(robosens_adjustmentFactor,2) + " RS Adj/MAX: " + round(robosens_MAX_adjustment,2) + "/" + round(robosens_maximumRatio,2) + " AUTOMATION1: " + Automation_Status + ": " + start_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " to " + end_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + ". SMB Mins: "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Mins: "  + round(profile.maxUAMSMBBasalMinutes, 2) + " Max COB: "  + round(profile.maxCOB, 2) + ". MinAbsorp((CI): "  + round(check_carb_absorption, 2) + "(" + profile.min_5m_carbimpact + ")"  + "Sensor Safety: " + sensor_safety_status + " " + round(glucoseDiff_Now,2) + " " + round(timeDiff_Now,2) + " " + round(glucoseRateOfChange_Now,1) + " TDD:" + round(past2hoursAverage, 2) + " 2week TDD:" + round(average_total_data, 2);
    }
