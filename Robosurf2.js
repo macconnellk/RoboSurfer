@@ -659,7 +659,7 @@ if (enable_Automation_1) {
       profile.maxUAMSMBBasalMinutes = new_maxUAM;   
       profile.maxCOB = new_max_COB;  
        
-      var check_carb_absorption =  (profile.min_5m_carbimpact * profile.carb_ratio) / profile.sens; 
+      var check_carb_absorption =  ((profile.min_5m_carbimpact * profile.carb_ratio) / profile.sens) * (60/5); 
          
     // Sets the autosens ratio to 1 for use by native Sigmoid, prevents any further adjustment to ISF
      autosens.ratio = 1;   
