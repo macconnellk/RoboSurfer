@@ -41,7 +41,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_Automation_1 = true; 
   var enable_smb_delivery_ratio_scaling = true;
 
-         // Sensor Safety: if data gaps or high BG delta, disable SMBs, UAMs, and smb_delivery_ratio_scaling. Also calculate glucose rate of change per minute
+         // Sensor Safety: if data gaps or high BG delta, disable SMBs, UAMs, and smb_delivery_ratio_scaling. 
+            // Calculate glucose rate of change per minute using same data
          var sensor_safety_status = "Off";
          var maxDeltaTick = 37; // single BG tick greater than x
          var SensorSafetyGlucoseTime = [];
@@ -256,7 +257,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       var min_hourly_carb_absorption = 34;
   
           
-// **************** ROBOSURFER ENHANCEMENT #1: ROBOSENS ****************
+// **************** ROBOSURFER ENHANCEMENT #1: ROBOSENS: ADJUSTS BASAL, ISF, CR BASED ON GLUCOSE AREA UNDER THE CURVE FOR 4, 8, and 24 Hours ****************
 
 //Only use when enable_robosens = true.
  if (enable_robosens) { 
@@ -411,7 +412,7 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
 }
        
        
-//  **************** ROBOSURFER ENHANCEMENT #2: Sigmoid Function with TDD-Factor Enhancement  ****************
+//  **************** ROBOSURFER ENHANCEMENT #2: Dynamic ISF Sigmoid with Robosens as TDD-Factor: FURTHER ADJUSTS ISF BASED PN CURRENT BG  ****************
      
 function sigmoidFunction(enable_new_sigmoidTDDFactor, adjustmentFactor, 
 minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage) {        
@@ -465,7 +466,7 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
     new_dynISF_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, adjustmentFactor, minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  
      
        
-// **************** ROBOSURFER ENHANCEMENT #3: DYNAMIC SMB DELIVERY RATIO ****************
+// **************** ROBOSURFER ENHANCEMENT #3: DYNAMIC SMB DELIVERY RATIO: ADJUSTS SMB DELIVERY RATIO BASED ON CURRENT BG ****************
 // Changes the setting SMB Delivery Ratio based on BG         
 
   if (enable_smb_delivery_ratio_scaling) {      
@@ -486,7 +487,7 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
         profile.smb_delivery_ratio = round(smb_delivery_ratio,2);
      }
 
-// **************** ROBOSURFER ENHANCEMENT #3: AUTOMATION #1: "NIGHTBOOST ****************
+// **************** ROBOSURFER ENHANCEMENT #3: AUTOMATION #1: "NIGHTBOOST: ADJUSTS ISF BASED ON TIME, CURRENT BG, and BG RATE OF CHANGE ****************
 //Only use when enable_Automation_1 = true
 if (enable_Automation_1) { 
 
