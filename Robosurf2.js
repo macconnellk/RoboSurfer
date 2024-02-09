@@ -255,7 +255,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
        
 //  Initialize Constant Carb Absorption variables        
       // Define the minimum amount of carb you wamt iAPS to decay in 1 hour.
-      var min_hourly_carb_absorption = 34;
+      var min_hourly_carb_absorption = 30;
   
           
 // **************** ROBOSURFER ENHANCEMENT #1: ROBOSENS: ADJUSTS BASAL, ISF, CR BASED ON GLUCOSE AREA UNDER THE CURVE FOR 4, 8, and 24 Hours ****************
