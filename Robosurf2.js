@@ -94,9 +94,6 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var initial_isf = profile.sens;
    var initial_cr = profile.carb_ratio; 
    var initial_csf = initial_isf / initial_cr; 
-   var robosurfer_isf = initial_isf;
-   var robosurfer_cr = initial_cr; 
-   var robosurfer_csf = initial_csf;    
    var cob = meal.mealCOB;
    var iob = iob[0].iob    
    var max_COB = profile.maxCOB;   
@@ -105,13 +102,57 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var smb_delivery_ratio = profile.smb_delivery_ratio;
    const now = new Date();
    var new_dynISF_ratio = 1;
-   var new_isf = robosurfer_isf;
-   var new_cr = robosurfer_cr;    
+   var new_isf = initial_isf;
+   var new_cr = initial_cr;    
    var new_maxSMB = maxSMB;   
    var new_maxUAM = maxUAM;   
    var new_max_COB = max_COB;    
    var check_csf = 0;    
 
+      
+//  Initialize ROBOSENS variables
+       // Initilize function variables
+         var robosens_isf = initial_isf;
+         var robosens_cr = initial_cr; 
+         var robosens_csf = initial_csf; 
+         var my24hrGlucose = []; // create array
+         var my24hrGlucoseTime = []; // create array
+         var old_basal = profile.current_basal;
+         var new_basal = profile.current_basal;     
+
+      // User-defined AUC targets for each time period in mg / dl / h (average glucose)
+      // Define target average glucose levels for different time periods
+             // User-defined targets for 4, 8, 24 lookbacks
+             // 4 hour average targets
+               const user_targetGlucoseLast4Hours = {0: 118, 1: 115, 2: 108, 3: 103, 4: 100, 5: 105, 6: 106, 7: 106, 8: 106, 9: 109, 10: 113, 11: 115, 12: 115, 13: 115, 14: 115, 15: 118, 16: 120, 17: 120, 18: 120, 19: 123, 20: 125, 21: 120, 22: 123, 23: 120};
+
+             // 8 hour avergae targets
+               const user_targetGlucoseLast8Hours = {0: 121, 1: 118, 2: 115, 3: 111, 4: 109, 5: 110, 6: 107, 7: 104, 8: 103, 9: 107, 10: 109, 11: 111, 12: 111, 13: 112, 14: 114, 15: 116, 16: 118, 17: 118, 18: 118, 19: 120, 20: 123, 21: 120, 22: 121, 23: 121};
+
+             // 12 hour average target
+               const user_targetAverageGlucoseLast24Hours = 114;
+
+      // Initialize the target variables based on current hour
+             // Get the current hour
+               const currentHour = new Date().getHours();
+
+            // Select the target thresholds
+               var target_averageGlucose_Last4Hours = user_targetGlucoseLast4Hours[currentHour];
+               var target_averageGlucose_Last8Hours = user_targetGlucoseLast8Hours[currentHour];
+               var target_averageGlucose_Last24Hours = user_targetAverageGlucoseLast24Hours;
+
+      //  Initialize basal sigmoid function variables
+               var robosens_minimumRatio = .7;
+               var robosens_maximumRatio = 1.2;
+               var robosens_adjustmentFactor = .5;
+               var robosens_sigmoidFactor = 1;
+               var robosens_sens_status = "On4hr";
+               var robosens_AF_adjustment = 0;
+               var robosens_MAX_adjustment = 0;
+               var dynamic_deviation_high = 160;
+               var dynamic_deviation_veryhigh = 220;  
+
+       
 //  Initialize Sigmoid Enhanced with TDD Response function variables
    var minimumRatio = .99;
    var maximumRatio = 1.25;
@@ -213,45 +254,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 //  Initialize Constant Carb Absorption variables        
       // Define the minimum amount of carb you wamt iAPS to decay in 1 hour.
       var min_hourly_carb_absorption = 34;
-
-//  Initialize ROBOSENS variables
-       // Initilize function variables
-         var my24hrGlucose = []; // create array
-         var my24hrGlucoseTime = []; // create array
-         var old_basal = profile.current_basal;
-         var new_basal = profile.current_basal;     
-
-      // User-defined AUC targets for each time period in mg / dl / h (average glucose)
-      // Define target average glucose levels for different time periods
-             // User-defined targets for 4, 8, 24 lookbacks
-             // 4 hour average targets
-               const user_targetGlucoseLast4Hours = {0: 118, 1: 115, 2: 108, 3: 103, 4: 100, 5: 105, 6: 106, 7: 106, 8: 106, 9: 109, 10: 113, 11: 115, 12: 115, 13: 115, 14: 115, 15: 118, 16: 120, 17: 120, 18: 120, 19: 123, 20: 125, 21: 120, 22: 123, 23: 120};
-
-             // 8 hour avergae targets
-               const user_targetGlucoseLast8Hours = {0: 121, 1: 118, 2: 115, 3: 111, 4: 109, 5: 110, 6: 107, 7: 104, 8: 103, 9: 107, 10: 109, 11: 111, 12: 111, 13: 112, 14: 114, 15: 116, 16: 118, 17: 118, 18: 118, 19: 120, 20: 123, 21: 120, 22: 121, 23: 121};
-
-             // 12 hour average target
-               const user_targetAverageGlucoseLast24Hours = 114;
-
-      // Initialize the target variables based on current hour
-             // Get the current hour
-               const currentHour = new Date().getHours();
-
-            // Select the target thresholds
-               var target_averageGlucose_Last4Hours = user_targetGlucoseLast4Hours[currentHour];
-               var target_averageGlucose_Last8Hours = user_targetGlucoseLast8Hours[currentHour];
-               var target_averageGlucose_Last24Hours = user_targetAverageGlucoseLast24Hours;
-
-      //  Initialize basal sigmoid function variables
-               var robosens_minimumRatio = .7;
-               var robosens_maximumRatio = 1.2;
-               var robosens_adjustmentFactor = .5;
-               var robosens_sigmoidFactor = 1;
-               var robosens_sens_status = "On4hr";
-               var robosens_AF_adjustment = 0;
-               var robosens_MAX_adjustment = 0;
-               var dynamic_deviation_high = 160;
-               var dynamic_deviation_veryhigh = 220;    
+  
           
 // **************** ROBOSURFER ENHANCEMENT #1: ROBOSENS ****************
 
@@ -329,12 +332,6 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
 
 //Create the ROBOSENS RATIO Sigmoid Factor
 // DYNAMIC ROBOSENS SIGMOID Function
-
-// RoboSens Sensitivity Protection Mechanism: If 4hr average glucose > 4hr target but current BG is under 4hr target, no adjustment to basal.
-//   if (averageGlucose_Last4Hours < target_averageGlucose_Last4Hours && myGlucose <= target_averageGlucose_Last4Hours ) {
-//      robosens_sigmoidFactor = 1;
-//      robosens_sens_status = "Protect";
-//   } else {
        
       //  Increase the basal sigmoid AF if the 8hr Percent Over Target is high
       // Increase by .1 per each additional 10%
@@ -354,7 +351,7 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
       var robosens_max_minus_one = robosens_maximumRatio - 1;
       
        // Dynamic deviation
-       // Sigmoid is based on 4 hour average bg. If current BG is over 160, use the max of 4,8,24 hour.  If current BG is over 220, use max of now,4,8,24.  
+       // Sigmoid is based on 4 hour average bg. If current BG is over 160, use the max of 4,8,24 hour instead.  If current BG is over 220, use max of now,4,8,24 instead.  
        // This is to tilt towards ongoing periods of resistance (8 or 24 hour) if current BG goes high. 
              var deviation_bg = averageGlucose_Last4Hours;
                     if (myGlucose > dynamic_deviation_high) {
@@ -397,13 +394,13 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
    profile.current_basal = new_basal;   
 
  // Robosens ISF and CR Adjustment   
-    robosurfer_isf = robosurfer_isf + (robosurfer_isf * (1-robosens_sigmoidFactor));
+    robosens_isf = robosens_isf + (robosens_isf * (1-robosens_sigmoidFactor));
     if (enable_dynamic_cr == true) { 
-             new_cr = robosurfer_isf / robosurfer_csf;
+             new_cr = robosens_isf / robosens_csf;
              new_cr = round(new_cr,1);
             } 
      
-    check_csf = robosurfer_isf / new_cr;
+    check_csf = robosens_isf / new_cr;
                                
 // Return the percentage over target results
 //return "ROBOSENS: Trgt/Avg/%Over: 4 Hours: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
@@ -618,7 +615,7 @@ if (enable_Automation_1) {
             // Commenting out while using dynamic ISF with Robosens 
             // Define the new automation 1 CSF 
             //if (enable_Automation_1_dynamic_cr == true) { 
-            //robosurfer_csf = robosurfer_csf * Automation_1_CSF_StrengthFactor;
+            //robosens_csf = robosens_csf * Automation_1_CSF_StrengthFactor;
             // }           
        
         }       
@@ -627,7 +624,7 @@ if (enable_Automation_1) {
 //******************* Calculates the New ISF Settings *****************************     
     
    // Calculates the new ISF and CR using dynISF ratio (standard or automation-adjusted); if Robosens is enabled, will further adjust the Robosens adjusted ISF and CR
-       new_isf = robosurfer_isf + (robosurfer_isf * (1 - new_dynISF_ratio));
+       new_isf = robosens_isf + (robosens_isf * (1 - new_dynISF_ratio));
        new_isf = round(new_isf,0);
 
        
