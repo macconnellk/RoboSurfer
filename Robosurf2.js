@@ -395,7 +395,7 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
    profile.current_basal = new_basal;   
 
  // Robosens ISF and CR Adjustment   
-    robosens_isf = robosens_isf + (robosens_isf * (1-robosens_sigmoidFactor));
+    robosens_isf = robosens_isf / robosens_sigmoidFactor;
     if (enable_dynamic_cr == true) { 
              new_cr = robosens_isf / robosens_csf;
              new_cr = round(new_cr,1);
@@ -625,7 +625,7 @@ if (enable_Automation_1) {
 //******************* Calculates the New ISF Settings *****************************     
     
    // Calculates the new ISF and CR using dynISF ratio (standard or automation-adjusted); if Robosens is enabled, will further adjust the Robosens adjusted ISF and CR
-       new_isf = robosens_isf + (robosens_isf * (1 - new_dynISF_ratio));
+       new_isf = robosens_isf / new_dynISF_ratio;
        new_isf = round(new_isf,0);
 
        
