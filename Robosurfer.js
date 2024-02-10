@@ -152,7 +152,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
                var robosens_sens_status = "On4hr";
                var robosens_AF_adjustment = 0;
                var robosens_MAX_adjustment = 0;
-               var dynamic_deviation_high = target_averageGlucose_Last4Hours;
+               var dynamic_deviation_high = 140;
                var dynamic_deviation_veryhigh = 220;  
 
        
