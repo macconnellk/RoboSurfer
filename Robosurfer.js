@@ -147,11 +147,12 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
                var robosens_maximumRatio = 1.2;
                var robosens_maximumRatio_safety_threshold = 3;  
                var robosens_adjustmentFactor = .5;
+               var robosens_adjustmentFactor_safety_threshold = 2; 
                var robosens_sigmoidFactor = 1;
                var robosens_sens_status = "On4hr";
                var robosens_AF_adjustment = 0;
                var robosens_MAX_adjustment = 0;
-               var dynamic_deviation_high = 160;
+               var dynamic_deviation_high = target_averageGlucose_Last4Hours;
                var dynamic_deviation_veryhigh = 220;  
 
        
@@ -338,14 +339,16 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
       // SET ROBOSENS ADJUSTMENT FACTOR: Increase the basal sigmoid AF if the 8hr Percent Over Target is high
       // Increase by .1 per each additional 10%
       if (percentageOverTarget_Last8Hours > 0 ) {
-         robosens_AF_adjustment = percentageOverTarget_Last8Hours / 100;   
+         robosens_AF_adjustment = .0007 * Math.pow(percentageOverTarget_Last8Hours,1.9223); // New approach   
          robosens_adjustmentFactor = robosens_adjustmentFactor + robosens_AF_adjustment;
+         robosens_adjustmentFactor = Math.min(robosens_adjustmentFactor, robosens_adjustmentFactor_safety_threshold);
+
+         // robosens_AF_adjustment = percentageOverTarget_Last8Hours / 100; // Original approach
          }
 
       //  SET ROBOSENS MAX: Increase the basal sigmoid robosens max if the 24hr Percent Over Target is high
-      // Increase by .1 per each additional 10%
+      // Set RS Max using the exponential curve defined in Sheets, Max will increase exponentially as 24hr BG goes up
       if (percentageOverTarget_Last24Hours > 0) {
-         // Set RS Max using the exponential curve defined in Sheets, Max will increase exponentially as 24hr BG goes up
          robosens_MAX_adjustment = .0007 * Math.pow(percentageOverTarget_Last24Hours,1.9223); // New approach
          robosens_maximumRatio = robosens_maximumRatio + robosens_MAX_adjustment;
          robosens_maximumRatio = Math.min(robosens_maximumRatio, robosens_maximumRatio_safety_threshold);
