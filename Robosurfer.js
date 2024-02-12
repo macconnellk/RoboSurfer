@@ -124,15 +124,19 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       // User-defined AUC targets for each time period in mg / dl / h (average glucose)
       // Define target average glucose levels for different time periods
              // User-defined targets for 4, 8, 24 lookbacks
-             // 4 hour average targets
+             // 4 hour average top of range targets 
                const user_targetGlucoseLast4Hours = {0: 123, 1: 118, 2: 108, 3: 103, 4: 100, 5: 105, 6: 106, 7: 106, 8: 106, 9: 116, 10: 125, 11: 130, 12: 130, 13: 130, 14: 130, 15: 130, 16: 130, 17: 130, 18: 130, 19: 140, 20: 150, 21: 140, 22: 140, 23: 130};
 
-             // 8 hour avergae targets
+             // 8 hour average top of range targets 
                const user_targetGlucoseLast8Hours = {0: 136, 1: 129, 2: 124, 3: 116, 4: 111, 5: 111, 6: 107, 7: 104, 8: 103, 9: 111, 10: 116, 11: 118, 12: 118, 13: 123, 14: 128, 15: 130, 16: 130, 17: 130, 18: 130, 19: 135, 20: 140, 21: 135, 22: 135, 23: 135};
 
-             // 12 hour average target
+             // 24 hour average top of range targets 
                const user_targetAverageGlucoseLast24Hours = 123;
 
+            // 4, 8, 24, bottom of range target
+                const user_bottomtargetAverageGlucose = 100;
+
+       
       // Initialize the target variables based on current hour
              // Get the current hour
                const currentHour = new Date().getHours();
@@ -397,12 +401,14 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
      robosens_sigmoidFactor = Math.max(Math.min(robosens_maximumRatio, robosens_sigmoidFactor), robosens_sigmoidFactor, robosens_minimumRatio);
    
 
- // Basal Adjustment
-   new_basal = profile.current_basal * robosens_sigmoidFactor;
-   new_basal = round_basal(new_basal);
-   profile.current_basal = new_basal;   
+ // Basal Adjustment: Multiply Basal By the 24hr Percent Above Threshold
+     if (averageGlucose_Last24Hours > target_averageGlucose_Last24Hours || averageGlucose_Last24Hours < user_bottomtargetAverageGlucose) {  
+         new_basal = profile.current_basal * (1+ (percentageOverTarget_Last24Hours/100);
+         new_basal = round_basal(new_basal);
+         profile.current_basal = new_basal;   
+     }  
 
- // Robosens ISF and CR Adjustment   
+ // Robosens ISF and CR Adjustment: Mutiply ISF By Robosens Factor   
     robosens_isf = robosens_isf / robosens_sigmoidFactor;
     if (enable_dynamic_cr == true) { 
              new_cr = robosens_isf / robosens_csf;
