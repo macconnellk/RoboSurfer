@@ -409,12 +409,15 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
      }  
 
  // Robosens ISF and CR Adjustment: Mutiply ISF By Robosens Factor   
-    robosens_isf = robosens_isf / robosens_sigmoidFactor;
-    if (enable_dynamic_cr == true) { 
-             new_cr = robosens_isf / robosens_csf;
-             new_cr = round(new_cr,1);
-            } 
-     
+    
+     if (averageGlucose_Last4Hours > target_averageGlucose_Last4Hours || averageGlucose_Last4Hours < user_bottomtargetAverageGlucose) {
+          robosens_isf = robosens_isf / robosens_sigmoidFactor;
+             if (enable_dynamic_cr == true) { 
+                   new_cr = robosens_isf / robosens_csf;
+                   new_cr = round(new_cr,1);
+                      } 
+     }
+    
     check_csf = robosens_isf / new_cr;
                                
 // Return the percentage over target results
