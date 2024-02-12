@@ -403,7 +403,7 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
 
  // Basal Adjustment: Multiply Basal By the 24hr Percent Above Threshold
      if (averageGlucose_Last24Hours > target_averageGlucose_Last24Hours || averageGlucose_Last24Hours < user_bottomtargetAverageGlucose) {  
-         new_basal = profile.current_basal * (1+ (percentageOverTarget_Last24Hours/100);
+         new_basal = profile.current_basal * (1+ (percentageOverTarget_Last24Hours/100));
          new_basal = round_basal(new_basal);
          profile.current_basal = new_basal;   
      }  
