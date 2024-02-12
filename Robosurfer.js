@@ -632,7 +632,7 @@ if (enable_Automation_1) {
 
 //******************* Calculates the New ISF Settings *****************************     
     
-   // Calculates the new ISF and CR using dynISF ratio (standard or automation-adjusted); if Robosens is enabled, will further adjust the Robosens adjusted ISF and CR
+   // Calculates a new ISF using dynISF ratio (standard or automation-adjusted); if Robosens is enabled, will further adjust the Robosens adjusted ISF
        new_isf = robosens_isf / new_dynISF_ratio;
        new_isf = round(new_isf,0);
 
