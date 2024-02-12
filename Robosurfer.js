@@ -440,7 +440,8 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
    // ORIGINAL SIGMOID APPROACH: const tdd_factor = tdd_averages.weightedAverage / tdd_averages.average_total_data;
    
  if (enable_new_sigmoidTDDFactor) {
-      var TDD_factor = robosens_sigmoidFactor;
+       var TDD_factor = 1; // Disable TDD Factor in dISF altogether to allow Robosens to handle resistance, use dISF for BG variation only
+       //var TDD_factor = robosens_sigmoidFactor; 
    } else { 
        var TDD_factor = weightedAverage / average_total_data; // the original Sigmoid approach
           }
