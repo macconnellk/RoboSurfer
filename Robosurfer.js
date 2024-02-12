@@ -230,10 +230,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var Automation_1_maximumRatio_5 = 2.8;
          var Automation_1_adjustmentFactor_5 = 1;
 
-         //220+ (345% - 350%)
+         //220+ (280% - 300%)
          //Automation 1 Sigmoid - Threshold 6 
          var Automation_1_minimumRatio_6 = .5;
-         var Automation_1_maximumRatio_6 = 3.5;
+         var Automation_1_maximumRatio_6 = 3;
          var Automation_1_adjustmentFactor_6 = 1;
        
           //Automation 1 Dynamic CR 
