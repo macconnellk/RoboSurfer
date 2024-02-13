@@ -338,10 +338,15 @@ var percentageOverTarget_Last4Hours = ((averageGlucose_Last4Hours - target_avera
 var percentageOverTarget_Last8Hours = ((averageGlucose_Last8Hours - target_averageGlucose_Last8Hours) / target_averageGlucose_Last8Hours) * 100;
 var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_averageGlucose_Last24Hours) / target_averageGlucose_Last24Hours) * 100;
 
- // SET THE ROBOSENS BASAL FACTOR
-     robosens_basalFactor = 1+(percentageOverTarget_Last24Hours/100);
+ // BASAL FACTOR: SET THE ROBOSENS BASAL FACTOR
+    // Choose the max of 1/6th 4hr ,1/3 8hr, or 24hr Percent Over Target to address rapidly increasing resistaance sooner
+     robosens_basalFactor = Math.max(
+       1 + (percentageOverTarget_Last4Hours / 6 / 100),
+       1 + (percentageOverTarget_Last8Hours / 3 / 100),
+       1 + (percentageOverTarget_Last24Hours / 100)
+      );
     
- //Set the ROBOSENS RATIO Sigmoid Factor
+ // ISF/CR FACTOR: Set the ROBOSENS RATIO Sigmoid Factor
 // DYNAMIC ROBOSENS SIGMOID Function
        
       // SET ROBOSENS ADJUSTMENT FACTOR: Increase the basal sigmoid AF if the 8hr Percent Over Target is high
