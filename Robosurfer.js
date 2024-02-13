@@ -210,36 +210,36 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          // 140-159 (142% - 164%)
          //Automation 1 Sigmoid - Threshold 2
          var Automation_1_minimumRatio_2 = .5;
-         var Automation_1_maximumRatio_2 = 1.9;
+         var Automation_1_maximumRatio_2 = 1.7;
          var Automation_1_adjustmentFactor_2 = .75;
 
          //160-179 (190%-203%)
          //Automation 1 Sigmoid - Threshold 3 
          var Automation_1_minimumRatio_3 = .5;
-         var Automation_1_maximumRatio_3 = 2.1;
+         var Automation_1_maximumRatio_3 = 1.8;
          var Automation_1_adjustmentFactor_3 = 1;
 
          //180-199 (238% - 246%)
          //Automation 1 Sigmoid - Threshold 4 
          var Automation_1_minimumRatio_4 = .5;
-         var Automation_1_maximumRatio_4 = 2.5;
+         var Automation_1_maximumRatio_4 = 2;
          var Automation_1_adjustmentFactor_4 = 1;
 
         //199-219 (274% - 278%)
         //Automation 1 Sigmoid - Threshold 5 
          var Automation_1_minimumRatio_5 = .5;
-         var Automation_1_maximumRatio_5 = 2.8;
+         var Automation_1_maximumRatio_5 = 2.3;
          var Automation_1_adjustmentFactor_5 = 1;
 
          //220+ (280% - 300%)
          //Automation 1 Sigmoid - Threshold 6 
          var Automation_1_minimumRatio_6 = .5;
-         var Automation_1_maximumRatio_6 = 3;
+         var Automation_1_maximumRatio_6 = 2.5;
          var Automation_1_adjustmentFactor_6 = 1;
        
           //Automation 1 Dynamic CR 
          var enable_Automation_1_dynamic_cr = true; // this variation of dynamic CR uses CSF to adjust CR in tandem wuth ISF. A CSF_StrengthFactor of 1 maintains the existing CSF and CR will be adjusted with ISF to maintain existing CSF.
-            var Automation_1_CSF_StrengthFactor = 1.1; // % change factor used to calculate new CR; 1 = no change to CSF & CR will be adjusted in line with the ISF change. 1.1 is a 10% increase to CSF (i.e carbs would have a greater impact on BG) and CR will be strengthened more than ISF to achieve this.
+            var Automation_1_CSF_StrengthFactor = 1; // % change factor used to calculate new CR; 1 = no change to CSF & CR will be adjusted in line with the ISF change. 1.1 is a 10% increase to CSF (i.e carbs would have a greater impact on BG) and CR will be strengthened more than ISF to achieve this.
              // Example: To reflect an increased impact of carbs at night (and slower absorption/digestion) during this time period, CSF must increase, CR would be adjusted more than ISF as a result. 
        
        //Automation 1 Other Settings
