@@ -71,7 +71,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
          var glucoseRateOfChange_Now = glucoseDiff_Now / timeDiff_Now;
          var glucoseRateOfChange_2Periods = glucoseDiff_2Periods / timeDiff_2Periods;  //normally 10 minutes
-         var glucoseRateOfChange_3Periods = glucoseDiff_3Periods / timeDiff_3Periods;  //normally 10 minutes
+         var glucoseRateOfChange_3Periods = glucoseDiff_3Periods / timeDiff_3Periods;  //normally 15 minutes
 
          if (timeDiff_Now >= 12 || timeDiff_2Periods >= 17 || glucoseDiff_Now >= maxDeltaTick || glucoseDiff_PriorPeriod >= maxDeltaTick ) {      
     
@@ -201,37 +201,31 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          // Automation_1 User-Defined Variables 
          var Automation_1_name = "Nightboost"; // Give the Automation a Name for use in return string
 
-         //120-139 (109%-125%)
          //Automation 1 Sigmoid - Threshold 1
          var Automation_1_minimumRatio_1 = .5;
          var Automation_1_maximumRatio_1 = 1.45;
          var Automation_1_adjustmentFactor_1 = .75;
 
-         // 140-159 (142% - 164%)
          //Automation 1 Sigmoid - Threshold 2
          var Automation_1_minimumRatio_2 = .5;
          var Automation_1_maximumRatio_2 = 1.7;
          var Automation_1_adjustmentFactor_2 = .75;
 
-         //160-179 (190%-203%)
          //Automation 1 Sigmoid - Threshold 3 
          var Automation_1_minimumRatio_3 = .5;
          var Automation_1_maximumRatio_3 = 1.8;
          var Automation_1_adjustmentFactor_3 = 1;
 
-         //180-199 (238% - 246%)
          //Automation 1 Sigmoid - Threshold 4 
          var Automation_1_minimumRatio_4 = .5;
          var Automation_1_maximumRatio_4 = 2;
          var Automation_1_adjustmentFactor_4 = 1;
 
-        //199-219 (274% - 278%)
         //Automation 1 Sigmoid - Threshold 5 
          var Automation_1_minimumRatio_5 = .5;
          var Automation_1_maximumRatio_5 = 2.3;
          var Automation_1_adjustmentFactor_5 = 1;
 
-         //220+ (280% - 300%)
          //Automation 1 Sigmoid - Threshold 6 
          var Automation_1_minimumRatio_6 = .5;
          var Automation_1_maximumRatio_6 = 2.5;
@@ -245,7 +239,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
        //Automation 1 Other Settings
          var Automation_1_SMB_UAM_Minutes_Increase = 15; // Standard Automation #1 SMB/UAM Increase
          var Automation_1_SMB_UAM_Minutes_Increase_HIGH = 30; // High BG Automation #1 SMB/UAM Increase
-         var Automation_1_SMB_UAM_Minutes_Increase_ACCEL = 60; // High BG Rate of Change Automation #1 SMB/UAM Increase 
+         var Automation_1_SMB_UAM_Minutes_Increase_ACCEL = 45; // High BG Rate of Change Automation #1 SMB/UAM Increase 
          var Automation_1_SMB_DeliveryRatio_Increase_ACCEL  = 1; // High BG Rate of Change SMB Delivery Ratio  
          var Automation_1_COB_Max = 100; // Automation #1 COB_Max
          var Automation_1_min_hourly_carb_absorption = 11; // Automation #1 min_hourly_carb_absorption. Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
@@ -524,115 +518,75 @@ if (enable_Automation_1) {
              && myGlucose > Automation_1_BGThreshold_1 && cob >= Automation_1_CarbThreshold) 
           {
 
+
+          // Baseline Nightboost settings are below, regardless of ROC.  E.g. If it's after 8p and BG > 120, Sig Max is 1.45 and SMB/UAM is +15 mins
+         
             new_max_COB = Automation_1_COB_Max; 
             min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; //
+            // Set Nightboost Threshold 1 Factors    
+                  Automation_Status = Automation_1_name + " OnMax1.45";   
+                  var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_1;
+                  var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_1;
+                  var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_1;
+                  new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase;   
+                  new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase;
 
-               // Determine Nightboost status and response
-               //Normal Rate of Change
+         // Determine Nightboost ROC status and response        
+         // E.g. If ROC is +24mg/dl in 15 mins, Sig Max is 1.7 - 2 and SMB/UAM is +30mins
+         // E.g. If ROC is +20mg/dl in  5 mins, +40 in 10 mins, or +60 in 15 minsm Sig Max is 2 - 2.5 and SMB/UAM is +45mins 
+         // Once ROC levels of, reveerts to baseline Nightboost even if BG high    
              
-                //120-139 (109%-125%)
+            //Increased Rate of Change (1.6mg/dl per minute)
+             if (glucoseRateOfChange_3Periods > 1.6) {
+             
+                //120-139 (Max: 1.7, AF 1)
                 if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
-                      // Set Nightboost Threshold 1 Factors    
-                     Automation_Status = Automation_1_name + " On1";   
-                     var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_1;
-                     var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_1;
-                     var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_1;
-                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase;   
-                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase;   
+                      // Set Nightboost Threshold 2 Factors    
+                     Automation_Status = Automation_1_name + " OnROCMax1.7";   
+                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
+                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
+                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
+                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_HIGH;   
+                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_HIGH;   
                 }
              
-                  // 140-159 (142% - 164%)
-                  if (myGlucose >= Automation_1_BGThreshold_2 && myGlucose < Automation_1_BGThreshold_3) {
-                     // Set Nightboost Threshold 2 Factors    
-                     Automation_Status = Automation_1_name + " On2";
-                     var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
-                     var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
-                     var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
-                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase;   
-                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase;
+                  // 140+ ((Max: 2, AF 1)
+                  if (myGlucose >= Automation_1_BGThreshold_2) {
+                     // Set Nightboost Threshold 4 Factors    
+                     Automation_Status = Automation_1_name + " OnROCMax2";
+                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_4;
+                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_4;
+                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_4;
+                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_HIGH;   
+                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_HIGH;
                   }
-
-                   //160-179 (190%-203%)
-                   if (myGlucose >= Automation_1_BGThreshold_3 && myGlucose < Automation_1_BGThreshold_4) {
-                        // Set Nightboost Threshold 3 Factors    
-                        Automation_Status = Automation_1_name + " On3";
-                        var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_3;
-                        var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_3;
-                        var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_3;
-                        new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_HIGH;   
-                        new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_HIGH; 
-                   }
-
-                  //180-199 (238% - 246%)
-                   if (myGlucose >= Automation_1_BGThreshold_4 && myGlucose < Automation_1_BGThreshold_5) {
-                        // Set Nightboost Threshold 4 Factors    
-                        Automation_Status = Automation_1_name + " On4";
-                        var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_4;
-                        var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_4;
-                        var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_4;
-                        new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_HIGH;   
-                        new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_HIGH; 
-                   }
-
-                   //199-219 (274% - 278%)
-                   if (myGlucose >= Automation_1_BGThreshold_5 && myGlucose < Automation_1_BGThreshold_6) {
-                     // Set Nightboost Threshold 5 Factors    
-                     Automation_Status = Automation_1_name + " On5";
-                     var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_5;
-                     var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_5;
-                     var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_5;
-                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_HIGH;   
-                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_HIGH; 
-                   }
-
-                // //220+ (345% - 350%)
-                   if (myGlucose >= Automation_1_BGThreshold_6) {
-                     // Set Nightboost Threshold 6 Factors    
-                     Automation_Status = Automation_1_name + " On6";
-                     var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_6;
-                     var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_6;
-                     var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_6;
-                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_HIGH;   
-                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_HIGH; 
-                   }
-             
+             }
+                
             //High Rate of Change (4mg/dl per minute)
              if (glucoseRateOfChange_Now > 4 || glucoseRateOfChange_2Periods > 4 || glucoseRateOfChange_3Periods > 4) {  
 
-                   // 120 -140 (107% - 135%)
-                  if ((myGlucose < Automation_1_BGThreshold_1)) {  
-                        // Set Nightboost Threshold 2 Factors with Acceleration    
-                        Automation_Status = Automation_1_name + " On ROC2";
-                        var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
-                        var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
-                        var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
+                   //120-139 (Max: 2, AF 1)
+                  if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
+                        // Set Nightboost Threshold 4 Factors with Acceleration    
+                        Automation_Status = Automation_1_name + " OnHighROCMax2";
+                        NightBoost_Sigmoid_Min = Automation_1_minimumRatio_4;
+                        NightBoost_Sigmoid_Max = Automation_1_maximumRatio_4;
+                        NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_4;
                         new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;   
                         new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;
                         profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
                 }
 
-                   // 140 -160 (153% - 185%)
-                  if (myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2) {
-                     // Set Nightboost Threshold 3 Factors with Acceleration    
-                     Automation_Status = Automation_1_name + " On ROC3";
-                     var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_3;
-                     var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_3;
-                     var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_3;
+                   // 140+ ((Max: 2, AF 1)
+                  if (myGlucose >= Automation_1_BGThreshold_2) {
+                     // Set Nightboost Threshold 6 Factors with Acceleration    
+                     Automation_Status = Automation_1_name + " On HighROCMax2.5";
+                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_6;
+                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_6;
+                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_6;
                      new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;   
                      new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;
                      profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
-                  }
-
-                   //160+ (262% - 350%)
-                if (myGlucose >= Automation_1_BGThreshold_2) {
-                     // Set Nightboost Threshold 4 Factors with Acceleration    
-                     Automation_Status = Automation_1_name + " On ROC6";
-                     var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_6;
-                     var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_6;
-                     var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_6;
-                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;   
-                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;
-                     profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL; 
                   }
                 
                 }
