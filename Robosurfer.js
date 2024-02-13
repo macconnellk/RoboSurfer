@@ -600,7 +600,7 @@ if (enable_Automation_1) {
              if (glucoseRateOfChange_Now > 4 || glucoseRateOfChange_2Periods > 4 || glucoseRateOfChange_3Periods > 4) {  
 
                    // 120 -140 (107% - 135%)
-                  if ((myGlucose >= Automation_1_BGThreshold_1ROC && myGlucose < Automation_1_BGThreshold_1)) {  
+                  if ((myGlucose < Automation_1_BGThreshold_1)) {  
                         // Set Nightboost Threshold 2 Factors with Acceleration    
                         Automation_Status = Automation_1_name + " On ROC2";
                         var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
