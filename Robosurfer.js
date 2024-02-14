@@ -332,13 +332,20 @@ var percentageOverTarget_Last4Hours = ((averageGlucose_Last4Hours - target_avera
 var percentageOverTarget_Last8Hours = ((averageGlucose_Last8Hours - target_averageGlucose_Last8Hours) / target_averageGlucose_Last8Hours) * 100;
 var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_averageGlucose_Last24Hours) / target_averageGlucose_Last24Hours) * 100;
 
- // BASAL FACTOR: SET THE ROBOSENS BASAL FACTOR
+ // BASAL FACTOR: SET THE ROBOSENS BASAL FACTOR IF IF 24AVG BG OUT OF RANGE
+if (averageGlucose_Last24Hours > target_averageGlucose_Last24Hours || averageGlucose_Last24Hours < user_bottomtargetAverageGlucose) {  
     // Choose the max of 1/6th 4hr ,1/3 8hr, or 24hr Percent Over Target to address rapidly increasing resistaance sooner
      robosens_basalFactor = Math.max(
        1 + (percentageOverTarget_Last4Hours / 6 / 100),
        1 + (percentageOverTarget_Last8Hours / 3 / 100),
        1 + (percentageOverTarget_Last24Hours / 100)
       );
+
+   // Basal Adjustment: Multiply Basal By the 24hr Percent Above Threshold
+         new_basal = profile.current_basal * robosens_basalFactor;
+         new_basal = round_basal(new_basal);
+         profile.current_basal = new_basal;   
+     }  
     
  // ISF/CR FACTOR: Set the ROBOSENS RATIO Sigmoid Factor
 // DYNAMIC ROBOSENS SIGMOID Function
@@ -403,13 +410,6 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
      //Respect min/max ratios
      robosens_sigmoidFactor = Math.max(Math.min(robosens_maximumRatio, robosens_sigmoidFactor), robosens_sigmoidFactor, robosens_minimumRatio);
    
-
- // Basal Adjustment: Multiply Basal By the 24hr Percent Above Threshold
-     if (averageGlucose_Last24Hours > target_averageGlucose_Last24Hours || averageGlucose_Last24Hours < user_bottomtargetAverageGlucose) {  
-         new_basal = profile.current_basal * robosens_basalFactor;
-         new_basal = round_basal(new_basal);
-         profile.current_basal = new_basal;   
-     }  
 
  // Robosens ISF and CR Adjustment: Mutiply ISF By Robosens Factor   
     
