@@ -347,9 +347,10 @@ if (averageGlucose_Last24Hours > target_averageGlucose_Last24Hours || averageGlu
          profile.current_basal = new_basal;   
      }  
     
- // ISF/CR FACTOR: Set the ROBOSENS RATIO Sigmoid Factor
+ // ISF/CR FACTOR: Set the ROBOSENS RATIO Sigmoid Factor IF 4HR AVG BG OUT OF RANGE
 // DYNAMIC ROBOSENS SIGMOID Function
-       
+ if (averageGlucose_Last4Hours > target_averageGlucose_Last4Hours || averageGlucose_Last4Hours < user_bottomtargetAverageGlucose) {
+    
       // SET ROBOSENS ADJUSTMENT FACTOR: Increase the basal sigmoid AF if the 8hr Percent Over Target is high
       // Increase by .1 per each additional 10%
       if (percentageOverTarget_Last8Hours > 0 ) {
@@ -412,8 +413,6 @@ if (averageGlucose_Last24Hours > target_averageGlucose_Last24Hours || averageGlu
    
 
  // Robosens ISF and CR Adjustment: Mutiply ISF By Robosens Factor   
-    
-     if (averageGlucose_Last4Hours > target_averageGlucose_Last4Hours || averageGlucose_Last4Hours < user_bottomtargetAverageGlucose) {
           robosens_isf = robosens_isf / robosens_sigmoidFactor;
              if (enable_dynamic_cr == true) { 
                    new_cr = robosens_isf / robosens_csf;
