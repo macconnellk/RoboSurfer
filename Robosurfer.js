@@ -125,10 +125,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       // Define target average glucose levels for different time periods
              // User-defined targets for 4, 8, 24 lookbacks
              // 4 hour average top of range targets 
-               const user_targetGlucoseLast4Hours = {0: 123, 1: 118, 2: 108, 3: 103, 4: 100, 5: 105, 6: 106, 7: 106, 8: 106, 9: 116, 10: 125, 11: 130, 12: 130, 13: 130, 14: 130, 15: 130, 16: 130, 17: 130, 18: 130, 19: 140, 20: 150, 21: 140, 22: 140, 23: 130};
+               const user_targetGlucoseLast4Hours = {0: 121, 1: 118, 2: 109, 3: 105, 4: 105, 5: 109, 6: 109, 7: 109, 8: 109, 9: 119, 10: 128, 11: 131, 12: 130, 13: 130, 14: 130, 15: 130, 16: 130, 17: 130, 18: 130, 19: 140, 20: 150, 21: 140, 22: 140, 23: 130};
 
              // 8 hour average top of range targets 
-               const user_targetGlucoseLast8Hours = {0: 136, 1: 129, 2: 124, 3: 116, 4: 111, 5: 111, 6: 107, 7: 104, 8: 103, 9: 111, 10: 116, 11: 118, 12: 118, 13: 123, 14: 128, 15: 130, 16: 130, 17: 130, 18: 130, 19: 135, 20: 140, 21: 135, 22: 135, 23: 135};
+               const user_targetGlucoseLast8Hours = {0: 136, 1: 129, 2: 124, 3: 118, 4: 113, 5: 113, 6: 109, 7: 107, 8: 107, 9: 114, 10: 118, 11: 120, 12: 119, 13: 124, 14: 129, 15: 131, 16: 130, 17: 130, 18: 130, 19: 135, 20: 140, 21: 135, 22: 135, 23: 135};
 
              // 24 hour average top of range targets 
                const user_targetAverageGlucoseLast24Hours = 123;
