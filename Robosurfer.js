@@ -204,7 +204,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
          //Automation 1 Sigmoid - Threshold 1
          var Automation_1_minimumRatio_1 = .5;
-         var Automation_1_maximumRatio_1 = 1.5;
+         var Automation_1_maximumRatio_1 = 1.55;
          var Automation_1_adjustmentFactor_1 = 1;
 
          //Automation 1 Sigmoid - Threshold 2
@@ -535,7 +535,7 @@ if (enable_Automation_1) {
             new_max_COB = Automation_1_COB_Max; 
             min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; //
             // Set Nightboost Threshold 1 Factors    
-                  Automation_Status = Automation_1_name + " OnMax1.5";   
+                  Automation_Status = Automation_1_name + " OnMax1.55";   
                   var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_1;
                   var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_1;
                   var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_1;
