@@ -564,10 +564,10 @@ if (enable_Automation_1) {
                   // 140+ ((Max: 2, AF 1)
                   if (myGlucose >= Automation_1_BGThreshold_2) {
                      // Set Nightboost Threshold 4 Factors    
-                     Automation_Status = Automation_1_name + " OnROCMax2.2";
-                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_5;
-                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_5;
-                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_5;
+                     Automation_Status = Automation_1_name + " OnROCMax2";
+                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_4;
+                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_4;
+                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_4;
                      new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_HIGH;   
                      new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_HIGH;
                   }
