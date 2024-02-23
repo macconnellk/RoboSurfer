@@ -214,7 +214,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
          //Automation 1 Sigmoid - Threshold 3 
          var Automation_1_minimumRatio_3 = .5;
-         var Automation_1_maximumRatio_3 = 1.8;
+         var Automation_1_maximumRatio_3 = 1.6;
          var Automation_1_adjustmentFactor_3 = 1;
 
          //Automation 1 Sigmoid - Threshold 4 
@@ -530,12 +530,12 @@ if (enable_Automation_1) {
           {
 
 
-          // Baseline Nightboost settings are below, regardless of ROC.  E.g. If it's after 8p and BG > 120, Sig Max is 1.45 and SMB/UAM is +15 mins
+          // Baseline Nightboost settings are below, regardless of ROC.  E.g. If it's after 8p and BG > 120, Sig Max is 1.3 and SMB/UAM is +15 mins
          
             new_max_COB = Automation_1_COB_Max; 
             min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; //
             // Set Nightboost Threshold 1 Factors    
-                  Automation_Status = Automation_1_name + " OnMax1.55";   
+                  Automation_Status = Automation_1_name + " OnMax1.3";   
                   var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_1;
                   var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_1;
                   var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_1;
@@ -543,17 +543,17 @@ if (enable_Automation_1) {
                   new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase;
 
          // Determine Nightboost ROC status and response        
-         // E.g. If ROC is +24mg/dl in 15 mins, Sig Max is 1.7 - 2 and SMB/UAM is +30mins
-         // E.g. If ROC is +20mg/dl in  5 mins, +40 in 10 mins, or +60 in 15 minsm Sig Max is 2 - 2.5 and SMB/UAM is +45mins 
-         // Once ROC levels of, reveerts to baseline Nightboost even if BG high    
+         // E.g. If ROC is +24mg/dl in 15 mins, Sig Max is 1.5 and SMB/UAM is +30mins
+         // E.g. If ROC is +20mg/dl in  5 mins, +40 in 10 mins, or +60 in 15 minsm Sig Max is 1.6 and SMB/UAM is +45mins 
+         // Once ROC levels off, reveerts to baseline Nightboost even if BG high    
              
             //Increased Rate of Change (1.6mg/dl per minute)
              if (glucoseRateOfChange_3Periods > 1.6) {
              
-                //120-139 (Max: 1.7, AF 1)
+                //120-139 (Max: 1.5, AF 1)
                 if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
                       // Set Nightboost Threshold 2 Factors    
-                     Automation_Status = Automation_1_name + " OnROCMax1.7";   
+                     Automation_Status = Automation_1_name + " OnROCMax1.5";   
                      NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
                      NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
                      NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
@@ -561,13 +561,13 @@ if (enable_Automation_1) {
                      new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_HIGH;   
                 }
              
-                  // 140+ ((Max: 2, AF 1)
+                  // 140+ ((Max: 1.5, AF 1)
                   if (myGlucose >= Automation_1_BGThreshold_2) {
-                     // Set Nightboost Threshold 4 Factors    
-                     Automation_Status = Automation_1_name + " OnROCMax2";
-                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_4;
-                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_4;
-                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_4;
+                     // Set Nightboost Threshold 2 Factors    
+                     Automation_Status = Automation_1_name + " OnROCMax1.5";
+                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
+                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
+                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
                      new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_HIGH;   
                      new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_HIGH;
                   }
@@ -576,25 +576,25 @@ if (enable_Automation_1) {
             //High Rate of Change (4mg/dl per minute)
              if (glucoseRateOfChange_Now > 4 || glucoseRateOfChange_2Periods > 4 || glucoseRateOfChange_3Periods > 4) {  
 
-                   //120-139 (Max: 2, AF 1)
+                   //120-139 (Max: 1.6, AF 1)
                   if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
-                        // Set Nightboost Threshold 4 Factors with Acceleration    
-                        Automation_Status = Automation_1_name + " OnHighROCMax2";
-                        NightBoost_Sigmoid_Min = Automation_1_minimumRatio_4;
-                        NightBoost_Sigmoid_Max = Automation_1_maximumRatio_4;
-                        NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_4;
+                        // Set Nightboost Threshold 3 Factors with Acceleration    
+                        Automation_Status = Automation_1_name + " OnHighROCMax1.6";
+                        NightBoost_Sigmoid_Min = Automation_1_minimumRatio_3;
+                        NightBoost_Sigmoid_Max = Automation_1_maximumRatio_3;
+                        NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_3;
                         new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;   
                         new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;
                         profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
                 }
 
-                   // 140+ ((Max: 2, AF 1)
+                   // 140+ ((Max: 1.6, AF 1)
                   if (myGlucose >= Automation_1_BGThreshold_2) {
                      // Set Nightboost Threshold 6 Factors with Acceleration    
-                     Automation_Status = Automation_1_name + " On HighROCMax2.5";
-                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_6;
-                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_6;
-                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_6;
+                     Automation_Status = Automation_1_name + " On HighROCMax1.6";
+                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_3;
+                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_3;
+                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_3;
                      new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;   
                      new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;
                      profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
