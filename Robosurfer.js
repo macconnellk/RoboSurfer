@@ -496,7 +496,12 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
 // **************** Initial call of the Sigmoid function to set a new autosens ratio ****************
 
     new_dynISF_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, adjustmentFactor, minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  
-     
+    
+      //******************* Calculates the New ISF Settings *****************************     
+      // Calculates a new ISF using dynISF ratio; if Robosens is enabled, will further adjust the Robosens adjusted ISF
+      // NOTE: Standard Sigmoid ISF will noy change the CR 
+          new_isf = robosens_isf / new_dynISF_ratio;
+          new_isf = round(new_isf,0);
        
 // **************** ROBOSURFER ENHANCEMENT #3: DYNAMIC SMB DELIVERY RATIO: ADJUSTS SMB DELIVERY RATIO BASED ON CURRENT BG ****************
 // Changes the setting SMB Delivery Ratio based on BG         
@@ -610,15 +615,20 @@ if (enable_Automation_1) {
             //if (enable_Automation_1_dynamic_cr == true) { 
             //robosens_csf = robosens_csf * Automation_1_CSF_StrengthFactor;
             // }           
-       
+
+            //******************* Calculates the New ISF Settings *****************************     
+            // Calculates a new ISF using dynISF ratio; if Robosens is enabled, will further adjust the Robosens adjusted ISF
+            // NOTE: Nightboost Sigmoid ISF WILL change the CR 
+                new_isf = robosens_isf / new_dynISF_ratio;
+                new_isf = round(new_isf,0);
+                if (enable_dynamic_cr == true) { 
+                   new_cr = new_isf / robosens_csf;
+                   new_cr = round(new_cr,1);
+                      }  
+                check_csf = new_isf / new_cr;
+             
         }       
       } 
-
-//******************* Calculates the New ISF Settings *****************************     
-    
-   // Calculates a new ISF using dynISF ratio (standard or automation-adjusted); if Robosens is enabled, will further adjust the Robosens adjusted ISF
-       new_isf = robosens_isf / new_dynISF_ratio;
-       new_isf = round(new_isf,0);
 
        
           
