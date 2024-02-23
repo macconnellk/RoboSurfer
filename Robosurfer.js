@@ -149,7 +149,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       //  Initialize user-defined basal sigmoid function variables
                var robosens_minimumRatio = .7;
                var robosens_maximumRatio = 1.2;
-               var robosens_maximumRatio_safety_threshold = 3;  
+               var robosens_maximumRatio_safety_threshold = 2;  
                var robosens_adjustmentFactor = .5;
                var robosens_adjustmentFactor_safety_threshold = 2; 
                var robosens_sigmoidFactor = 1;
@@ -241,7 +241,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var Automation_1_SMB_UAM_Minutes_Increase = 15; // Standard Automation #1 SMB/UAM Increase
          var Automation_1_SMB_UAM_Minutes_Increase_HIGH = 30; // High BG Automation #1 SMB/UAM Increase
          var Automation_1_SMB_UAM_Minutes_Increase_ACCEL = 45; // High BG Rate of Change Automation #1 SMB/UAM Increase 
-         var Automation_1_SMB_DeliveryRatio_Increase_ACCEL = 1; // High BG Rate of Change SMB Delivery Ratio  
+         var Automation_1_SMB_DeliveryRatio_Increase_ACCEL = .75; // High BG Rate of Change SMB Delivery Ratio  
          var Automation_1_COB_Max = 100; // Automation #1 COB_Max
          var Automation_1_min_hourly_carb_absorption = 24; // Automation #1 min_hourly_carb_absorption. Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
 
@@ -363,11 +363,11 @@ if (averageGlucose_Last24Hours > target_averageGlucose_Last24Hours || averageGlu
  if (averageGlucose_Last4Hours > target_averageGlucose_Last4Hours || averageGlucose_Last4Hours < user_bottomtargetAverageGlucose) {
     
       // SET ROBOSENS ADJUSTMENT FACTOR: Increase the basal sigmoid AF if the 8hr Percent Over Target is high
-      // Increase by .1 per each additional 10%
+      // Set RS AF using the exponential curve defined in Sheets, AF will increase exponentially as 8hr BG goes up
       if (percentageOverTarget_Last8Hours > 0 ) {
          robosens_AF_adjustment = .0007 * Math.pow(percentageOverTarget_Last8Hours,1.9223); // New approach   
          robosens_adjustmentFactor = robosens_adjustmentFactor + robosens_AF_adjustment;
-         robosens_adjustmentFactor = Math.min(robosens_adjustmentFactor, robosens_adjustmentFactor_safety_threshold);
+         robosens_adjustmentFactor = Math.min(robosens_adjustmentFactor, robosens_adjustmentFactor_safety_threshold); // Restrict exponential adjustment by user-defined safety threshold
 
          // robosens_AF_adjustment = percentageOverTarget_Last8Hours / 100; // Original approach
          }
@@ -377,7 +377,7 @@ if (averageGlucose_Last24Hours > target_averageGlucose_Last24Hours || averageGlu
       if (percentageOverTarget_Last24Hours > 0) {
          robosens_MAX_adjustment = .0007 * Math.pow(percentageOverTarget_Last24Hours,1.9223); // New approach
          robosens_maximumRatio = robosens_maximumRatio + robosens_MAX_adjustment;
-         robosens_maximumRatio = Math.min(robosens_maximumRatio, robosens_maximumRatio_safety_threshold);
+         robosens_maximumRatio = Math.min(robosens_maximumRatio, robosens_maximumRatio_safety_threshold); // Restrict exponential adjustment by user-defined safety threshold
 
          // robosens_MAX_adjustment = percentageOverTarget_Last24Hours / 100; // Original approach
          }
