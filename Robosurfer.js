@@ -243,7 +243,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var Automation_1_SMB_UAM_Minutes_Increase_ACCEL = 45; // High BG Rate of Change Automation #1 SMB/UAM Increase 
          var Automation_1_SMB_DeliveryRatio_Increase_ACCEL = 1; // High BG Rate of Change SMB Delivery Ratio  
          var Automation_1_COB_Max = 100; // Automation #1 COB_Max
-         var Automation_1_min_hourly_carb_absorption = 24; // Automation #1 min_hourly_carb_absorption. Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
+         var Automation_1_min_hourly_carb_absorption = 20; // Automation #1 min_hourly_carb_absorption. Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
 
       // Automation_1 Initialized Function Variables    
       var Automation_Status = "Off";
@@ -256,7 +256,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
        
 //  Initialize Constant Carb Absorption variables        
       // Define the minimum amount of carb you wamt iAPS to decay in 1 hour.
-      var min_hourly_carb_absorption = 28;
+      var min_hourly_carb_absorption = 26;
   
           
 // **************** ROBOSURFER ENHANCEMENT #1: ROBOSENS: ADJUSTS BASAL, ISF, CR BASED ON GLUCOSE AREA UNDER THE CURVE FOR 4, 8, and 24 Hours ****************
