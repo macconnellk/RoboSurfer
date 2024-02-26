@@ -224,12 +224,12 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
         //Automation 1 Sigmoid - Threshold 5 
          var Automation_1_minimumRatio_5 = .5;
-         var Automation_1_maximumRatio_5 = 2.5;
+         var Automation_1_maximumRatio_5 = 2.7;
          var Automation_1_adjustmentFactor_5 = 1;
 
          //Automation 1 Sigmoid - Threshold 6 
          var Automation_1_minimumRatio_6 = .5;
-         var Automation_1_maximumRatio_6 = 2.7;
+         var Automation_1_maximumRatio_6 = 2.9;
          var Automation_1_adjustmentFactor_6 = 1;
        
           //Automation 1 Dynamic CR 
@@ -576,10 +576,10 @@ if (enable_Automation_1) {
                      profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
                 }
              
-                  // 140+ ((Max: 1.5, AF 1)
+                  // 140+ ((Max: 2.7, AF 1)
                   if (myGlucose >= Automation_1_BGThreshold_2) {
                      // Set Nightboost Threshold 3 Factors    
-                     Automation_Status = Automation_1_name + " OnROCMax2.5";
+                     Automation_Status = Automation_1_name + " OnROCMax2.7";
                      NightBoost_Sigmoid_Min = Automation_1_minimumRatio_5;
                      NightBoost_Sigmoid_Max = Automation_1_maximumRatio_5;
                      NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_5;
@@ -592,10 +592,10 @@ if (enable_Automation_1) {
             //High Rate of Change (4mg/dl per minute)
              if (glucoseRateOfChange_Now > 4 || glucoseRateOfChange_2Periods > 4 || glucoseRateOfChange_3Periods > 4) {  
 
-                   //120-139 (Max: 2.7, AF 1)
+                   //120-139 (Max: 2.9, AF 1)
                   if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
                         // Set Nightboost Threshold 4 Factors with Acceleration    
-                        Automation_Status = Automation_1_name + " OnHighROCMax2.7";
+                        Automation_Status = Automation_1_name + " OnHighROCMax2.9";
                         NightBoost_Sigmoid_Min = Automation_1_minimumRatio_6;
                         NightBoost_Sigmoid_Max = Automation_1_maximumRatio_6;
                         NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_6;
