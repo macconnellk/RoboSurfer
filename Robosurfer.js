@@ -229,7 +229,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
          //Automation 1 Sigmoid - Threshold 6 
          var Automation_1_minimumRatio_6 = .5;
-         var Automation_1_maximumRatio_6 = 4;
+         var Automation_1_maximumRatio_6 = 3.8;
          var Automation_1_adjustmentFactor_6 = 1;
        
           //Automation 1 Dynamic CR 
@@ -590,7 +590,7 @@ if (enable_Automation_1) {
              }
                 
             //High Rate of Change (4mg/dl per minute)
-             if (glucoseRateOfChange_Now > 4 || glucoseRateOfChange_2Periods > 4 || glucoseRateOfChange_3Periods > 4) {  
+             if (glucoseRateOfChange_2Periods > 4 || glucoseRateOfChange_3Periods > 4) {  
 
                    //120-139 (Max: 4.0, AF 1)
                   if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
