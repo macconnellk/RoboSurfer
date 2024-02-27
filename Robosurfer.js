@@ -443,7 +443,7 @@ if (enable_Automation_1) {
             // Calculates a new ISF using Nightboost Starting ISF and Nightboost dynISF ratio; if Robosens is enabled, Robosens will further adjust the Nightboost adjusted ISF and CR
             // NOTE: Nightboost Sigmoid ISF WILL change the CR 
                 robosens_isf = robosens_isf / new_dynISF_ratio;
-                robosens_isf = round(robosensisf,0);
+                robosens_isf = round(robosens_isf,0);
              
         }       
       } 
