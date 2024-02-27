@@ -204,7 +204,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
          //Automation 1 Sigmoid - Threshold 1
          var Automation_1_minimumRatio_1 = .5;
-         var Automation_1_maximumRatio_1 = 2.2;
+         var Automation_1_maximumRatio_1 = 1.5;
          var Automation_1_adjustmentFactor_1 = 1;
 
          //Automation 1 Sigmoid - Threshold 2
@@ -224,12 +224,12 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
         //Automation 1 Sigmoid - Threshold 5 
          var Automation_1_minimumRatio_5 = .5;
-         var Automation_1_maximumRatio_5 = 3.5;
+         var Automation_1_maximumRatio_5 = 2.1;
          var Automation_1_adjustmentFactor_5 = 1;
 
          //Automation 1 Sigmoid - Threshold 6 
          var Automation_1_minimumRatio_6 = .5;
-         var Automation_1_maximumRatio_6 = 3.8;
+         var Automation_1_maximumRatio_6 = 2.25;
          var Automation_1_adjustmentFactor_6 = 1;
        
           //Automation 1 Dynamic CR 
@@ -543,8 +543,7 @@ if (enable_Automation_1) {
              && myGlucose > Automation_1_BGThreshold_1 && cob >= Automation_1_CarbThreshold) 
           {
 
-
-          // Baseline Nightboost settings are below, regardless of ROC.  E.g. If it's after 8p and BG > 120, Sig Max is 2.2 and SMB/UAM is +15 mins
+          // Baseline Nightboost settings are below, regardless of ROC.  E.g. If it's after 8p and BG > 120, Sig Max is 1.5 and SMB/UAM is +15 mins
          
             new_max_COB = Automation_1_COB_Max; 
             min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; //
