@@ -201,7 +201,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
        
          // Automation_1 User-Defined Variables 
          var Automation_1_name = "Nightboost"; // Give the Automation a Name for use in return string
-
+         var Automation_1_ISF = 125;
+         
          //Automation 1 Sigmoid - Threshold 1
          var Automation_1_minimumRatio_1 = .5;
          var Automation_1_maximumRatio_1 = 1.5;
@@ -257,9 +258,199 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 //  Initialize Constant Carb Absorption variables        
       // Define the minimum amount of carb you wamt iAPS to decay in 1 hour.
       var min_hourly_carb_absorption = 26;
-  
+
+
+//  **************** ROBOSURFER ENHANCEMENT #1: Dynamic ISF Sigmoid- ADJUSTS ISF BASED PN CURRENT BG  ****************
+     
+function sigmoidFunction(enable_new_sigmoidTDDFactor, adjustmentFactor, 
+minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage) {        
+
+
+   // DYNISF SIGMOID MODIFICATION #1
+   // Use the robosens_sigmoidFactor as the TDD factor
+   // ORIGINAL SIGMOID APPROACH: const tdd_factor = tdd_averages.weightedAverage / tdd_averages.average_total_data;
+   
+ if (enable_new_sigmoidTDDFactor) {
+       var TDD_factor = 1; // Disable TDD Factor in dISF altogether to allow Robosens to handle resistance, use dISF for BG variation only 
+   } else { 
+       var TDD_factor = weightedAverage / average_total_data; // the original Sigmoid approach
+          }
+
+// The Dynamic ISF Sigmoid Code 
+
+      var ratioInterval = maximumRatio - minimumRatio;
+      var max_minus_one = maximumRatio - 1;
+
+   // DYNISF SIGMOID MODIFICATION #2
+    // The TDD delta effect in the iAPS Chris Wilson (Logarithmic) DynISF approach allows ISF to shift when BG is below target BG (unlike the original Sigmoid DynamicISF approach). 
+    // The following math applies the robosens_sigmoidFactor to the target BG to this shift.
+    // Like the original Sigmoid approach, Profile ISF will be applied at target but only when robosens_sigmoidFactor = 1.  
+    // ORIGINAL SIGMOID APPROACH: const bg_dev = (current_bg - profile.min_bg) * 0.0555;
+
+    if (enable_new_sigmoidTDDFactor) {
+       var deviation = (myGlucose - (target / TDD_factor)) * 0.0555; 
+    } else {
+       var deviation = (myGlucose - target) * 0.0555; // the original Sigmoid approach
+          }
+       
+     //Makes sigmoid factor(y) = 1 when BG deviation(x) = 0.
+     var fix_offset = (Math.log10(1/max_minus_one-minimumRatio/max_minus_one) / Math.log10(Math.E));
+       
+     //Exponent used in sigmoid formula
+     var exponent = deviation * adjustmentFactor * TDD_factor + fix_offset;
+    
+     // The sigmoid function
+      sigmoidFactor = ratioInterval / (1 + Math.exp(-exponent)) + minimumRatio;
+
+     //Respect min/max ratios
+     sigmoidFactor = Math.max(Math.min(maximumRatio, sigmoidFactor), sigmoidFactor, minimumRatio);
+
+      return sigmoidFactor;
+
+}        
+
+// **************** Initial call of the Sigmoid function to set a new autosens ratio ****************
+
+    new_dynISF_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, adjustmentFactor, minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  
+    
+      //******************* Calculates the New ISF Settings *****************************     
+      // Calculates a new ISF using dynISF ratio; if Robosens is enabled, Robosens will further adjust this adjusted ISF
+      // NOTE: Standard Sigmoid ISF will not change the CR 
+          robosens_isf = robosens_isf / new_dynISF_ratio;
+          robosens_isf = round(robosens_isf,0);
+
+//  **************** END ROBOSURFER ENHANCEMENT #1: Dynamic ISF Sigmoid  ****************
+       
+// **************** ROBOSURFER ENHANCEMENT #2: DYNAMIC SMB DELIVERY RATIO: ADJUSTS SMB DELIVERY RATIO BASED ON CURRENT BG ****************
+// Changes the setting SMB Delivery Ratio based on BG         
+
+  if (enable_smb_delivery_ratio_scaling) {      
+
+   // The SMB Delivery Ratio Scaling Function
+
+     // If BG between start bg and top of BG Range, scale SMB Delivery ratio
+     if (myGlucose >= smb_delivery_ratio_scale_start_bg && myGlucose <= (smb_delivery_ratio_scale_start_bg + smb_delivery_ratio_bg_range)) {
+        smb_delivery_ratio = (myGlucose - smb_delivery_ratio_scale_start_bg) * ((smb_delivery_ratio_max - smb_delivery_ratio_min) / smb_delivery_ratio_bg_range) + smb_delivery_ratio_min;
+      }
+
+     // If BG above user-defined BG range, use SMB ratio max
+     if (myGlucose > (smb_delivery_ratio_scale_start_bg + smb_delivery_ratio_bg_range)) {
+        smb_delivery_ratio = smb_delivery_ratio_max;
+      }
+
+      // Set profile to new value
+        profile.smb_delivery_ratio = round(smb_delivery_ratio,2);
+     }
+
+// **************** END ROBOSURFER ENHANCEMENT #2: DYNAMIC SMB DELIVERY RATIO **********************************************
+       
+// **************** ROBOSURFER ENHANCEMENT #3: AUTOMATION #1: "NIGHTBOOST: ADJUSTS ISF BASED ON TIME, CURRENT BG, and BG RATE OF CHANGE ****************
+//Only use when enable_Automation_1 = true
+// This function will replace the values determined in the prior Dynamic ISF and Delivery Ratio functions        
+if (enable_Automation_1) { 
+
+            // Check if the current time is within the specified range, greater than BG threshold and COB threshold
+          if (((now >= start_time && now <= end_time) || (now <= start_time && now <= end_time && start_time > end_time) ||
+             (now >= start_time && now >= end_time && start_time > end_time))
+             && myGlucose > Automation_1_BGThreshold_1 && cob >= Automation_1_CarbThreshold) 
+          {
+
+          // Baseline Nightboost settings are below, regardless of ROC.  E.g. If it's after 8p and BG > 120, Sig Max is 1.5 and SMB/UAM is +15 mins
+
+            robosens_isf = Automation_1_ISF; // Set the starting Profile ISF to the Nightboost user-defined starting ISF
+            new_max_COB = Automation_1_COB_Max; 
+            min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; //
+            // Set Nightboost Threshold 1 Factors    
+                  Automation_Status = Automation_1_name + " OnMax2.2";   
+                  var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_1;
+                  var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_1;
+                  var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_1;
+                  new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase;   
+                  new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase;
+
+         // Determine Nightboost ROC status and response        
+         // E.g. If ROC is +24mg/dl in 15 mins, Sig Max is 3.5 and SMB/UAM is +30mins
+         // E.g. If ROC is +20mg/dl in  5 mins, +40 in 10 mins, or +60 in 15 minsm Sig Max is 4 and SMB/UAM is +45mins 
+         // Once ROC levels off, reveerts to baseline Nightboost even if BG high    
+             
+            //Increased Rate of Change (1.6mg/dl per minute)
+             if (glucoseRateOfChange_3Periods > 1.6) {
+             
+                //120-139 (Max: 3.5, AF 1)
+                if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
+                      // Set Nightboost Threshold 3 Factors    
+                     Automation_Status = Automation_1_name + " OnROCMax3.5";   
+                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_5;
+                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_5;
+                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_5;
+                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_HIGH;   
+                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_HIGH;
+                     profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
+                }
+             
+                  // 140+ ((Max: 3.5, AF 1)
+                  if (myGlucose >= Automation_1_BGThreshold_2) {
+                     // Set Nightboost Threshold 3 Factors    
+                     Automation_Status = Automation_1_name + " OnROCMax3.5";
+                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_5;
+                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_5;
+                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_5;
+                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_HIGH;   
+                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_HIGH;
+                     profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
+                  }
+             }
+                
+            //High Rate of Change (4mg/dl per minute)
+             if (glucoseRateOfChange_2Periods > 4 || glucoseRateOfChange_3Periods > 4) {  
+
+                   //120-139 (Max: 4.0, AF 1)
+                  if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
+                        // Set Nightboost Threshold 4 Factors with Acceleration    
+                        Automation_Status = Automation_1_name + " OnHighROCMax4.0";
+                        NightBoost_Sigmoid_Min = Automation_1_minimumRatio_6;
+                        NightBoost_Sigmoid_Max = Automation_1_maximumRatio_6;
+                        NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_6;
+                        new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;   
+                        new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;
+                        profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
+                }
+
+                   // 140+ ((Max: 4.0, AF 1)
+                  if (myGlucose >= Automation_1_BGThreshold_2) {
+                     // Set Nightboost Threshold 4 Factors with Acceleration    
+                     Automation_Status = Automation_1_name + " On HighROCMax4.0";
+                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_6;
+                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_6;
+                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_6;
+                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;   
+                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;
+                     profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
+                  }
+                
+                }
+             
+            // Run Sigmoid Function to get new_dynISF_ratio for Automation 1  
+            new_dynISF_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, NightBoost_Sigmoid_AF, NightBoost_Sigmoid_Min, NightBoost_Sigmoid_Max, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
+
+            // Commenting out while using dynamic ISF with Robosens 
+            // Define the new automation 1 CSF 
+            //if (enable_Automation_1_dynamic_cr == true) { 
+            //robosens_csf = robosens_csf * Automation_1_CSF_StrengthFactor;
+            // }           
+
+            //******************* Calculates the Nightboost ISF Settings *****************************     
+            // Calculates a new ISF using Nightboost Starting ISF and Nightboost dynISF ratio; if Robosens is enabled, Robosens will further adjust the Nightboost adjusted ISF and CR
+            // NOTE: Nightboost Sigmoid ISF WILL change the CR 
+                robosens_isf = robosens_isf / new_dynISF_ratio;
+                robosens_isf = round(robosensisf,0);
+             
+        }       
+      } 
+
+ // **************** END ROBOSURFER ENHANCEMENT #3: AUTOMATION #1: "NIGHTBOOST ********************************
           
-// **************** ROBOSURFER ENHANCEMENT #1: ROBOSENS: ADJUSTS BASAL, ISF, CR BASED ON GLUCOSE AREA UNDER THE CURVE FOR 4, 8, and 24 Hours ****************
+// **************** ROBOSURFER ENHANCEMENT #4: ROBOSENS: ADJUSTS BASAL, ISF, CR BASED ON GLUCOSE AREA UNDER THE CURVE FOR 4, 8, and 24 Hours ****************
 
 //Only use when enable_robosens = true.
  if (enable_robosens) { 
@@ -432,214 +623,21 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
      //Respect min/max ratios
      robosens_sigmoidFactor = Math.max(Math.min(robosens_maximumRatio, robosens_sigmoidFactor), robosens_sigmoidFactor, robosens_minimumRatio);
    
-
- // Robosens ISF and CR Adjustment: Mutiply ISF By Robosens Factor   
-          robosens_isf = robosens_isf / robosens_sigmoidFactor;
-             if (enable_dynamic_cr == true) { 
-                   new_cr = robosens_isf / robosens_csf;
-                   new_cr = round(new_cr,1);
-                      } 
      }
-    
-    check_csf = robosens_isf / new_cr;
-                               
-// Return the percentage over target results
-//return "ROBOSENS: Trgt/Avg/%Over: 4 Hours: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
-//" 8 Hours:" + target_averageGlucose_Last8Hours + "/" + round(averageGlucose_Last8Hours, 0) + "/" + round(percentageOverTarget_Last8Hours, 0) + "%" + 
-//" 24 Hours:" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RoboSens Ratio: " + round(robosens_sigmoidFactor, 2) + "Profile Basal: " + old_basal + " RoboSens Basal: " + profile.current_basal + " RoboSens Protection: " + robosens_sens_status + " RoboSens AF Adj/Factor: " + robosens_AF_adjustment + "/" + robosens_adjustmentFactor + " RoboSens Max Adj/Max: " + robosens_MAX_adjustment + "/" + robosens_maximumRatio;
-     
-
+                                  
 }
-       
-       
-//  **************** ROBOSURFER ENHANCEMENT #2: Dynamic ISF Sigmoid with Robosens as TDD-Factor: FURTHER ADJUSTS ISF BASED PN CURRENT BG  ****************
-     
-function sigmoidFunction(enable_new_sigmoidTDDFactor, adjustmentFactor, 
-minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage) {        
 
-
-   // DYNISF SIGMOID MODIFICATION #1
-   // Use the robosens_sigmoidFactor as the TDD factor
-   // ORIGINAL SIGMOID APPROACH: const tdd_factor = tdd_averages.weightedAverage / tdd_averages.average_total_data;
-   
- if (enable_new_sigmoidTDDFactor) {
-       var TDD_factor = 1; // Disable TDD Factor in dISF altogether to allow Robosens to handle resistance, use dISF for BG variation only
-       //var TDD_factor = robosens_sigmoidFactor; 
-   } else { 
-       var TDD_factor = weightedAverage / average_total_data; // the original Sigmoid approach
-          }
-
-// The Dynamic ISF Sigmoid Code 
-
-      var ratioInterval = maximumRatio - minimumRatio;
-      var max_minus_one = maximumRatio - 1;
-
-   // DYNISF SIGMOID MODIFICATION #2
-    // The TDD delta effect in the iAPS Chris Wilson (Logarithmic) DynISF approach allows ISF to shift when BG is below target BG (unlike the original Sigmoid DynamicISF approach). 
-    // The following math applies the robosens_sigmoidFactor to the target BG to this shift.
-    // Like the original Sigmoid approach, Profile ISF will be applied at target but only when robosens_sigmoidFactor = 1.  
-    // ORIGINAL SIGMOID APPROACH: const bg_dev = (current_bg - profile.min_bg) * 0.0555;
-
-    if (enable_new_sigmoidTDDFactor) {
-       var deviation = (myGlucose - (target / TDD_factor)) * 0.0555; 
-    } else {
-       var deviation = (myGlucose - target) * 0.0555; // the original Sigmoid approach
-          }
-       
-     //Makes sigmoid factor(y) = 1 when BG deviation(x) = 0.
-     var fix_offset = (Math.log10(1/max_minus_one-minimumRatio/max_minus_one) / Math.log10(Math.E));
-       
-     //Exponent used in sigmoid formula
-     var exponent = deviation * adjustmentFactor * TDD_factor + fix_offset;
-    
-     // The sigmoid function
-      sigmoidFactor = ratioInterval / (1 + Math.exp(-exponent)) + minimumRatio;
-
-     //Respect min/max ratios
-     sigmoidFactor = Math.max(Math.min(maximumRatio, sigmoidFactor), sigmoidFactor, minimumRatio);
-
-      return sigmoidFactor;
-
-}        
-
-// **************** Initial call of the Sigmoid function to set a new autosens ratio ****************
-
-    new_dynISF_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, adjustmentFactor, minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  
-    
-      //******************* Calculates the New ISF Settings *****************************     
-      // Calculates a new ISF using dynISF ratio; if Robosens is enabled, will further adjust the Robosens adjusted ISF
-      // NOTE: Standard Sigmoid ISF will noy change the CR 
-          new_isf = robosens_isf / new_dynISF_ratio;
+// Robosens ISF and CR Adjustment: Mutiply ISF By Robosens Factor   
+          new_isf = robosens_isf / robosens_sigmoidFactor;
           new_isf = round(new_isf,0);
-       
-// **************** ROBOSURFER ENHANCEMENT #3: DYNAMIC SMB DELIVERY RATIO: ADJUSTS SMB DELIVERY RATIO BASED ON CURRENT BG ****************
-// Changes the setting SMB Delivery Ratio based on BG         
-
-  if (enable_smb_delivery_ratio_scaling) {      
-
-   // The SMB Delivery Ratio Scaling Function
-
-     // If BG between start bg and top of BG Range, scale SMB Delivery ratio
-     if (myGlucose >= smb_delivery_ratio_scale_start_bg && myGlucose <= (smb_delivery_ratio_scale_start_bg + smb_delivery_ratio_bg_range)) {
-        smb_delivery_ratio = (myGlucose - smb_delivery_ratio_scale_start_bg) * ((smb_delivery_ratio_max - smb_delivery_ratio_min) / smb_delivery_ratio_bg_range) + smb_delivery_ratio_min;
-      }
-
-     // If BG above user-defined BG range, use SMB ratio max
-     if (myGlucose > (smb_delivery_ratio_scale_start_bg + smb_delivery_ratio_bg_range)) {
-        smb_delivery_ratio = smb_delivery_ratio_max;
-      }
-
-      // Set profile to new value
-        profile.smb_delivery_ratio = round(smb_delivery_ratio,2);
-     }
-
-// **************** ROBOSURFER ENHANCEMENT #3: AUTOMATION #1: "NIGHTBOOST: ADJUSTS ISF BASED ON TIME, CURRENT BG, and BG RATE OF CHANGE ****************
-//Only use when enable_Automation_1 = true
-if (enable_Automation_1) { 
-
-            // Check if the current time is within the specified range, greater than BG threshold and COB threshold
-          if (((now >= start_time && now <= end_time) || (now <= start_time && now <= end_time && start_time > end_time) ||
-             (now >= start_time && now >= end_time && start_time > end_time))
-             && myGlucose > Automation_1_BGThreshold_1 && cob >= Automation_1_CarbThreshold) 
-          {
-
-          // Baseline Nightboost settings are below, regardless of ROC.  E.g. If it's after 8p and BG > 120, Sig Max is 1.5 and SMB/UAM is +15 mins
-         
-            new_max_COB = Automation_1_COB_Max; 
-            min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; //
-            // Set Nightboost Threshold 1 Factors    
-                  Automation_Status = Automation_1_name + " OnMax2.2";   
-                  var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_1;
-                  var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_1;
-                  var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_1;
-                  new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase;   
-                  new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase;
-
-         // Determine Nightboost ROC status and response        
-         // E.g. If ROC is +24mg/dl in 15 mins, Sig Max is 3.5 and SMB/UAM is +30mins
-         // E.g. If ROC is +20mg/dl in  5 mins, +40 in 10 mins, or +60 in 15 minsm Sig Max is 4 and SMB/UAM is +45mins 
-         // Once ROC levels off, reveerts to baseline Nightboost even if BG high    
-             
-            //Increased Rate of Change (1.6mg/dl per minute)
-             if (glucoseRateOfChange_3Periods > 1.6) {
-             
-                //120-139 (Max: 3.5, AF 1)
-                if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
-                      // Set Nightboost Threshold 3 Factors    
-                     Automation_Status = Automation_1_name + " OnROCMax3.5";   
-                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_5;
-                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_5;
-                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_5;
-                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_HIGH;   
-                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_HIGH;
-                     profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
-                }
-             
-                  // 140+ ((Max: 3.5, AF 1)
-                  if (myGlucose >= Automation_1_BGThreshold_2) {
-                     // Set Nightboost Threshold 3 Factors    
-                     Automation_Status = Automation_1_name + " OnROCMax3.5";
-                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_5;
-                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_5;
-                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_5;
-                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_HIGH;   
-                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_HIGH;
-                     profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
-                  }
-             }
-                
-            //High Rate of Change (4mg/dl per minute)
-             if (glucoseRateOfChange_2Periods > 4 || glucoseRateOfChange_3Periods > 4) {  
-
-                   //120-139 (Max: 4.0, AF 1)
-                  if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
-                        // Set Nightboost Threshold 4 Factors with Acceleration    
-                        Automation_Status = Automation_1_name + " OnHighROCMax4.0";
-                        NightBoost_Sigmoid_Min = Automation_1_minimumRatio_6;
-                        NightBoost_Sigmoid_Max = Automation_1_maximumRatio_6;
-                        NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_6;
-                        new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;   
-                        new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;
-                        profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
-                }
-
-                   // 140+ ((Max: 4.0, AF 1)
-                  if (myGlucose >= Automation_1_BGThreshold_2) {
-                     // Set Nightboost Threshold 4 Factors with Acceleration    
-                     Automation_Status = Automation_1_name + " On HighROCMax4.0";
-                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_6;
-                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_6;
-                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_6;
-                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;   
-                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;
-                     profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
-                  }
-                
-                }
-             
-            // Run Sigmoid Function to get new_dynISF_ratio for Automation 1  
-            new_dynISF_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, NightBoost_Sigmoid_AF, NightBoost_Sigmoid_Min, NightBoost_Sigmoid_Max, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
-
-            // Commenting out while using dynamic ISF with Robosens 
-            // Define the new automation 1 CSF 
-            //if (enable_Automation_1_dynamic_cr == true) { 
-            //robosens_csf = robosens_csf * Automation_1_CSF_StrengthFactor;
-            // }           
-
-            //******************* Calculates the New ISF Settings *****************************     
-            // Calculates a new ISF using dynISF ratio; if Robosens is enabled, will further adjust the Robosens adjusted ISF
-            // NOTE: Nightboost Sigmoid ISF WILL change the CR 
-                new_isf = robosens_isf / new_dynISF_ratio;
-                new_isf = round(new_isf,0);
-                if (enable_dynamic_cr == true) { 
+             if (enable_dynamic_cr == true) { 
                    new_cr = new_isf / robosens_csf;
                    new_cr = round(new_cr,1);
-                      }  
-                check_csf = new_isf / new_cr;
-             
-        }       
-      } 
+                      } 
+             check_csf = new_isf / new_cr;
 
+       
+// *************** End RoboSens ***************************************       
        
           
 // **************** ROBOSURFER ENHANCEMENT #4: SET CONSTANT MINIMUM HOURLY CARB ABSORPTION ****************
