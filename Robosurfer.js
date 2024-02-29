@@ -189,6 +189,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       const end_time = new Date(now);
       end_time.setHours(0, 0, 0); // Assuming the end time is 12:00 AM
        
+      var nightboost_cr_ratio = 1
       var Automation_1_BGThreshold_1 = 105; // BG over 
       var Automation_1_BGThreshold_2 = 140; // BG over
       var Automation_1_BGThreshold_3 = 160; // BG over 
@@ -314,11 +315,7 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
 
     new_dynISF_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, adjustmentFactor, minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  
     
-      //******************* Calculates the New ISF Settings *****************************     
-      // Calculates a new ISF using dynISF ratio; if Robosens is enabled, Robosens will further adjust this adjusted ISF
-      // NOTE: Standard Sigmoid ISF will not change the CR 
-          robosens_isf = robosens_isf / new_dynISF_ratio;
-          robosens_isf = round(robosens_isf,0);
+      
 
 //  **************** END ROBOSURFER ENHANCEMENT #1: Dynamic ISF Sigmoid  ****************
        
@@ -435,18 +432,13 @@ if (enable_Automation_1) {
              
             // Run Sigmoid Function to get new_dynISF_ratio for Automation 1  
             new_dynISF_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, NightBoost_Sigmoid_AF, NightBoost_Sigmoid_Min, NightBoost_Sigmoid_Max, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
-
+            nightboost_cr_ratio = new_dynISF_ratio;
+             
             // Commenting out while using dynamic ISF with Robosens 
             // Define the new automation 1 CSF 
             //if (enable_Automation_1_dynamic_cr == true) { 
             //robosens_csf = robosens_csf * Automation_1_CSF_StrengthFactor;
             // }           
-
-            //******************* Calculates the Nightboost ISF Settings *****************************     
-            // Calculates a new ISF using Nightboost Starting ISF and Nightboost dynISF ratio; if Robosens is enabled, Robosens will further adjust the Nightboost adjusted ISF and CR
-            // NOTE: Nightboost Sigmoid ISF WILL change the CR 
-                robosens_isf = robosens_isf / new_dynISF_ratio;
-                robosens_isf = round(robosens_isf,0);
              
         }       
       } 
@@ -631,13 +623,14 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
 }
 
 // Robosens ISF and CR Adjustment: Mutiply ISF By Robosens Factor   
-          new_isf = robosens_isf / robosens_sigmoidFactor;
-          new_isf = round(new_isf,0);
              if (enable_dynamic_cr == true) { 
-                   new_cr = new_isf / robosens_csf;
+                   new_cr = (robosens_isf / robosens_sigmoidFactor / nightboost_cr_ratio) / robosens_csf;
                    new_cr = round(new_cr,1);
                       } 
              check_csf = new_isf / new_cr;
+
+          new_isf = robosens_isf / robosens_sigmoidFactor / new_dynISF_ratio;
+          new_isf = round(new_isf,0);
 
        
 // *************** End RoboSens ***************************************       
