@@ -8,15 +8,15 @@ function round(value, digits) {
 
 // The function will increase the SMBs is COB = 60 (which generally means >60 COB) and high ROC.   
 
-//  User-defined function variables        
-// Define the minimum amount of carb you wamt iAPS to decay in 1 hour.
-var min_hourly_carb_absorption = 24;
+//  User-defined Mealboost variables        
+         var Mealboost_SMB_UAM_Minutes_Increase = 15; // Standard SMB/UAM Increase
+         var Mealboost_SMB_UAM_Minutes_Increase_HIGH = 30; // High BG SMB/UAM Increase
+         var Mealboost_SMB_UAM_Minutes_Increase_ACCEL = 45; // High BG Rate of Change SMB/UAM Increase 
+         var Mealboost_SMB_DeliveryRatio_Increase_ACCEL = .75; // High BG Rate of Change SMB Delivery Ratio  
+         
         
 //  Initialize function variables
-  const isf = profile.sens;
-  const carb_factor = profile.carb_ratio;
-  var min_5m_carbabsorption = 0;
-  var min_5m_carbimpact = 0;
+  
 
 // The Constant Carb Absorption Function
 
