@@ -627,7 +627,7 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
                    new_cr = (robosens_isf / robosens_sigmoidFactor / nightboost_cr_ratio) / robosens_csf;
                    new_cr = round(new_cr,1);
                       } 
-             check_csf = new_isf / new_cr;
+             check_csf = (robosens_isf / robosens_sigmoidFactor / nightboost_cr_ratio) / new_cr;
 
           new_isf = robosens_isf / robosens_sigmoidFactor / new_dynISF_ratio;
           new_isf = round(new_isf,0);
