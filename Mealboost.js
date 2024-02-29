@@ -7,7 +7,15 @@ function round(value, digits) {
     }
 
 // The function will increase the SMBs is COB = 60 (which generally means >60 COB) and high ROC.   
+ // Automation #1 Thresholds
+      // Define the start time and end time
+      const start_time = new Date(now);
+      start_time.setHours(0, 0, 0); // Assuming the start time is 12:00 AM
 
+      const end_time = new Date(now);
+      end_time.setHours(7, 59, 0); // Assuming the end time is 7:59 PM
+
+        
 //  User-defined Mealboost variables        
          var Mealboost_SMB_UAM_Minutes_Increase = 15; // High ROC Standard SMB/UAM Increase
          var Mealboost_SMB_UAM_Minutes_Increase_HIGH = 30; // High BG High ROC SMB/UAM Increase
