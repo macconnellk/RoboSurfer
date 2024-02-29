@@ -6,14 +6,15 @@ function round(value, digits) {
         return Math.round(value * scale) / scale; 
     }
 
+        
 // The function will increase the SMBs is COB = 60 (which generally means >60 COB) and high ROC.   
  // Automation #1 Thresholds
       // Define the start time and end time
-      const start_time = new Date(now);
-      start_time.setHours(0, 0, 0); // Assuming the start time is 12:00 AM
+      const Mealboost_start_time = new Date(now);
+      Mealboost_start_time.setHours(0, 0, 0); // Assuming the start time is 12:00 AM
 
-      const end_time = new Date(now);
-      end_time.setHours(7, 59, 0); // Assuming the end time is 7:59 PM
+      const Mealboost_end_time = new Date(now);
+      Mealboost_end_time.setHours(7, 59, 0); // Assuming the end time is 7:59 PM
 
         
 //  User-defined Mealboost variables        
@@ -24,6 +25,14 @@ function round(value, digits) {
          
 // The Mealboost Function
 
+if (enable_Mealboost) { 
+
+            // Check if the current time is within the specified range, greater than BG threshold and COB threshold
+          if (((now >= Mealboost_start_time && now <= Mealboost_end_time) || (now <= Mealboost_start_time && now <= Mealboost_end_time && Mealboost_start_time > Mealboost_end_time) ||
+             (now >= Mealboost_start_time && now >= Mealboost_end_time && Mealboost_start_time > Mealboost_end_time))
+             && myGlucose > 105) 
+          {
+        
    //Increased Rate of Change (1.6mg/dl per minute)
              if (cob = 60 && glucoseRateOfChange_3Periods > 1.6) {
              
