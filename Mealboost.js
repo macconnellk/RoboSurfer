@@ -14,7 +14,7 @@ function round(value, digits) {
       Mealboost_start_time.setHours(0, 0, 0); // Assuming the start time is 12:00 AM
 
       const Mealboost_end_time = new Date(now);
-      Mealboost_end_time.setHours(7, 59, 0); // Assuming the end time is 7:59 PM
+      Mealboost_end_time.setHours(19, 59, 0); // Assuming the end time is 7:59 PM
 
         
 //  User-defined Mealboost variables        
