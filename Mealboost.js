@@ -14,11 +14,7 @@ function round(value, digits) {
          var Mealboost_SMB_UAM_Minutes_Increase_ACCEL = 45; // High BG Rate of Change SMB/UAM Increase 
          var Mealboost_SMB_DeliveryRatio_Increase_ACCEL = .75; // High BG Rate of Change SMB Delivery Ratio  
          
-        
-//  Initialize function variables
-  
-
-// The Constant Carb Absorption Function
+// The Mealboost Function
 
   // Reduce hourly carb absorption to 5-minute carb absoorption
      min_5m_carbabsorption = min_hourly_carb_absorption / (60 / 5);
