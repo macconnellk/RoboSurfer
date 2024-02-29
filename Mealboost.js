@@ -20,7 +20,7 @@ function round(value, digits) {
 //  User-defined Mealboost variables        
          var Mealboost_SMB_UAM_Minutes_Increase = 15; // High ROC Standard SMB/UAM Increase
          var Mealboost_SMB_UAM_Minutes_Increase_HIGH = 30; // High BG High ROC SMB/UAM Increase
-         var Mealboost_SMB_UAM_Minutes_Increase_ACCEL = 45; // High BG Very High ROC SMB/UAM Increase 
+         var Mealboost_SMB_UAM_Minutes_Increase_ACCEL = 30; // High BG Very High ROC SMB/UAM Increase 
          var Mealboost_SMB_DeliveryRatio_Increase_ACCEL = .75; // High BG Rate of Change SMB Delivery Ratio  
          
 // The Mealboost Function
