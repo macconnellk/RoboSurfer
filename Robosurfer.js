@@ -524,7 +524,7 @@ if (enable_Automation_1) {
 
  if (averageGlucose_Last8Hours > target_averageGlucose_Last8Hours) {   
        percentageOverTarget_Last8Hours = ((averageGlucose_Last8Hours - target_averageGlucose_Last8Hours) / target_averageGlucose_Last8Hours) * 100;
- )
+ }
 
  if (averageGlucose_Last24Hours > target_averageGlucose_Last24Hours) {   
        percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_averageGlucose_Last24Hours) / target_averageGlucose_Last24Hours) * 100;
@@ -538,7 +538,7 @@ if (enable_Automation_1) {
 
  if (averageGlucose_Last8Hours < user_bottomtargetAverageGlucose) {   
        percentageOverTarget_Last8Hours = ((averageGlucose_Last8Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
- )
+ }
 
  if (averageGlucose_Last24Hours < user_bottomtargetAverageGlucose) {   
        percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
