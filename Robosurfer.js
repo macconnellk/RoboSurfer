@@ -119,7 +119,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var my24hrGlucose = []; // create array
          var my24hrGlucoseTime = []; // create array
          var old_basal = profile.current_basal;
-         var new_basal = profile.current_basal;     
+         var new_basal = profile.current_basal;
+         var percentageOverTarget_Last4Hours = 0;
+         var percentageOverTarget_Last8Hours = 0;
+         var percentageOverTarget_Last24Hours = 0;
 
       // User-defined AUC targets for each time period in mg / dl / h (average glucose)
       // Define target average glucose levels for different time periods
@@ -134,7 +137,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
                const user_targetAverageGlucoseLast24Hours = 123;
 
             // 4, 8, 24, bottom of range target
-                const user_bottomtargetAverageGlucose = 105;
+                const user_bottomtargetAverageGlucose = 100;
 
        
       // Initialize the target variables based on current hour
@@ -202,7 +205,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
        
          // Automation_1 User-Defined Variables 
          var Automation_1_name = "Nightboost"; // Give the Automation a Name for use in return string
-         var Automation_1_ISF = 125;
+         var Automation_1_ISF = 110;
          var Automation_1_target = 105;
          
          //Automation 1 Sigmoid - Threshold 1
@@ -515,10 +518,34 @@ if (enable_Automation_1) {
    var averageGlucose_Last24Hours = calculateAverageGlucose(last24HoursData);
 
 // Calculate percentage over target for each time period
-var percentageOverTarget_Last4Hours = ((averageGlucose_Last4Hours - target_averageGlucose_Last4Hours) / target_averageGlucose_Last4Hours) * 100;
-var percentageOverTarget_Last8Hours = ((averageGlucose_Last8Hours - target_averageGlucose_Last8Hours) / target_averageGlucose_Last8Hours) * 100;
-var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_averageGlucose_Last24Hours) / target_averageGlucose_Last24Hours) * 100;
+ if (averageGlucose_Last4Hours > target_averageGlucose_Last4Hours) {
+       percentageOverTarget_Last4Hours = ((averageGlucose_Last4Hours - target_averageGlucose_Last4Hours) / target_averageGlucose_Last4Hours) * 100;
+ }
 
+ if (averageGlucose_Last8Hours > target_averageGlucose_Last8Hours) {   
+       percentageOverTarget_Last8Hours = ((averageGlucose_Last8Hours - target_averageGlucose_Last8Hours) / target_averageGlucose_Last8Hours) * 100;
+ )
+
+ if (averageGlucose_Last24Hours > target_averageGlucose_Last24Hours) {   
+       percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_averageGlucose_Last24Hours) / target_averageGlucose_Last24Hours) * 100;
+ 
+ }
+
+// Calculate percentage under range for each time period
+ if (averageGlucose_Last4Hours < user_bottomtargetAverageGlucose) {
+       percentageOverTarget_Last4Hours = ((averageGlucose_Last4Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
+ }
+
+ if (averageGlucose_Last8Hours < user_bottomtargetAverageGlucose) {   
+       percentageOverTarget_Last8Hours = ((averageGlucose_Last8Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
+ )
+
+ if (averageGlucose_Last24Hours < user_bottomtargetAverageGlucose) {   
+       percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
+ 
+ }
+    
+    
  // BASAL FACTOR: SET THE ROBOSENS BASAL FACTOR 
  // IF 8HR and 24HR AVG BG ABOVE RANGE   
    if (averageGlucose_Last8Hours > target_averageGlucose_Last8Hours && averageGlucose_Last24Hours > target_averageGlucose_Last24Hours) {  
@@ -541,7 +568,7 @@ var percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_ave
 
    // IF 24HR AVG BELOW RANGE   
    if (averageGlucose_Last24Hours < user_bottomtargetAverageGlucose) {  
-        robosens_basalFactor = averageGlucose_Last24Hours / user_bottomtargetAverageGlucose;
+        robosens_basalFactor = 1 + (percentageOverTarget_Last24Hours / 100);
 
                      // Set Robosens Basal Status
                            robosens_basal_status = "On24hrLow";    
