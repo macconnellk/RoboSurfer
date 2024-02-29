@@ -631,8 +631,15 @@ if (enable_Automation_1) {
                                   robosens_sens_status = "OnCurrentBG";
                            }      
          
-         var robosens_deviation = (deviation_bg - target_averageGlucose_Last4Hours) * 0.0555;
-    
+         if (averageGlucose_Last4Hours > target_averageGlucose_Last4Hours) {
+             var robosens_deviation = (deviation_bg - target_averageGlucose_Last4Hours) * 0.0555;
+         }
+         
+         if (averageGlucose_Last4Hours < averageGlucose_Last4Hours < user_bottomtargetAverageGlucose) {
+             var robosens_deviation = (deviation_bg - averageGlucose_Last4Hours < user_bottomtargetAverageGlucose) * 0.0555;
+         }
+         
+         
      //Makes sigmoid factor(y) = 1 when BG deviation(x) = 0.
      var robosens_fix_offset = (Math.log10(1/robosens_max_minus_one - robosens_minimumRatio / robosens_max_minus_one) / Math.log10(Math.E));
        
