@@ -7,7 +7,7 @@ function round(value, digits) {
     }
 
         
-// The function will increase the SMBs is COB = 60 (which generally means >60 COB) and high ROC.   
+// The function will increase the SMBs if COB = 60 (which generally means >60 COB) and high ROC.   
  // Automation #1 Thresholds
       // Define the start time and end time
       const Mealboost_start_time = new Date(now);
@@ -27,7 +27,7 @@ function round(value, digits) {
 
 if (enable_Mealboost) { 
 
-            // Check if the current time is within the specified range, greater than BG threshold and COB threshold
+            // Check if the current time is within the specified range, greater COB threshold
           if (((now >= Mealboost_start_time && now <= Mealboost_end_time) || (now <= Mealboost_start_time && now <= Mealboost_end_time && Mealboost_start_time > Mealboost_end_time) ||
              (now >= Mealboost_start_time && now >= Mealboost_end_time && Mealboost_start_time > Mealboost_end_time))
              && myGlucose > 105) 
@@ -73,7 +73,7 @@ if (enable_Mealboost) {
                 
                 }
  
-return "The min_5m_carbimpact has been adjusted to: " + round(profile.min_5m_carbimpact, 2) + ".";
+return "Mealboost: " + Mealboost_Status + + " SMB:" + new_maxSMB;
 
 
 }
