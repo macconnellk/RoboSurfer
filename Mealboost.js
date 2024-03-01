@@ -34,7 +34,7 @@ if (enable_Mealboost) {
           {
         
    //Increased Rate of Change (1.6mg/dl per minute)
-             if (cob = 60 && glucoseRateOfChange_3Periods > 1.6) {
+             if (cob == 60 && glucoseRateOfChange_3Periods > 1.6) {
              
                 //105-139 
                 if ((myGlucose >= 105 && myGlucose < 139)) {  
@@ -53,7 +53,7 @@ if (enable_Mealboost) {
              }
                 
             //High Rate of Change (4mg/dl per minute)
-             if (cob = 60 && (glucoseRateOfChange_2Periods > 4 || glucoseRateOfChange_3Periods > 4)) {  
+             if (cob == 60 && (glucoseRateOfChange_2Periods > 4 || glucoseRateOfChange_3Periods > 4)) {  
 
                    //105-139 
                   if ((myGlucose >= 105 && myGlucose < 139)) {      
@@ -73,7 +73,7 @@ if (enable_Mealboost) {
                 
                 }
  
-return "Mealboost: " + Mealboost_Status + + " SMB:" + new_maxSMB;
+return "Mealboost: " + Mealboost_Status + " SMB:" + new_maxSMB;
 
 
 }
