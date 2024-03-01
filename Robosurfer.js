@@ -635,8 +635,8 @@ if (enable_Automation_1) {
              var robosens_deviation = (deviation_bg - target_averageGlucose_Last4Hours) * 0.0555;
          }
          
-         if (averageGlucose_Last4Hours < averageGlucose_Last4Hours < user_bottomtargetAverageGlucose) {
-             var robosens_deviation = (deviation_bg - averageGlucose_Last4Hours < user_bottomtargetAverageGlucose) * 0.0555;
+         if (averageGlucose_Last4Hours < user_bottomtargetAverageGlucose) {
+             var robosens_deviation = (deviation_bg - user_bottomtargetAverageGlucose) * 0.0555;
          }
          
          
