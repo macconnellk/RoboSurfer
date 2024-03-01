@@ -40,6 +40,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_new_sigmoidTDDFactor = true;
   var enable_Automation_1 = true; 
   var enable_smb_delivery_ratio_scaling = true;
+  var enable_Mealboost = true; 
 
          // Sensor Safety: if data gaps or high BG delta, disable SMBs, UAMs, and smb_delivery_ratio_scaling. 
             // Calculate glucose rate of change per minute using same data
@@ -80,6 +81,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
                       profile.enableSMB_always = false;
                       enable_smb_delivery_ratio_scaling = false;
                       enable_Automation_1 = false;
+                      enable_Mealboost = false;
        
              }
    
@@ -105,6 +107,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var new_dynISF_ratio = 1;
    var new_isf = initial_isf;
    var new_cr = initial_cr;    
+   var initial_maxSMB = maxSMB;
    var new_maxSMB = maxSMB;   
    var new_maxUAM = maxUAM;   
    var new_max_COB = max_COB;    
@@ -264,6 +267,24 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       // Define the minimum amount of carb you wamt iAPS to decay in 1 hour.
       var min_hourly_carb_absorption = 26;
 
+//  Initialize Mealboost variables        
+
+       var Mealboost_Status = "Off";
+       var Mealboost_SMB_change = 0;
+       
+       // Define the start time and end time
+      const Mealboost_start_time = new Date(now);
+      Mealboost_start_time.setHours(0, 0, 0); // Assuming the start time is 12:00 AM
+
+      const Mealboost_end_time = new Date(now);
+      Mealboost_end_time.setHours(19, 59, 0); // Assuming the end time is 7:59 PM
+      
+//  User-defined Mealboost variables        
+         var Mealboost_SMB_UAM_Minutes_Increase = 15; // High ROC Standard SMB/UAM Increase
+         var Mealboost_SMB_UAM_Minutes_Increase_HIGH = 30; // High BG High ROC SMB/UAM Increase
+         var Mealboost_SMB_UAM_Minutes_Increase_ACCEL = 30; // High BG Very High ROC SMB/UAM Increase 
+         var Mealboost_SMB_DeliveryRatio_Increase_ACCEL = .75; // High BG Rate of Change SMB Delivery Ratio  
+       
 
 //  **************** ROBOSURFER ENHANCEMENT #1: Dynamic ISF Sigmoid- ADJUSTS ISF BASED PN CURRENT BG  ****************
      
@@ -667,7 +688,7 @@ if (enable_Automation_1) {
           new_isf = round(new_isf,0);
 
        
-// *************** End RoboSens ***************************************       
+// *************** END ROBOSENS ***************************************       
        
           
 // **************** ROBOSURFER ENHANCEMENT #4: SET CONSTANT MINIMUM HOURLY CARB ABSORPTION ****************
@@ -689,6 +710,68 @@ if (enable_Automation_1) {
    //Set profile to new value
   profile.min_5m_carbimpact = round(min_5m_carbimpact,2);
 
+// *************** END CONSTANT CARB ABSORPTION ***************************************
+
+// **************** ROBOSURFER ENHANCEMENT #5: MEALBOOST: Increase SMBs and Delivery Ratio if 60+COBa and High ROC  ****************
+// The function will increase the SMBs if COB = 60 (which generally means >60 COB) and high ROC.   
+         
+// The Mealboost Function
+
+if (enable_Mealboost) { 
+
+            // Check if the current time is within the specified range, greater COB threshold
+          if (((now >= Mealboost_start_time && now <= Mealboost_end_time) || (now <= Mealboost_start_time && now <= Mealboost_end_time && Mealboost_start_time > Mealboost_end_time) ||
+             (now >= Mealboost_start_time && now >= Mealboost_end_time && Mealboost_start_time > Mealboost_end_time))
+             && myGlucose > 105) 
+          {
+        
+   //Increased Rate of Change (1.6mg/dl per minute)
+             if (cob == 60 && glucoseRateOfChange_3Periods > 1.6) {
+             
+                //105-139 
+                if ((myGlucose >= 105 && myGlucose < 139)) {  
+                     Mealboost_Status = "Mealboost:OnROC<140"
+                     new_maxSMB = maxSMB + Mealboost_SMB_UAM_Minutes_Increase;   
+                     new_maxUAM = maxUAM + Mealboost_SMB_UAM_Minutes_Increase;
+                }
+             
+                  // 140+ 
+                  if (myGlucose >= 140) {
+                     Mealboost_Status = "Mealboost:OnROC140+"
+                     new_maxSMB = maxSMB + Mealboost_SMB_UAM_Minutes_Increase_HIGH;   
+                     new_maxUAM = maxUAM + Mealboost_SMB_UAM_Minutes_Increase_HIGH;
+                     profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
+                  }
+             }
+                
+            //High Rate of Change (4mg/dl per minute)
+             if (cob == 60 && (glucoseRateOfChange_2Periods > 4 || glucoseRateOfChange_3Periods > 4)) {  
+
+                   //105-139 
+                  if ((myGlucose >= 105 && myGlucose < 139)) {      
+                        Mealboost_Status = "Mealboost:OnHIGHROC<140"
+                        new_maxSMB = maxSMB + Mealboost_SMB_UAM_Minutes_Increase_HIGH;   
+                        new_maxUAM = maxUAM + Mealboost_SMB_UAM_Minutes_Increase_HIGH;
+                        profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
+                }
+
+                   // 140+ 
+                  if (myGlucose >= 140) {   
+                     Mealboost_Status = "Mealboost:OnHIGHROC140+"
+                     new_maxSMB = maxSMB + Mealboost_SMB_UAM_Minutes_Increase_ACCEL;   
+                     new_maxUAM = maxUAM + Mealboost_SMB_UAM_Minutes_Increase_ACCEL;
+                     profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
+                  }
+                
+                }
+
+                  Mealboost_SMB_change = initial_maxSMB - new_maxSMB;    
+             
+       }
+   }
+
+// *************** END MEALBOOST ***************************************      
+       
 //******************* Set the Profile with the New ISF and CR Settings *****************************
        
       profile.sens = new_isf;    
@@ -707,6 +790,6 @@ if (enable_Automation_1) {
 
 return "Robosens Status Basal/ISF: " + round(robosens_basalFactor,2) + "(" + robosens_basal_status + ")/" + round(robosens_sigmoidFactor, 2) + "(" + robosens_sens_status +  "). dISF ratio: " + round(new_dynISF_ratio, 2) + ". ISF was/now: " + round(initial_isf, 2) + "/ " + round(profile.sens,2) + " Basal was/now: " + old_basal + "/ " + profile.current_basal + ". CR was/now: " + initial_cr + "/ " + round(profile.carb_ratio, 2) + " CSF was/now "  + round(initial_csf, 2) + "/ " + round(check_csf, 2)+ ". SMB Deliv. Ratio: " + profile.smb_delivery_ratio + " ROBOSENS: Trg-" + user_bottomtargetAverageGlucose + "/Av/%Over: 4Hr: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
 " 8Hr:" + target_averageGlucose_Last8Hours + "/" + round(averageGlucose_Last8Hours, 0) + "/" + round(percentageOverTarget_Last8Hours, 0) + "%" + 
-" 24Hr:" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RS Adj/AF: " + round(robosens_AF_adjustment,2) + "/" + round(robosens_adjustmentFactor,2) + " RS Adj/MAX: " + round(robosens_MAX_adjustment,2) + "/" + round(robosens_maximumRatio,2) + " Sensor Safety: " + sensor_safety_status + " AUTOMATION1: " + Automation_Status + ": " + start_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " to " + end_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + ". SMB Mins: "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Mins: "  + round(profile.maxUAMSMBBasalMinutes, 2) + " Max COB: "  + round(profile.maxCOB, 2) + ". MinAbsorp((CI): "  + round(check_carb_absorption, 2) + "(" + profile.min_5m_carbimpact + ")" + " TDD:" + round(past2hoursAverage, 2) + " 2week TDD:" + round(average_total_data, 2);
+" 24Hr:" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RS Adj/AF: " + round(robosens_AF_adjustment,2) + "/" + round(robosens_adjustmentFactor,2) + " RS Adj/MAX: " + round(robosens_MAX_adjustment,2) + "/" + round(robosens_maximumRatio,2) + " Sensor Safety: " + sensor_safety_status + " AUTOMATION1: " + Automation_Status + ": " + start_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " to " + end_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + ". SMB Mins: "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Mins: "  + round(profile.maxUAMSMBBasalMinutes, 2) + " Max COB: "  + round(profile.maxCOB, 2) + ". MinAbsorp((CI): "  + round(check_carb_absorption, 2) + "(" + profile.min_5m_carbimpact + ")" + "Mealboost: " + Mealboost_Status + " SMB:+" + Mealboost_SMB_change +" TDD:" + round(past2hoursAverage, 2) + " 2week TDD:" + round(average_total_data, 2);
    }
 }
