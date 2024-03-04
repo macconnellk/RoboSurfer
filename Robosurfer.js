@@ -216,13 +216,13 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          
          //Automation 1 Sigmoid - Threshold 1
          var Automation_1_minimumRatio_1 = .5;
-         var Automation_1_maximumRatio_1 = 1.6;
+         var Automation_1_maximumRatio_1 = 1.2;
          var Automation_1_adjustmentFactor_1 = .5;
 
          //Automation 1 Sigmoid - Threshold 2
          var Automation_1_minimumRatio_2 = .5;
-         var Automation_1_maximumRatio_2 = 1.65;
-         var Automation_1_adjustmentFactor_2 = 1;
+         var Automation_1_maximumRatio_2 = 1.6;
+         var Automation_1_adjustmentFactor_2 = .5;
 
          //Automation 1 Sigmoid - Threshold 3 
          var Automation_1_minimumRatio_3 = .5;
@@ -390,9 +390,9 @@ if (enable_Automation_1) {
             
              // Set Nightboost Threshold 1 Factors    
                   Automation_Status = Automation_1_name + " OnMax1.6";   
-                  var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_1;
-                  var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_1;
-                  var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_1;
+                  var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
+                  var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
+                  var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
                   new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase;   
                   new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase;
 
@@ -458,10 +458,49 @@ if (enable_Automation_1) {
                 
                 }
 
-               // Check if the current time is within the less aggressive range
+       // LESS AGGRESSIVE TIME: Check if the current time is within the less aggressive range
              if ((now >= less_aggressive_time && now <= end_time) || (now <= less_aggressive_time && now <= end_time && start_time > end_time) ||
              (now >= less_aggressive_time && now >= end_time && less_aggressive_time > end_time)) {
 
+                // Set Nightboost Threshold 1 Factors    
+                  Automation_Status = Automation_1_name + " On1.2(LessAggressive)";   
+                  var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_1;
+                  var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_1;
+                  var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_1;
+                  new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase;   
+                  new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase;
+                  profile.smb_delivery_ratio = .5;
+
+         // LESS AGGRESSIVE TIME: Determine Nightboost ROC status and response        
+         // Once ROC levels off, reveerts to baseline Nightboost even if BG high    
+             
+            //LESS AGGRESSIVE TIME: Increased Rate of Change (1.6mg/dl per minute)
+             if (glucoseRateOfChange_3Periods > 1.6) {
+             
+                //105-139 (Max: 1.6, AF 1)
+                if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
+                      // Set Nightboost Threshold 2 Factors    
+                     Automation_Status = Automation_1_name + " OnROCMax1.6(Less Aggressive";   
+                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
+                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
+                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
+                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase;   
+                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase;
+                     profile.smb_delivery_ratio = .5;
+                }
+             
+                  // 140+ ((Max: 1.6, AF 1)
+                  if (myGlucose >= Automation_1_BGThreshold_2) {
+                     // Set Nightboost Threshold 2 Factors    
+                     Automation_Status = Automation_1_name + " OnROCMax1.6(Less Aggressive)";
+                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
+                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
+                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
+                     new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase;   
+                     new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase;;
+                     profile.smb_delivery_ratio = .5;
+                  }
+             }
              
 
              }
