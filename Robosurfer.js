@@ -196,7 +196,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       end_time.setHours(0, 0, 0); // Assuming the end time is 12:00 AM
 
       const less_aggressive_time = new Date(now);
-      end_time.setHours(23, 0, 0); // Assuming the end time is 11:00 PM 
+      less_aggressive_time.setHours(23, 0, 0); // Assuming the end time is 11:00 PM 
        
       var nightboost_cr_ratio = 1
       var Automation_1_BGThreshold_1 = 105; // BG over 
