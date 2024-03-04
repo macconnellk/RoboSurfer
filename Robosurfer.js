@@ -194,6 +194,9 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
       const end_time = new Date(now);
       end_time.setHours(0, 0, 0); // Assuming the end time is 12:00 AM
+
+      const less_aggressive_time = new Date(now);
+      end_time.setHours(23, 0, 0); // Assuming the end time is 11:00 PM 
        
       var nightboost_cr_ratio = 1
       var Automation_1_BGThreshold_1 = 105; // BG over 
@@ -454,6 +457,14 @@ if (enable_Automation_1) {
                   }
                 
                 }
+
+               // Check if the current time is within the less aggressive range
+             if ((now >= less_aggressive_time && now <= end_time) || (now <= less_aggressive_time && now <= end_time && start_time > end_time) ||
+             (now >= less_aggressive_time && now >= end_time && less_aggressive_time > end_time)) {
+
+             
+
+             }
              
             // Run Sigmoid Function to get new_dynISF_ratio for Automation 1  
             new_dynISF_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, NightBoost_Sigmoid_AF, NightBoost_Sigmoid_Min, NightBoost_Sigmoid_Max, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
