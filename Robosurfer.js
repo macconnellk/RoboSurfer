@@ -283,7 +283,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       const Mealboost_end_time = new Date(now);
       Mealboost_end_time.setHours(19, 59, 0); // Assuming the end time is 7:59 PM
       
-//  User-defined Mealboost variables        
+//  User-defined Mealboost variables
+         var Mealboost_COB_threshold = 50; 
          var Mealboost_SMB_UAM_Minutes_Increase = 15; // High ROC Standard SMB/UAM Increase
          var Mealboost_SMB_UAM_Minutes_Increase_HIGH = 30; // High BG High ROC SMB/UAM Increase
          var Mealboost_SMB_UAM_Minutes_Increase_ACCEL = 30; // High BG Very High ROC SMB/UAM Increase
@@ -778,7 +779,7 @@ if (enable_Mealboost) {
           {
         
    //Increased Rate of Change (1.6mg/dl per minute)
-             if (cob == 60 && glucoseRateOfChange_3Periods > 1.6) {
+             if (cob > Mealboost_COB_threshold && glucoseRateOfChange_3Periods > 1.6) {
              
                 //105-139 
                 if ((myGlucose >= 105 && myGlucose < 139)) {  
@@ -797,7 +798,7 @@ if (enable_Mealboost) {
              }
                 
             //High Rate of Change (4mg/dl per minute)
-             if (cob == 60 && (glucoseRateOfChange_2Periods > 4 || glucoseRateOfChange_3Periods > 4)) {  
+             if (cob > Mealboost_COB_threshold && (glucoseRateOfChange_2Periods > 4 || glucoseRateOfChange_3Periods > 4)) {  
 
                    //105-139 
                   if ((myGlucose >= 105 && myGlucose < 139)) {      
