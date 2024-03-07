@@ -654,9 +654,9 @@ if (enable_Automation_1) {
          profile.current_basal = new_basal;   
        
     
- // ISF/CR FACTOR: Set the ROBOSENS RATIO Sigmoid Factor IF 4HR AVG BG OUT OF RANGE
+ // ISF/CR FACTOR: Set the ROBOSENS RATIO Sigmoid Factor IF 4HR AVG BG ABOVE RANGE OR 4HR AND 8HR BELOW RANGE
 // DYNAMIC ROBOSENS SIGMOID Function
- if (averageGlucose_Last4Hours > target_averageGlucose_Last4Hours || averageGlucose_Last4Hours < user_bottomtargetAverageGlucose) {
+ if (averageGlucose_Last4Hours > target_averageGlucose_Last4Hours || (averageGlucose_Last4Hours < user_bottomtargetAverageGlucose && averageGlucose_Last8Hours < user_bottomtargetAverageGlucose)) {
     
       // SET ROBOSENS ADJUSTMENT FACTOR: Increase the basal sigmoid AF if the 8hr Percent Over Target is high
       // Set RS AF using the exponential curve defined in Sheets, AF will increase exponentially as 8hr BG goes up
