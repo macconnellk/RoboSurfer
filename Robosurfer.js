@@ -190,7 +190,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       // Automation #1 Thresholds
       // Define the start time and end time
       const start_time = new Date(now);
-      start_time.setHours(20, 0, 0); // Assuming the start time is 8:00 PM
+      start_time.setHours(19, 0, 0); // Assuming the start time is 8:00 PM
 
       const end_time = new Date(now);
       end_time.setHours(0, 0, 0); // Assuming the end time is 12:00 AM
@@ -281,7 +281,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       Mealboost_start_time.setHours(0, 0, 0); // Assuming the start time is 12:00 AM
 
       const Mealboost_end_time = new Date(now);
-      Mealboost_end_time.setHours(19, 59, 0); // Assuming the end time is 7:59 PM
+      Mealboost_end_time.setHours(18, 59, 0); // Assuming the end time is 7:59 PM
       
 //  User-defined Mealboost variables
          var Mealboost_COB_threshold = 50; 
