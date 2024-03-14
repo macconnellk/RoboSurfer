@@ -190,7 +190,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       // Automation #1 Thresholds
       // Define the start time and end time
       const start_time = new Date(now);
-      start_time.setHours(19, 0, 0); // Assuming the start time is 8:00 PM
+      start_time.setHours(21, 0, 0); // Assuming the start time is 8:00 PM
 
       const end_time = new Date(now);
       end_time.setHours(0, 0, 0); // Assuming the end time is 12:00 AM
