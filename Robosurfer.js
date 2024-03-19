@@ -409,10 +409,10 @@ if (enable_Automation_1) {
                 //105-139 (Max: 2.2, AF 1)
                 if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
                       // Set Nightboost Threshold 3 Factors    
-                     Automation_Status = Automation_1_name + " OnROCMax1.2";   
-                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
-                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
-                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
+                     Automation_Status = Automation_1_name + " OnROCMax1.8";   
+                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_3;
+                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_3;
+                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_3;
                      new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_HIGH;   
                      new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_HIGH;
                      profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_HIGH;
@@ -421,10 +421,10 @@ if (enable_Automation_1) {
                   // 140+ ((Max: 2.1, AF 1)
                   if (myGlucose >= Automation_1_BGThreshold_2) {
                      // Set Nightboost Threshold 3 Factors    
-                     Automation_Status = Automation_1_name + " OnROCMax1.2";
-                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
-                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
-                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
+                     Automation_Status = Automation_1_name + " OnROCMax1.8";
+                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_3;
+                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_3;
+                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_3;
                      new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_HIGH;   
                      new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_HIGH;
                      profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
@@ -437,10 +437,10 @@ if (enable_Automation_1) {
                    //105-139 (Max: 2.35, AF 1)
                   if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
                         // Set Nightboost Threshold 4 Factors with Acceleration    
-                        Automation_Status = Automation_1_name + " OnHighROCMax1.2";
-                        NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
-                        NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
-                        NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
+                        Automation_Status = Automation_1_name + " OnHighROCMax1.8";
+                        NightBoost_Sigmoid_Min = Automation_1_minimumRatio_3;
+                        NightBoost_Sigmoid_Max = Automation_1_maximumRatio_3;
+                        NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_3;
                         new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;   
                         new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;
                         profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_HIGH;
@@ -449,10 +449,10 @@ if (enable_Automation_1) {
                    // 140+ ((Max: 2.35, AF 1)
                   if (myGlucose >= Automation_1_BGThreshold_2) {
                      // Set Nightboost Threshold 4 Factors with Acceleration    
-                     Automation_Status = Automation_1_name + " On HighROCMax1.2";
-                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
-                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
-                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
+                     Automation_Status = Automation_1_name + " On HighROCMax1.8";
+                     NightBoost_Sigmoid_Min = Automation_1_minimumRatio_3;
+                     NightBoost_Sigmoid_Max = Automation_1_maximumRatio_3;
+                     NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_3;
                      new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;   
                      new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase_ACCEL;
                      profile.smb_delivery_ratio = Automation_1_SMB_DeliveryRatio_Increase_ACCEL;
