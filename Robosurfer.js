@@ -119,6 +119,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var robosens_isf = initial_isf;
          var robosens_cr = initial_cr; 
          var robosens_csf = initial_csf; 
+         const TEN_MINUTES = 10 * 60 * 1000; // 10 minutes in milliseconds
+         var now_milliseconds = Date.now(); // Current time in milliseconds
          var lastCarbTime = meal.lastCarbTime;       
          var my24hrGlucose = []; // create array
          var my24hrGlucoseTime = []; // create array
@@ -733,9 +735,11 @@ if (enable_Automation_1) {
 
 // Robosens ISF and CR Adjustment: Mutiply ISF By Robosens Factor   
              // If carbs have been entered in last 10 minutes, turn off dynamic cr
-             // if lastCarbTime <= (now) + 10 minutes {
-             //        enable_dynamic_cr = false;
-             //   }
+
+            // Check if lastCarbTime is less than or equal to 10 minutes from now
+            if (lastCarbTime <= now_milliseconds + TEN_MINUTES) {
+                    enable_dynamic_cr = false;
+             }
        
              if (enable_dynamic_cr == true) { 
                    new_cr = (robosens_isf / robosens_sigmoidFactor / nightboost_cr_ratio) / robosens_csf;
