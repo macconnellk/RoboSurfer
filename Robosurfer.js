@@ -394,10 +394,10 @@ if (enable_Automation_1) {
             min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; //
             
              // Set Nightboost Threshold 1 Factors (Was Threshold 2, 1.6)
-                  Automation_Status = Automation_1_name + " OnMax1.0";   
-                  var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_1;
-                  var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_1;
-                  var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_1;
+                  Automation_Status = Automation_1_name + " OnMax1.2";   
+                  var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
+                  var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
+                  var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
                   new_maxSMB = maxSMB + Automation_1_SMB_UAM_Minutes_Increase;   
                   new_maxUAM = maxUAM + Automation_1_SMB_UAM_Minutes_Increase;
 
