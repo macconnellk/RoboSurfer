@@ -738,7 +738,7 @@ if (enable_Automation_1) {
 
             // Check if lastCarbTime is less than or equal to 10 minutes from now
             
-             if (now_milliseconds <= lastCarbTimePlus10Mins) {
+             if (now_milliseconds <= lastCarbTimePlus10Mins && lastCarbTime != 0) {
                     enable_dynamic_cr = false;
              }
        
