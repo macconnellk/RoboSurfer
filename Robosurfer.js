@@ -193,7 +193,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       // Automation #1 Thresholds
       // Define the start time and end time
       const start_time = new Date(now);
-      start_time.setHours(21, 0, 0); // Assuming the start time is 8:00 PM
+      start_time.setHours(20, 0, 0); // Assuming the start time is 8:00 PM
 
       const end_time = new Date(now);
       end_time.setHours(0, 0, 0); // Assuming the end time is 12:00 AM
@@ -214,7 +214,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
        
          // Automation_1 User-Defined Variables 
          var Automation_1_name = "Nightboost"; // Give the Automation a Name for use in return string
-         var Automation_1_ISF = 120; // (Was 110)
+         var Automation_1_ISF = 115; // (Was 110)
          var Automation_1_target = 115; // (Was 105)
          
          //Automation 1 Sigmoid - Threshold 1 
@@ -224,7 +224,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
          //Automation 1 Sigmoid - Threshold 2 (Was 1.6)
          var Automation_1_minimumRatio_2 = .5;
-         var Automation_1_maximumRatio_2 = 1.2;
+         var Automation_1_maximumRatio_2 = 1.3;
          var Automation_1_adjustmentFactor_2 = .5;
 
          //Automation 1 Sigmoid - Threshold 3 
@@ -393,8 +393,8 @@ if (enable_Automation_1) {
             new_max_COB = Automation_1_COB_Max; 
             min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; //
             
-             // Set Nightboost Threshold 1 Factors (Was Threshold 2, 1.6)
-                  Automation_Status = Automation_1_name + " OnMax1.2";   
+             // Set Nightboost Threshold 2 Factors (Was Threshold 2, 1.6)
+                  Automation_Status = Automation_1_name + " OnMax1.3";   
                   var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
                   var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
                   var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
