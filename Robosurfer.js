@@ -121,7 +121,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var robosens_csf = initial_csf; 
          var now_milliseconds = Date.now(); // Current time in milliseconds
          var lastCarbTime = meal.lastCarbTime;
-         var lastCarbTimePlus10Mins; = lastCarbTime + (10 * 60 * 1000); // 10 minutes in milliseconds
+         var lastCarbTimePlus10Mins = lastCarbTime + (10 * 60 * 1000); // 10 minutes in milliseconds
          var my24hrGlucose = []; // create array
          var my24hrGlucoseTime = []; // create array
          var old_basal = profile.current_basal;
