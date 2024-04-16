@@ -815,7 +815,7 @@ if (enable_Mealboost) {
                         Mealboost_Status = "Mealboost:OnHIGHROC<140"
                         new_maxSMB = maxSMB + Mealboost_SMB_UAM_Minutes_Increase_HIGH;   
                         new_maxUAM = maxUAM + Mealboost_SMB_UAM_Minutes_Increase_HIGH;
-                        profile.smb_delivery_ratio = Mealboost_SMB_DeliveryRatio_Increase_ACCEL;
+                        
                 }
 
                    // 140+ 
@@ -823,7 +823,7 @@ if (enable_Mealboost) {
                      Mealboost_Status = "Mealboost:OnHIGHROC140+"
                      new_maxSMB = maxSMB + Mealboost_SMB_UAM_Minutes_Increase_ACCEL;   
                      new_maxUAM = maxUAM + Mealboost_SMB_UAM_Minutes_Increase_ACCEL;
-                     profile.smb_delivery_ratio = Mealboost_SMB_DeliveryRatio_Increase_ACCEL;
+                     profile.smb_delivery_ratio = Mealboost_SMB_DeliveryRatio_Increase_HIGH;
                   }
                 
                 }
