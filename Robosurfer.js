@@ -215,7 +215,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          // Automation_1 User-Defined Variables 
          var Automation_1_name = "Nightboost"; // Give the Automation a Name for use in return string
          var Automation_1_ISF = 110; // (Was 110)
-         var Automation_1_target = 105; // (Was 105)
+         var Automation_1_target = 110; // (Was 105)
          
          //Automation 1 Sigmoid - Threshold 1 
          var Automation_1_minimumRatio_1 = .5;
@@ -224,7 +224,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
          //Automation 1 Sigmoid - Threshold 2 (Was 1.6)
          var Automation_1_minimumRatio_2 = .5;
-         var Automation_1_maximumRatio_2 = 1.6;
+         var Automation_1_maximumRatio_2 = 1.5;
          var Automation_1_adjustmentFactor_2 = .5;
 
          //Automation 1 Sigmoid - Threshold 3 
@@ -394,7 +394,7 @@ if (enable_Automation_1) {
             min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; //
             
              // Set Nightboost Threshold 2 Factors (Was Threshold 2, 1.6)
-                  Automation_Status = Automation_1_name + " OnMax1.6";   
+                  Automation_Status = Automation_1_name + " OnMax1.5";   
                   var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
                   var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
                   var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
