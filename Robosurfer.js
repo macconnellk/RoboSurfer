@@ -802,9 +802,8 @@ if (enable_Mealboost) {
                   // 140+ 
                   if (myGlucose >= 140) {
                      Mealboost_Status = "Mealboost:OnROC140+"
-                     new_maxSMB = maxSMB + Mealboost_SMB_UAM_Minutes_Increase_HIGH;   
-                     new_maxUAM = maxUAM + Mealboost_SMB_UAM_Minutes_Increase_HIGH;
-                     profile.smb_delivery_ratio = Mealboost_SMB_DeliveryRatio_Increase_ACCEL;
+                     new_maxSMB = maxSMB + Mealboost_SMB_UAM_Minutes_Increase;   
+                     new_maxUAM = maxUAM + Mealboost_SMB_UAM_Minutes_Increase;
                   }
              }
                 
