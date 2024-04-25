@@ -1,6 +1,8 @@
 import LoopKit
+import CoreData
 import SwiftUI
 import Swinject
+
 
 extension Bolus {
     final class StateModel: BaseStateModel<Provider> {
@@ -11,7 +13,6 @@ extension Bolus {
         // added for bolus calculator
         @Injected() var settings: SettingsManager!
         @Injected() var nsManager: NightscoutManager!
-        @Injected() var announcementStorage: AnnouncementsStorage!
 
         @Published var suggestion: Suggestion?
         @Published var predictions: Predictions?
@@ -59,20 +60,36 @@ extension Bolus {
         @Published var fattyMealFactor: Decimal = 0
         @Published var useFattyMealCorrectionFactor: Bool = false
         @Published var displayPredictions: Bool = true
-
+        @Published var LatestCarbEntryInsulin: Decimal = 0
+        @Published var roundedLatestCarbEntryInsulin: Decimal = 0
+        @Published var log_roundedWholeCalc: Decimal = 0
+        @Published var wholeCalc_carbs: Decimal = 0
+           
         @Published var meal: [CarbsEntry]?
         @Published var carbs: Decimal = 0
         @Published var fat: Decimal = 0
         @Published var protein: Decimal = 0
         @Published var note: String = ""
 
+         @FetchRequest(
+            entity: Meals.entity(),
+            sortDescriptors: [NSSortDescriptor(key: "createdAt", ascending: false)]
+        ) var Latestmeal: FetchedResults<Meals>
+ 
+        @Published var logMessage: String = ""
+        @Published var latestCarbValue: Decimal = 0
+        @Published var carbs2: Decimal = 0
+        
+
         override func subscribe() {
+            
             setupInsulinRequired()
             broadcaster.register(SuggestionObserver.self, observer: self)
             units = settingsManager.settings.units
             percentage = settingsManager.settings.insulinReqPercentage
             threshold = provider.suggestion?.threshold ?? 0
             maxBolus = provider.pumpSettings().maxBolus
+  //          profileCarbRatio = provider.altCalcProfile().carb_ratio
             // added
             fraction = settings.settings.overrideFactor
             useCalc = settings.settings.useCalc
@@ -97,10 +114,11 @@ extension Bolus {
                 suggestion = notNilSugguestion
                 if let notNilPredictions = suggestion?.predictions {
                     predictions = notNilPredictions
-                }
+                }                             
             }
         }
-
+    
+        
         func getDeltaBG() {
             let glucose = provider.fetchGlucose()
             guard glucose.count >= 3 else { return }
@@ -110,25 +128,25 @@ extension Bolus {
             deltaBG = delta
         }
 
-        func calculateInsulin() -> Decimal {
+        func calculateInsulin(carbs2: Decimal) -> Decimal {
             var conversion: Decimal = 1.0
             if units == .mmolL {
                 conversion = 0.0555
             }
             // insulin needed for the current blood glucose
-            let targetDifference = (currentBG - target) * conversion
-            // targetDifferenceInsulin = targetDifference / isf
+             let targetDifference = (currentBG - target) * conversion
+             targetDifferenceInsulin = targetDifference / isf
 
-            // more or less insulin because of bg trend in the last 15 minutes
+            // more or less insulin because of bg trend in the last 15 minutes (DISABLED)
             // fifteenMinInsulin = (deltaBG * conversion) / isf
 
             // determine whole COB for which we want to dose insulin for and then determine insulin for wholeCOB
             wholeCobInsulin = cob / carbRatio
+            
+             // determine how much the calculator reduces/ increases the bolus because of IOB
+             iobInsulinReduction = (-1) * iob
 
-            // determine how much the calculator reduces/ increases the bolus because of IOB
-            iobInsulinReduction = (-1) * iob
-
-            // adding everything together
+            // adding everything together for COB
             // add a calc for the case that no fifteenMinInsulin is available
             if deltaBG != 0 {
                 wholeCalc = (targetDifferenceInsulin + iobInsulinReduction + wholeCobInsulin + fifteenMinInsulin)
@@ -141,6 +159,34 @@ extension Bolus {
                     wholeCalc = (targetDifferenceInsulin + iobInsulinReduction + wholeCobInsulin)
                 }
             }
+            
+            if carbs2 > 0 {      
+                
+                // For max_cob = 60   
+                if carbs2 >= 60 {
+                   //calculate insulin for latest carb entry
+                    LatestCarbEntryInsulin = 60 / carbRatio
+                    wholeCalc_carbs = LatestCarbEntryInsulin 
+                } else {  
+                    //calculate insulin for latest carb entry
+                    LatestCarbEntryInsulin = carbs2 / carbRatio
+                    wholeCalc_carbs = LatestCarbEntryInsulin
+                }   
+                 
+                // logging and rounding LatestCarbEntryInsulin and wholecalc
+                let LatestCarbEntryInsulinAsDouble = Double(LatestCarbEntryInsulin)
+                roundedLatestCarbEntryInsulin = Decimal(round(100 * LatestCarbEntryInsulinAsDouble) / 100)
+                let Log_wholeCalcAsDouble = Double(wholeCalc)
+                log_roundedWholeCalc = Decimal(round(100 * Log_wholeCalcAsDouble) / 100)
+                logMessage = "Carbs:\(carbs2) -> \(roundedLatestCarbEntryInsulin)\nwholeCalc:\(log_roundedWholeCalc)"
+
+            
+                wholeCalc = min(wholeCalc, wholeCalc_carbs)
+                
+           } else {
+                logMessage = "\nNo New Carbs (carbs2=0)"
+            }
+                  
             // rounding
             let wholeCalcAsDouble = Double(wholeCalc)
             roundedWholeCalc = Decimal(round(100 * wholeCalcAsDouble) / 100)
@@ -217,23 +263,18 @@ extension Bolus {
                 self.insulinRecommended = self.apsManager
                     .roundBolus(amount: max(self.insulinRecommended, 0))
 
-                if self.useCalc {
-                    self.getDeltaBG()
-                    self.insulinCalculated = self.calculateInsulin()
-                }
-            }
+             // Disabling the intial insulin calculation to require an OnClick in the View code.  Allows carb entries to be assessed in the calculation rather than only COB
+             //   if self.useCalc {
+             //           self.getDeltaBG()
+             //           self.insulinCalculated = self.calculateInsulin()
+             //       } 
+                                        
+         }
         }
 
-        // To do rewrite everything! Looking ridiculous now.
-        func backToCarbsView(
-            complexEntry: Bool,
-            _ meal: FetchedResults<Meals>,
-            override: Bool,
-            deleteNothing: Bool,
-            editMode: Bool
-        ) {
-            if !deleteNothing { delete(deleteTwice: complexEntry, meal: meal) }
-            showModal(for: .addCarbs(editMode: editMode, override: override))
+        func backToCarbsView(complexEntry: Bool, _ meal: FetchedResults<Meals>, override: Bool) {
+            delete(deleteTwice: complexEntry, meal: meal)
+            showModal(for: .addCarbs(editMode: complexEntry, override: override))
         }
 
         func delete(deleteTwice: Bool, meal: FetchedResults<Meals>) {
@@ -241,47 +282,31 @@ extension Bolus {
                 return
             }
 
+            var date = Date()
+
+            if let mealDate = meals.actualDate {
+                date = mealDate
+            } else if let mealdate = meals.createdAt {
+                date = mealdate
+            }
+
             let mealArray = DataTable.Treatment(
                 units: units,
                 type: .carbs,
-                date: (deleteTwice ? (meals.createdAt ?? Date()) : meals.actualDate) ?? Date(),
+                date: date,
                 id: meals.id ?? "",
                 isFPU: deleteTwice ? true : false,
                 fpuID: deleteTwice ? (meals.fpuID ?? "") : ""
             )
 
+            print(
+                "meals 2: ID: " + mealArray.id.description + " FPU ID: " + (mealArray.fpuID ?? "")
+                    .description
+            )
+
             if deleteTwice {
-                nsManager.deleteNormalCarbs(mealArray)
-                nsManager.deleteFPUs(mealArray)
-            } else {
-                nsManager.deleteNormalCarbs(mealArray)
+                nsManager.deleteCarbs(mealArray, complexMeal: true)
             }
-        }
-
-        func remoteBolus() -> String? {
-            if let enactedAnnouncement = announcementStorage.recentEnacted() {
-                let components = enactedAnnouncement.notes.split(separator: ":")
-                guard components.count == 2 else { return nil }
-                let command = String(components[0]).lowercased()
-                let arguments = String(components[1]).lowercased()
-                let eventual: String = units == .mmolL ? evBG.asMmolL
-                    .formatted(.number.grouping(.never).rounded().precision(.fractionLength(1))) : evBG.formatted()
-
-                if command == "bolus" {
-                    return "\n" + NSLocalizedString("A Remote Bolus ", comment: "Remote Bolus Alert, part 1") +
-                        NSLocalizedString("was delivered", comment: "Remote Bolus Alert, part 2") + (
-                            -1 * enactedAnnouncement.createdAt
-                                .timeIntervalSinceNow
-                                .minutes
-                        )
-                        .formatted(.number.grouping(.never).rounded().precision(.fractionLength(0))) +
-                        NSLocalizedString(
-                            " minutes ago, triggered remotely from Nightscout, by a caregiver or a parent. Do you still want to bolus?\n\nPredicted eventual glucose, if you don't bolus, is: ",
-                            comment: "Remote Bolus Alert, part 3"
-                        ) + eventual + " " + units.rawValue
-                }
-            }
-            return nil
         }
     }
 }
