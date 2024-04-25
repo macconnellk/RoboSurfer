@@ -12,8 +12,7 @@ extension Bolus {
         @State private var showInfo = false
         @State private var exceededMaxBolus = false
         @State private var keepForNextWiew: Bool = false
-        @State private var remoteBolusAlert: Alert?
-        @State private var isRemoteBolusAlertPresented: Bool = false
+    
 
         private enum Config {
             static let dividerHeight: CGFloat = 2
@@ -80,24 +79,28 @@ extension Bolus {
                         Button(action: {
                             showInfo.toggle()
                         }, label: {
-                            Image(systemName: "info.bubble")
-                                .symbolRenderingMode(.palette)
-                                .foregroundStyle(colorScheme == .light ? .black : .white, .blue)
+                            Image(systemName: "info.circle")
                             Text("Calculations")
                         })
                             .foregroundStyle(.blue)
                             .font(.footnote)
                             .buttonStyle(PlainButtonStyle())
                             .frame(maxWidth: .infinity, alignment: .leading)
+                        // Highjackig Fatty Meals Functionality to enable calculation of insulin using latest carbs or COB
                         if state.fattyMeals {
                             Spacer()
                             Toggle(isOn: $state.useFattyMealCorrectionFactor) {
-                                Text("Fatty Meal")
+                                Text("Calculate Insulin")
                             }
                             .toggleStyle(CheckboxToggleStyle())
                             .font(.footnote)
                             .onChange(of: state.useFattyMealCorrectionFactor) { _ in
-                                state.insulinCalculated = state.calculateInsulin()
+                                if let carbs2 = meal.first?.carbs, carbs2 > 0 {
+                                state.insulinCalculated = state.calculateInsulin(carbs2: Decimal(carbs2))
+                                } else {
+                                  let carbs2 = 0  
+                                  state.insulinCalculated = state.calculateInsulin(carbs2: Decimal(carbs2))
+                                }   
                             }
                         }
                     }
@@ -110,7 +113,7 @@ extension Bolus {
                         }
                     } else {
                         HStack {
-                            Text("Insulin recommended")
+                            Text("Recommended Bolus")
                             Spacer()
                             Text(
                                 formatter
@@ -163,21 +166,8 @@ extension Bolus {
                 if state.amount > 0 {
                     Section {
                         Button {
-                            if let remoteBolus = state.remoteBolus() {
-                                remoteBolusAlert = Alert(
-                                    title: Text("A Remote Bolus Was Just Delivered!"),
-                                    message: Text(remoteBolus),
-                                    primaryButton: .destructive(Text("Bolus"), action: {
-                                        keepForNextWiew = true
-                                        state.add()
-                                    }),
-                                    secondaryButton: .cancel()
-                                )
-                                isRemoteBolusAlertPresented = true
-                            } else {
-                                keepForNextWiew = true
-                                state.add()
-                            }
+                            keepForNextWiew = true
+                            state.add()
                         }
                         label: { Text(exceededMaxBolus ? "Max Bolus exceeded!" : "Enact bolus") }
                             .frame(maxWidth: .infinity, alignment: .center)
@@ -195,9 +185,6 @@ extension Bolus {
                         label: { Text("Continue without bolus") }.frame(maxWidth: .infinity, alignment: .center)
                     }
                 }
-            }
-            .alert(isPresented: $isRemoteBolusAlertPresented) {
-                remoteBolusAlert!
             }
             .dynamicTypeSize(...DynamicTypeSize.xxLarge)
             .blur(radius: showInfo ? 20 : 0)
@@ -220,7 +207,15 @@ extension Bolus {
                 configureView {
                     state.waitForSuggestionInitial = waitForSuggestion
                     state.waitForSuggestion = waitForSuggestion
-                    state.insulinCalculated = state.calculateInsulin()
+    
+                    if let carbs2 = meal.first?.carbs, carbs2 > 0 {
+                        state.insulinCalculated = state.calculateInsulin(carbs2: Decimal(carbs2))
+                    } else {
+                        // Provide a default value for carbs if necessary
+                        let carbs2 = 0
+                        state.insulinCalculated = state.calculateInsulin(carbs2: Decimal(carbs2))
+                        }      
+    
                 }
             }
             .onDisappear {
@@ -264,8 +259,10 @@ extension Bolus {
                     Divider().frame(height: Config.dividerHeight) // .overlay(Config.overlayColour)
                     VStack {
                         HStack {
-                            Text("Full Bolus")
-                                .foregroundColor(.secondary)
+                            let logMessage = state.logMessage
+                            // Combine "Full Bolus", log message, and potential styling
+                            Text("Full Bolus " + (logMessage.isEmpty ? "" : "(\(logMessage))"))
+                            .foregroundColor(logMessage.isEmpty ? .secondary : .yellow)  // Optional highlight
                             Spacer()
                             let insulin = state.roundedWholeCalc
                             Text(insulin.formatted()).foregroundStyle(state.roundedWholeCalc < 0 ? Color.loopRed : Color.primary)
@@ -301,7 +298,6 @@ extension Bolus {
                 .padding(.bottom, 20)
             }
             .font(.footnote)
-            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
             .background(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .fill(Color(colorScheme == .dark ? UIColor.systemGray4 : UIColor.systemGray4).opacity(0.9))
@@ -323,9 +319,9 @@ extension Bolus {
         func carbsView() {
             if fetch {
                 keepForNextWiew = true
-                state.backToCarbsView(complexEntry: hasFatOrProtein, meal, override: false, deleteNothing: false, editMode: true)
+                state.backToCarbsView(complexEntry: true, meal, override: false)
             } else {
-                state.backToCarbsView(complexEntry: false, meal, override: true, deleteNothing: true, editMode: false)
+                state.backToCarbsView(complexEntry: false, meal, override: true)
             }
         }
 
@@ -414,7 +410,7 @@ extension Bolus {
                 }
                 if state.useFattyMealCorrectionFactor {
                     HStack {
-                        Text("Carbs Fraction")
+                        Text("Carb Entry Fraction")
                             .foregroundColor(.orange)
                         Spacer()
                         let fraction = state.fattyMealFactor
