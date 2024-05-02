@@ -39,7 +39,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_dynamic_cr = true; 
   var enable_new_sigmoidTDDFactor = true;
   var enable_Automation_1 = true; 
-  var enable_smb_delivery_ratio_scaling = true;
+  var enable_smb_delivery_ratio_scaling = false;
   var enable_Mealboost = true; 
 
          // Sensor Safety: if data gaps or high BG delta, disable SMBs, UAMs, and smb_delivery_ratio_scaling. 
@@ -173,7 +173,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
        
 //  Initialize Sigmoid Enhanced with TDD Response function variables
    var minimumRatio = .99;
-   var maximumRatio = 1.25;
+   var maximumRatio = 1.1; //was 1.25
    var adjustmentFactor = .75;
    var past2hoursAverage = oref2_variables.past2hoursAverage;
    var average_total_data = oref2_variables.average_total_data;
