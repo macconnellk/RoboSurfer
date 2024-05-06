@@ -158,7 +158,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       //  Initialize user-defined basal sigmoid function variables
                var robosens_minimumRatio = .7;
                var robosens_maximumRatio = 1.2;
-               var robosens_maximumRatio_safety_threshold = 2;  
+               var robosens_maximumRatio_safety_threshold = 1.5;  
                var robosens_adjustmentFactor = .5;
                var robosens_adjustmentFactor_safety_threshold = 2; 
                var robosens_sigmoidFactor = 1;
