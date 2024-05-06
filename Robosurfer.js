@@ -112,15 +112,15 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var overrideTarget = oref2_variables.overrideTarget;
    var smbisOff = oref2_variables.smbisOff;  
 
-   if useOverride {
+   if (useOverride) {
       logOverride = "On";
-      if overrideTarget >=80 {
+      if (overrideTarget >=80) {
          var target = overrideTarget;
          }
       var initial_isf = initial_isf / overridePercentage;
       var initial_csf = initial_isf / initial_cr; 
       var current_basal = round_basal(current_basal * overridePercentage);
-      if smbisOff {
+      if (smbisOff) {
          profile.enableUAM = false;
          profile.enableSMB_always = false;
          }
