@@ -91,18 +91,44 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    //  Initialize log variables  
    var log_protectionmechanism = "Off";
    
-//  Initialize general RoboSurfer function variables
+//  Initialize APS state variables
    var myGlucose = glucose[0].glucose;
    var target = profile.min_bg;
    var initial_isf = profile.sens;
    var initial_cr = profile.carb_ratio; 
    var initial_csf = initial_isf / initial_cr; 
+   var current_basal = profile.current_basal;    
    var cob = meal.mealCOB;
    var iob = iob[0].iob    
    var max_COB = profile.maxCOB;   
    var maxSMB = profile.maxSMBBasalMinutes;
    var maxUAM = profile.maxUAMSMBBasalMinutes;  
    var smb_delivery_ratio = profile.smb_delivery_ratio;
+
+   // Adjust for Profiles       
+   var logOverride = "Off"
+   var useOverride = oref2_variables.useOverride; 
+   var overridePercentage = oref2_variables.overridePercentage / 100;   
+   var overrideTarget = oref2_variables.overrideTarget;
+   var smbisOff = oref2_variables.smbisOff;  
+
+   if useOverride {
+      logOverride = "On";
+      if overrideTarget >=80 {
+         var target = overrideTarget;
+         }
+      var initial_isf = initial_isf / overridePercentage;
+      var initial_csf = initial_isf / initial_cr; 
+      var current_basal = round_basal(current_basal * overridePercentage);
+      if smbisOff {
+         profile.enableUAM = false;
+         profile.enableSMB_always = false;
+         }
+      oref2_variables.useOverride = false;
+      oref2_variables.overridePercentage = 100;     
+      }  
+
+ //  Initialize general RoboSurfer function variables      
    const now = new Date();
    var new_dynISF_ratio = 1;
    var new_isf = initial_isf;
@@ -111,8 +137,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var new_maxSMB = maxSMB;   
    var new_maxUAM = maxUAM;   
    var new_max_COB = max_COB;    
-   var check_csf = 0;    
-
+   var check_csf = 0;
+ 
       
 //  Initialize ROBOSENS variables
        // Initilize function variables
@@ -124,8 +150,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var lastCarbTimePlus10Mins = lastCarbTime + (10 * 60 * 1000); // 10 minutes in milliseconds
          var my24hrGlucose = []; // create array
          var my24hrGlucoseTime = []; // create array
-         var old_basal = profile.current_basal;
-         var new_basal = profile.current_basal;
+         var old_basal = current_basal;
+         var new_basal = current_basal;
          var percentageOverTarget_Last4Hours = 0;
          var percentageOverTarget_Last8Hours = 0;
          var percentageOverTarget_Last24Hours = 0;
@@ -652,7 +678,7 @@ if (enable_Automation_1) {
       }           
    
    // Basal Robosens Adjustment
-         new_basal = profile.current_basal * robosens_basalFactor;
+         new_basal = new_basal * robosens_basalFactor;
          new_basal = round_basal(new_basal);
          profile.current_basal = new_basal;   
        
@@ -851,7 +877,7 @@ if (enable_Mealboost) {
        
 // **************** End RoboSurfer Enhancements ****************
 
-return "Robosens Status Basal/ISF: " + round(robosens_basalFactor,2) + "(" + robosens_basal_status + ")/" + round(robosens_sigmoidFactor, 2) + "(" + robosens_sens_status +  "). dISF ratio: " + round(new_dynISF_ratio, 2) + ". ISF was/now: " + round(initial_isf, 2) + "/ " + round(profile.sens,2) + " Basal was/now: " + old_basal + "/ " + profile.current_basal + ". dCR(" + enable_dynamic_cr + ") was/now: " + initial_cr + "/ " + round(profile.carb_ratio, 2) + " CSF was/now "  + round(initial_csf, 2) + "/ " + round(check_csf, 2)+ ". SMB Deliv. Ratio: " + profile.smb_delivery_ratio + " ROBOSENS: Trg-" + user_bottomtargetAverageGlucose + "/Av/%Over: 4Hr: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
+return "Robosens Status Basal/ISF: " + round(robosens_basalFactor,2) + "(" + robosens_basal_status + ")/" + round(robosens_sigmoidFactor, 2) + "(" + robosens_sens_status +  "). dISF ratio: " + round(new_dynISF_ratio, 2) + ". Override:" + logOverride + ". ISF was/now: " + round(initial_isf, 2) + "/ " + round(profile.sens,2) + " Basal was/now: " + old_basal + "/ " + profile.current_basal + ". dCR(" + enable_dynamic_cr + ") was/now: " + initial_cr + "/ " + round(profile.carb_ratio, 2) + " CSF was/now "  + round(initial_csf, 2) + "/ " + round(check_csf, 2)+ ". SMB Deliv. Ratio: " + profile.smb_delivery_ratio + " ROBOSENS: Trg-" + user_bottomtargetAverageGlucose + "/Av/%Over: 4Hr: " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
 " 8Hr:" + target_averageGlucose_Last8Hours + "/" + round(averageGlucose_Last8Hours, 0) + "/" + round(percentageOverTarget_Last8Hours, 0) + "%" + 
 " 24Hr:" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RS Adj/AF: " + round(robosens_AF_adjustment,2) + "/" + round(robosens_adjustmentFactor,2) + " RS Adj/MAX: " + round(robosens_MAX_adjustment,2) + "/" + round(robosens_maximumRatio,2) + " Sensor Safety: " + sensor_safety_status + " AUTOMATION1: " + Automation_Status + ": " + start_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " to " + end_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + ". SMB Mins: "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Mins: "  + round(profile.maxUAMSMBBasalMinutes, 2) + " Max COB: "  + round(profile.maxCOB, 2) + ". MinAbsorp((CI): "  + round(check_carb_absorption, 2) + "(" + profile.min_5m_carbimpact + ")" + "Mealboost: " + Mealboost_Status + " SMB:+" + Mealboost_SMB_change +" TDD:" + round(past2hoursAverage, 2) + " 2week TDD:" + round(average_total_data, 2);
    }
