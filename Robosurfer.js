@@ -625,7 +625,7 @@ if (enable_Automation_1) {
     
  // BASAL FACTOR: SET THE ROBOSENS BASAL FACTOR 
  // IF 8HR and 24HR AVG BG ABOVE RANGE   
-   if (averageGlucose_Last8Hours > target_averageGlucose_Last8Hours && averageGlucose_Last24Hours > target_averageGlucose_Last24Hours) {  
+   if (averageGlucose_Last8Hours > target_averageGlucose_Last8Hours && averageGlucose_Last24Hours > target_averageGlucose_Last24Hours && averageGlucose_Last4Hours > target_averageGlucose_Last4Hours && myGlucose > target_averageGlucose_Last4Hours) {
        // Choose the max of 1/6th 4hr ,1/3 8hr, or 24hr Percent Over Target to address rapidly increasing resistaance sooner
         robosens_basalFactor = Math.max(
           1 + (percentageOverTarget_Last4Hours / 6 / 100),
