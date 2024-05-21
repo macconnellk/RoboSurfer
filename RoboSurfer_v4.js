@@ -1,4 +1,4 @@
-function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoir, clock, pumphistory, preferences, basal_profile, oref2_variables) {
+function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoir, clock, basal_profile, dynamicVariables) {
 
    // Define various functions used later on, in the main function
          // Round Basal
@@ -107,10 +107,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
    // Adjust for Profiles       
    var logOverride = "Off"
-   var useOverride = oref2_variables.useOverride; 
-   var overridePercentage = oref2_variables.overridePercentage / 100;   
-   var overrideTarget = oref2_variables.overrideTarget;
-   var smbisOff = oref2_variables.smbisOff;  
+   var useOverride = dynamicVariables.useOverride; 
+   var overridePercentage = dynamicVariables.overridePercentage / 100;   
+   var overrideTarget = dynamicVariables.overrideTarget;
+   var smbisOff = dynamicVariables.smbisOff;  
 
    if (useOverride) {
       logOverride = "On";
@@ -124,8 +124,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          profile.enableUAM = false;
          profile.enableSMB_always = false;
          }
-      oref2_variables.useOverride = false;
-      oref2_variables.overridePercentage = 100;     
+      dynamicVariables.useOverride = false;
+      dynamicVariables.overridePercentage = 100;     
       }  
 
  //  Initialize general RoboSurfer function variables      
@@ -201,9 +201,9 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var minimumRatio = .99;
    var maximumRatio = 1.1; //was 1.25
    var adjustmentFactor = .75;
-   var past2hoursAverage = oref2_variables.past2hoursAverage;
-   var average_total_data = oref2_variables.average_total_data;
-   var weightedAverage = oref2_variables.weightedAverage;
+   var past2hoursAverage = dynamicVariables.past2hoursAverage;
+   var average_total_data = dynamicVariables.average_total_data;
+   var weightedAverage = dynamicVariables.weightedAverage;
        // Sensitivity Protection Mechanism: If 24hr TDD is less than 2-Week TDD (more sensitive), set weighted average TDD to the 24hr TDD value)
          if (past2hoursAverage < average_total_data) {
             weightedAverage = past2hoursAverage;
