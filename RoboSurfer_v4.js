@@ -1,4 +1,4 @@
-function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoir, clock, pumphistory, preferences, basal_profile, dynamicVariables) {
+function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoir, clock, dynamicVariables) {
 
    // Define various functions used later on, in the main function
          // Round Basal
