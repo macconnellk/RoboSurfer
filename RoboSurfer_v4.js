@@ -711,16 +711,18 @@ if (enable_Automation_1) {
       var robosens_max_minus_one = robosens_maximumRatio - 1;
       
        // Dynamic deviation
-       // Sigmoid is based on 4 hour average bg. If current BG is over 160, use the max of 4,8,24 hour instead.  If current BG is over 220, use max of now,4,8,24 instead.  
+       // Sigmoid is based on 4 hour average bg. 
+       //   If current BG is over 160, use the max of 4,8,24 hour instead.  
+       //   If current BG is over 220, use max of now,4,8,24 instead. UPDATE: DISABLING THIS LOGIC DUE TO HIGH DOSES OVER 220  
        // This is to tilt towards ongoing periods of resistance (8 or 24 hour) if current BG goes high. 
              var deviation_bg = averageGlucose_Last4Hours;
                     if (myGlucose > dynamic_deviation_high) {
                           deviation_bg = Math.max(averageGlucose_Last4Hours, averageGlucose_Last8Hours, averageGlucose_Last24Hours);
                      }
 
-                    if (myGlucose > dynamic_deviation_veryhigh) {
-                           deviation_bg = Math.max(myGlucose,averageGlucose_Last4Hours, averageGlucose_Last8Hours, averageGlucose_Last24Hours);
-                     }
+                 // DISABLE   if (myGlucose > dynamic_deviation_veryhigh) {
+                 // DISABLE         deviation_bg = Math.max(myGlucose,averageGlucose_Last4Hours, averageGlucose_Last8Hours, averageGlucose_Last24Hours);
+                 // DISABLE   }
 
                         // Set Robosens Sens Status
                            robosens_sens_status = "On4hr"; 
@@ -730,9 +732,10 @@ if (enable_Automation_1) {
                             if (deviation_bg == averageGlucose_Last24Hours) {
                                   robosens_sens_status = "On24hr";   
                            } 
-                            if (deviation_bg == myGlucose) {
-                                  robosens_sens_status = "OnCurrentBG";
-                           }      
+    
+                  // DISABLE         if (deviation_bg == myGlucose) {
+                  // DISABLE               robosens_sens_status = "OnCurrentBG";
+                  // DISABLE        }      
          
          if (averageGlucose_Last4Hours > target_averageGlucose_Last4Hours) {
              var robosens_deviation = (deviation_bg - target_averageGlucose_Last4Hours) * 0.0555;
@@ -879,6 +882,6 @@ if (enable_Mealboost) {
 
 return "Robosens Status Basal/ISF " + round(robosens_basalFactor,2) + "(" + robosens_basal_status + ")/" + round(robosens_sigmoidFactor, 2) + "(" + robosens_sens_status +  "). dISF ratio " + round(new_dynISF_ratio, 2) + ". Override" + logOverride + ". ISF was/now " + round(initial_isf, 2) + "/ " + round(profile.sens,2) + " Basal was/now " + old_basal + "/ " + profile.current_basal + ". dCR(" + enable_dynamic_cr + ") was/now " + initial_cr + "/ " + round(profile.carb_ratio, 2) + " CSF was/now "  + round(initial_csf, 2) + "/ " + round(check_csf, 2)+ ". SMB Deliv. Ratio " + profile.smb_delivery_ratio + " ROBOSENS Trg-" + user_bottomtargetAverageGlucose + "/Av/%Over 4Hr " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
 " 8Hr" + target_averageGlucose_Last8Hours + "/" + round(averageGlucose_Last8Hours, 0) + "/" + round(percentageOverTarget_Last8Hours, 0) + "%" + 
-" 24Hr" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RS Adj/AF " + round(robosens_AF_adjustment,2) + "/" + round(robosens_adjustmentFactor,2) + " RS Adj/MAX " + round(robosens_MAX_adjustment,2) + "/" + round(robosens_maximumRatio,2) + " Sensor Safety " + sensor_safety_status + " AUTOMATION1 " + Automation_Status + " " + start_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " to " + end_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + ". SMB Mins "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Mins "  + round(profile.maxUAMSMBBasalMinutes, 2) + " Max COB "  + round(profile.maxCOB, 2) + ". MinAbsorp((CI) "  + round(check_carb_absorption, 2) + "(" + profile.min_5m_carbimpact + ")" + "Mealboost " + Mealboost_Status + " SMB+" + Mealboost_SMB_change +" TDD" + round(past2hoursAverage, 2) + " 2week TDD" + round(average_total_data, 2);
+" 24Hr" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RS Adj/AF " + round(robosens_AF_adjustment,2) + "/" + round(robosens_adjustmentFactor,2) + " RS Adj/MAX " + round(robosens_MAX_adjustment,2) + "/" + round(robosens_maximumRatio,2) + " Sensor Safety " + sensor_safety_status + " AUTOMATION1 " + Automation_Status + " " + start_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " to " + end_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + ". SMB Mins "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Mins "  + round(profile.maxUAMSMBBasalMinutes, 2) + " Max COB "  + round(profile.maxCOB, 2) + ". MinAbsorp((CI) "  + round(check_carb_absorption, 2) + "(" + profile.min_5m_carbimpact + ")" + "Mealboost " + Mealboost_Status + " SMB+" + Mealboost_SMB_change +" TDD " + round(past2hoursAverage, 2) + " 2week TDD " + round(average_total_data, 2);
    }
 }
