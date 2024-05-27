@@ -669,8 +669,8 @@ if (enable_Automation_1) {
                            } 
       }       
 
-   // IF 24HR AVG BELOW RANGE   
-   if (averageGlucose_Last24Hours < user_bottomtargetAverageGlucose) {  
+   // IF 24HR AVG BELOW 24 HOUR TARGET   
+   if (averageGlucose_Last24Hours < user_targetAverageGlucoseLast24Hours) {  
         robosens_basalFactor = 1 + (percentageOverTarget_Last24Hours / 100);
 
                      // Set Robosens Basal Status
