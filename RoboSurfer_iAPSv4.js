@@ -680,12 +680,15 @@ if (enable_Automation_1) {
                            } 
       }       
 
-   // IF 24HR AVG BELOW 24 HOUR TARGET, REDUCE BASAL BY % UNDER TARGET
-      // NIGHTPROTECT: IF IT'S NIGHTTIME AND BG IS UNDER NIGHTPROTECT THRESHOLD, REDUCE BASAL BY A SET NIGHTPROTECT FACTOR 
+   // IF 24HR AVG BELOW TARGET RANGE, REDUCE BASAL BY % UNDER TARGET (MIN OF 8HR or 24HR)
+      // NIGHTPROTECT: IF IT'S NIGHTTIME AND BG IS UNDER NIGHTPROTECT THRESHOLD, REDUCE BASAL BY MIN OF 8HR OR A SET NIGHTPROTECT FACTOR 
     
    if (averageGlucose_Last24Hours < user_targetAverageGlucoseLast24Hours) {  
         
-         robosens_basalFactor = 1 + (percentageOverTarget_Last24Hours / 100);
+         robosens_basalFactor = Math.min(
+          1 + (percentageOverTarget_Last8Hours / 100),
+          1 + (percentageOverTarget_Last24Hours / 100)
+         );
          // Set Robosens Basal Status
          robosens_basal_status = "On24hrLow";
       
@@ -697,7 +700,11 @@ if (enable_Automation_1) {
                       (now >= nightProtect_start_time && now >= nightProtect_end_time && nightProtect_start_time > nightProtect_end_time))
                          && myGlucose < nightProtect_BGThreshold) {
 
-                         robosens_basalFactor = nightProtect_basalFactor; // (currently -25%)
+                         robosens_basalFactor = Math.min(
+                            1 + (percentageOverTarget_Last8Hours / 100),
+                            nightProtect_basalFactor 
+                         );
+                          
                          profile.enableUAM = false;
                          profile.enableSMB_always = false;
 
