@@ -37,10 +37,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 //Turn RoboSurfer and functions on or off
   var enable_RoboSurfer = true;
   var enable_robosens = true; 
+  var enable_nightProtect = true; 
   var enable_dynamic_cr = true; 
   var enable_new_sigmoidTDDFactor = true;
-  var enable_Automation_1 = true;
-  var enable_nightProtect = true; 
+  var enable_Automation_1 = true; 
   var enable_smb_delivery_ratio_scaling = false;
   var enable_Mealboost = true; 
 
@@ -689,7 +689,7 @@ if (enable_Automation_1) {
          // Set Robosens Basal Status
          robosens_basal_status = "On24hrLow";
       
-            if enable_nightProtect = true {
+            if (enable_nightProtect) {
 
                   // Current settings: IF BETWEEN 9pm and 3am, and BG under 110, reduce basal by 25%
                
