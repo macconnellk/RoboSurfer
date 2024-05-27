@@ -695,7 +695,7 @@ if (enable_Automation_1) {
                
                    if (((now >= nightProtect_start_time && now <= nightProtect_end_time) || (now <= nightProtect_start_time && now <= nightProtect_end_time && nightProtect_start_time > nightProtect_end_time) ||
                       (now >= nightProtect_start_time && now >= nightProtect_end_time && nightProtect_start_time > nightProtect_end_time))
-                         && myGlucose < nightProtect_BGThreshold {
+                         && myGlucose < nightProtect_BGThreshold) {
 
                          robosens_basalFactor = nightProtect_basalFactor; // (currently -25%)
                          profile.enableUAM = false;
