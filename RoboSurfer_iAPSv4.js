@@ -178,7 +178,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
                var nightProtect_basalFactor = -.25;
                // Define the start time and end time
                const nightProtect_start_time = new Date(now);
-               nightProtect_start_time.setHours(22, 0, 0); // The start time is 10:00 PM
+               nightProtect_start_time.setHours(21, 0, 0); // The start time is 9:00 PM
                const nightProtect_end_time = new Date(now);
                nightProtect_end_time.setHours(3, 0, 0); // The end time is 3:00 AM
 
@@ -691,7 +691,7 @@ if (enable_Automation_1) {
       
             if enable_nightProtect = true {
 
-                  // Current settings: IF BETWEEN 10pm and 3am, and BG under 110, reduce basal by 25%
+                  // Current settings: IF BETWEEN 9pm and 3am, and BG under 110, reduce basal by 25%
                
                    if (((now >= nightProtect_start_time && now <= nightProtect_end_time) || (now <= nightProtect_start_time && now <= nightProtect_end_time && nightProtect_start_time > nightProtect_end_time) ||
                       (now >= nightProtect_start_time && now >= nightProtect_end_time && nightProtect_start_time > nightProtect_end_time))
