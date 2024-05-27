@@ -698,6 +698,8 @@ if (enable_Automation_1) {
                          && myGlucose < nightProtect_BGThreshold {
 
                          robosens_basalFactor = nightProtect_basalFactor; // (currently -25%)
+                         profile.enableUAM = false;
+                         profile.enableSMB_always = false;
 
                       // Set Robosens Basal Status
                         robosens_basal_status = "On24hrLow_NightProtect"; 
