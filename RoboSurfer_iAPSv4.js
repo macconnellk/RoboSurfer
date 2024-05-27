@@ -25,9 +25,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
 // RoboSurfer is my own compilation of other individual Middleware capabilites.  RoboSurfer currently includes:
 // 1) Sigmoid with optional Adjustable TDD Response
-// 2) Scale SMB Delivery Ratio
-// 3) Constant Minimum Carb Absorption
-// 4) Settings automations
+// 2) Robosens  
+// 3) Scale SMB Delivery Ratio
+// 4) Constant Minimum Carb Absorption
+// 5) Settings automations
 //    a) Nightboost
 
 //RoboSurfer uses Sigmoid Dynamic ISF.  Settings are made here within the code.  
@@ -38,7 +39,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_robosens = true; 
   var enable_dynamic_cr = true; 
   var enable_new_sigmoidTDDFactor = true;
-  var enable_Automation_1 = true; 
+  var enable_Automation_1 = true;
+  var enable_nightProtect = true; 
   var enable_smb_delivery_ratio_scaling = false;
   var enable_Mealboost = true; 
 
@@ -171,7 +173,15 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
             // 4, 8, 24, bottom of range target
                 const user_bottomtargetAverageGlucose = 110;
 
-       
+            //Define NightProtect Basal variables   
+               var nightProtect_BGThreshold = 110;
+               var nightProtect_basalFactor = -.25;
+               // Define the start time and end time
+               const nightProtect_start_time = new Date(now);
+               nightProtect_start_time.setHours(22, 0, 0); // The start time is 10:00 PM
+               const nightProtect_end_time = new Date(now);
+               nightProtect_end_time.setHours(3, 0, 0); // The end time is 3:00 AM
+
       // Initialize the target variables based on current hour
              // Get the current hour
                const currentHour = new Date().getHours();
@@ -635,6 +645,7 @@ if (enable_Automation_1) {
  }
 
 // Calculate percentage under range for each time period
+// For 4hr and 8hr use bottom of range.  For 24hr, use single-number 24hr target    
  if (averageGlucose_Last4Hours < user_bottomtargetAverageGlucose) {
        percentageOverTarget_Last4Hours = ((averageGlucose_Last4Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
  }
@@ -643,8 +654,8 @@ if (enable_Automation_1) {
        percentageOverTarget_Last8Hours = ((averageGlucose_Last8Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
  }
 
- if (averageGlucose_Last24Hours < user_bottomtargetAverageGlucose) {   
-       percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
+ if (averageGlucose_Last24Hours < user_targetAverageGlucoseLast24Hours) {   
+       percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - user_targetAverageGlucoseLast24Hours) / user_targetAverageGlucoseLast24Hours) * 100;
  
  }
     
@@ -669,12 +680,30 @@ if (enable_Automation_1) {
                            } 
       }       
 
-   // IF 24HR AVG BELOW 24 HOUR TARGET   
+   // IF 24HR AVG BELOW 24 HOUR TARGET, REDUCE BASAL BY % UNDER TARGET
+      // NIGHTPROTECT: IF IT'S NIGHTTIME AND BG IS UNDER NIGHTPROTECT THRESHOLD, REDUCE BASAL BY A SET NIGHTPROTECT FACTOR 
+    
    if (averageGlucose_Last24Hours < user_targetAverageGlucoseLast24Hours) {  
-        robosens_basalFactor = 1 + (percentageOverTarget_Last24Hours / 100);
+        
+         robosens_basalFactor = 1 + (percentageOverTarget_Last24Hours / 100);
+         // Set Robosens Basal Status
+         robosens_basal_status = "On24hrLow";
+      
+            if enable_nightProtect = true {
 
-                     // Set Robosens Basal Status
-                           robosens_basal_status = "On24hrLow";    
+                  // Current settings: IF BETWEEN 10pm and 3am, and BG under 110, reduce basal by 25%
+               
+                   if (((now >= nightProtect_start_time && now <= nightProtect_end_time) || (now <= nightProtect_start_time && now <= nightProtect_end_time && nightProtect_start_time > nightProtect_end_time) ||
+                      (now >= nightProtect_start_time && now >= nightProtect_end_time && nightProtect_start_time > nightProtect_end_time))
+                         && myGlucose < nightProtect_BGThreshold {
+
+                         robosens_basalFactor = nightProtect_basalFactor; // (currently -25%)
+
+                      // Set Robosens Basal Status
+                        robosens_basal_status = "On24hrLow_NightProtect"; 
+                      
+                   }
+            }
       }           
    
    // Basal Robosens Adjustment
