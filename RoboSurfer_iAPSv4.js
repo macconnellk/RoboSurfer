@@ -174,7 +174,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
                 const user_bottomtargetAverageGlucose = 110;
 
             //Define NightProtect Basal variables   
-               var nightProtect_BGThreshold = 110;
+               var nightProtect_BGThreshold = 115;
                var nightProtect_basalFactor = .8;
                // Define the start time and end time
                const nightProtect_start_time = new Date(now);
