@@ -175,7 +175,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
             //Define NightProtect Basal variables   
                var nightProtect_BGThreshold = 110;
-               var nightProtect_basalFactor = -.25;
+               var nightProtect_basalFactor = .8;
                // Define the start time and end time
                const nightProtect_start_time = new Date(now);
                nightProtect_start_time.setHours(21, 0, 0); // The start time is 9:00 PM
