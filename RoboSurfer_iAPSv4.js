@@ -114,6 +114,12 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var overrideTarget = dynamicVariables.overrideTarget;
    var smbisOff = dynamicVariables.smbisOff;  
 
+   if (overridePercentage = .87) {
+         enable_robosens = false;
+         useOverride = false;
+         logOverride = "Robosens Off";
+         }
+       
    if (useOverride) {
       logOverride = "On";
       if (overrideTarget >=80) {
@@ -126,6 +132,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          profile.enableUAM = false;
          profile.enableSMB_always = false;
          }
+      
       dynamicVariables.useOverride = false;
       dynamicVariables.overridePercentage = 100;     
       }  
