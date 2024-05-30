@@ -250,7 +250,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
        
          // Automation_1 User-Defined Variables 
          var Automation_1_name = "Nightboost"; // Give the Automation a Name for use in return string
-         var Automation_1_ISF = 190; // (Was 110)
+         var Automation_1_ISF = 195; // (Was 110)
          var Automation_1_target = 120; // (Was 105)
          
          //Automation 1 Sigmoid - Threshold 1 
