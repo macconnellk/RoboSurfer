@@ -118,6 +118,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          enable_robosens = false;
          useOverride = false;
          current_basal = round((current_basal / .87),2);
+         profile.current_basal = current_basal;
          dynamicVariables.useOverride = false;
          dynamicVariables.overridePercentage = 100;
          logOverride = "Robosens Off";
