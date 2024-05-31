@@ -117,6 +117,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    if (overridePercentage = .87) {
          enable_robosens = false;
          useOverride = false;
+         dynamicVariables.useOverride = false;
+         dynamicVariables.overridePercentage = 100;
          logOverride = "Robosens Off";
          }
        
