@@ -114,7 +114,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var overrideTarget = dynamicVariables.overrideTarget;
    var smbisOff = dynamicVariables.smbisOff;  
 
-   if ((useOverride) && overridePercentage = .87) {
+   if (useOverride && overridePercentage = .87) {
          enable_robosens = false;
          useOverride = false;
          current_basal = round((current_basal / .87),2);
