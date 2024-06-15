@@ -171,6 +171,13 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var percentageOverTarget_Last16Hours = 0;
          var percentageOverTarget_Last20Hours = 0;
          var percentageOverTarget_Last24Hours = 0;
+         var basalfactorFraction_4Hours = 0;
+         var basalfactorFraction_8Hours = 0;
+         var basalfactorFraction_12Hours = 0;
+         var basalfactorFraction_16Hours = 0;
+         var basalfactorFraction_20Hours = 0;
+         var basalfactorFraction_24Hours = 0;
+         var totalBasalfactorFraction = 0;
 
       // User-defined AUC targets for each time period in mg / dl / h (average glucose)
       // Define target average glucose levels for different time periods
@@ -728,11 +735,32 @@ if (enable_Automation_1) {
    if (averageGlucose_Last8Hours > target_averageGlucose_Last8Hours && averageGlucose_Last24Hours > target_averageGlucose_Last24Hours && averageGlucose_Last4Hours > target_averageGlucose_Last4Hours && myGlucose > target_averageGlucose_Last4Hours) { 
       // SUM 1/6 of 24hr for each period over target
       if (percentageOverTarget_Last4Hours > 0) {
-            
-   //       ADD LOGIC FOR EACH TIME PERIOD
-    
-    
-       robosens_basalFactor = 1 + (percentageOverTarget_Last24Hours / 100)
+            basalfactorFraction_4Hours = .17
+      }
+
+      if (percentageOverTarget_Last8Hours > 0) {
+            basalfactorFraction_8Hours = .17
+      }
+
+      if (percentageOverTarget_Last12Hours > 0) {
+            basalfactorFraction_12Hours = .17
+      }
+      
+      if (percentageOverTarget_Last16Hours > 0) {
+            basalfactorFraction_16Hours = .17
+      }
+
+      if (percentageOverTarget_Last20Hours > 0) {
+            basalfactorFraction_20Hours = .16
+      }
+
+      if (percentageOverTarget_Last24Hours > 0) {
+            basalfactorFraction_24Hours = .16
+      }
+
+      totalBasalfactorFraction = basalfactorFraction_4Hours + basalfactorFraction_8Hours + basalfactorFraction_12Hours + basalfactorFraction_16Hours + basalfactorFraction_20Hours + basalfactorFraction_24Hours;
+      robosens_basalFactor = round(percentageOverTarget_Last24Hours * totalBasalfactorFraction,0)
+      robosens_basalFactor = 1 + (robosens_basalFactor / 100)
 
     
    // IF 24HR AVG BELOW TARGET RANGE, REDUCE BASAL BY % UNDER TARGET (MIN OF 8HR or 24HR)
