@@ -198,7 +198,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
                const user_targetGlucoseLast20Hours = {0: 128, 1: 127, 2: 127, 3: 127, 4: 127, 5: 125, 6: 124, 7: 123, 8: 123, 9: 123, 10: 123, 11: 123, 12: 123, 13: 123, 14: 123, 15: 121, 16: 119, 17: 121, 18: 121, 19: 123, 20: 125, 21: 126, 22: 127, 23: 128};
 
              // 24 hour average top of range targets 
-               const user_targetAverageGlucoseLast24Hours = 123;
+               const user_targetAverageGlucoseLast24Hours = 124;
 
             // 4, 8, 24, bottom of range target
                 const user_bottomtargetAverageGlucose = 110;
