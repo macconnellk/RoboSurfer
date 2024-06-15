@@ -731,37 +731,37 @@ if (enable_Automation_1) {
  //                          } 
 //    }       
 
-   NEW BASAL FACTOR: SET THE ROBOSENS BASAL FACTOR
-   IF Current, 4HR, 8HR and 24HR AVG BG ABOVE RANGE   
+//   NEW BASAL FACTOR: SET THE ROBOSENS BASAL FACTOR
+//   IF Current, 4HR, 8HR and 24HR AVG BG ABOVE RANGE   
    if (averageGlucose_Last8Hours > target_averageGlucose_Last8Hours && averageGlucose_Last24Hours > target_averageGlucose_Last24Hours && averageGlucose_Last4Hours > target_averageGlucose_Last4Hours && myGlucose > target_averageGlucose_Last4Hours) { 
       // SUM 1/6 of 24hr for each period over target
       if (percentageOverTarget_Last4Hours > 0) {
-            basalfactorFraction_4Hours = .17
+            basalfactorFraction_4Hours = .17;
       }
 
       if (percentageOverTarget_Last8Hours > 0) {
-            basalfactorFraction_8Hours = .17
+            basalfactorFraction_8Hours = .17;
       }
 
       if (percentageOverTarget_Last12Hours > 0) {
-            basalfactorFraction_12Hours = .17
+            basalfactorFraction_12Hours = .17;
       }
       
       if (percentageOverTarget_Last16Hours > 0) {
-            basalfactorFraction_16Hours = .17
+            basalfactorFraction_16Hours = .17;
       }
 
       if (percentageOverTarget_Last20Hours > 0) {
-            basalfactorFraction_20Hours = .16
+            basalfactorFraction_20Hours = .16;
       }
 
       if (percentageOverTarget_Last24Hours > 0) {
-            basalfactorFraction_24Hours = .16
+            basalfactorFraction_24Hours = .16;
       }
 
       totalBasalfactorFraction = basalfactorFraction_4Hours + basalfactorFraction_8Hours + basalfactorFraction_12Hours + basalfactorFraction_16Hours + basalfactorFraction_20Hours + basalfactorFraction_24Hours;
-      robosens_basalFactor = round(percentageOverTarget_Last24Hours * totalBasalfactorFraction,0)
-      robosens_basalFactor = 1 + (robosens_basalFactor / 100)
+      robosens_basalFactor = round(percentageOverTarget_Last24Hours * totalBasalfactorFraction,0);
+      robosens_basalFactor = 1 + (robosens_basalFactor / 100);
 
     
    // IF 24HR AVG BELOW TARGET RANGE, REDUCE BASAL BY % UNDER TARGET (MIN OF 8HR or 24HR)
