@@ -762,6 +762,11 @@ if (enable_Automation_1) {
       totalBasalfactorFraction = basalfactorFraction_4Hours + basalfactorFraction_8Hours + basalfactorFraction_12Hours + basalfactorFraction_16Hours + basalfactorFraction_20Hours + basalfactorFraction_24Hours;
       robosens_basalFactor = round(percentageOverTarget_Last24Hours * totalBasalfactorFraction,0);     
       robosens_basalFactor = 1 + (robosens_basalFactor / 100);
+   
+      // Set Robosens Basal Status
+            robosens_basal_status = "On:" + totalBasalfactorFraction;   
+
+      
    }
     
    // IF 24HR AVG BELOW TARGET RANGE, REDUCE BASAL BY % UNDER TARGET (MIN OF 8HR or 24HR)
