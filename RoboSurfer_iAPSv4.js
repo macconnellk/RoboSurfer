@@ -181,6 +181,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
       // User-defined AUC targets for each time period in mg / dl / h (average glucose)
       // Define target average glucose levels for different time periods
+      // Targets: https://docs.google.com/spreadsheets/d/1NX4tF37qDjnOZvsi8x7eB3ftryf4UAps7STKQ6OiPLU/edit?usp=sharing 
              // User-defined targets for 4, 8, 12, 16, 20, 24 lookbacks
              // 4 hour average top of range targets 
                const user_targetGlucoseLast4Hours = {0: 121, 1: 118, 2: 109, 3: 105, 4: 105, 5: 109, 6: 109, 7: 109, 8: 109, 9: 119, 10: 128, 11: 131, 12: 130, 13: 130, 14: 130, 15: 130, 16: 130, 17: 130, 18: 130, 19: 140, 20: 150, 21: 140, 22: 140, 23: 130};
