@@ -875,7 +875,8 @@ if (enable_Automation_1) {
      if (robosens_sigmoidFactor > 1) {
          robosens_sigmoidFactor = ((robosens_sigmoidFactor - 1) * (robosens_power/100)) + 1;
      }
-                                  
+
+ } 
 }
 
 // Robosens ISF and CR Adjustment: Mutiply ISF By Robosens Factor   
