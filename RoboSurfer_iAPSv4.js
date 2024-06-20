@@ -277,7 +277,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       const less_aggressive_time = new Date(now);
       less_aggressive_time.setHours(23, 0, 0); // Assuming the end time is 11:00 PM 
        
-      var nightboost_cr_ratio = 1
+      var nightboost_cr_ratio = 1;
       var Automation_1_BGThreshold_1 = 105; // BG over 
       var Automation_1_BGThreshold_2 = 140; // BG over
       var Automation_1_BGThreshold_3 = 160; // BG over 
@@ -715,27 +715,7 @@ if (enable_Automation_1) {
        percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - user_targetAverageGlucoseLast24Hours) / user_targetAverageGlucoseLast24Hours) * 100;
  
  }
-    
-    
- // OLD BASAL FACTOR: SET THE ROBOSENS BASAL FACTOR 
- // IF 8HR and 24HR AVG BG ABOVE RANGE   
- //  if (averageGlucose_Last8Hours > target_averageGlucose_Last8Hours && averageGlucose_Last24Hours > target_averageGlucose_Last24Hours && averageGlucose_Last4Hours > target_averageGlucose_Last4Hours && myGlucose > target_averageGlucose_Last4Hours) {
-       // Choose the max of 1/6th 4hr ,1/3 8hr, or 24hr Percent Over Target to address rapidly increasing resistaance sooner
- //       robosens_basalFactor = Math.max(
- //         1 + (percentageOverTarget_Last4Hours / 6 / 100),
- //         1 + (percentageOverTarget_Last8Hours / 3 / 100),
- //         1 + (percentageOverTarget_Last24Hours / 100)
- //        );
-
-                     // Set Robosens Basal Status
- //                          robosens_basal_status = "On24hr"; 
- //                          if (robosens_basalFactor == 1 + (percentageOverTarget_Last4Hours / 6 / 100)) {
- //                                 robosens_basal_status = "On4hr";
- //                          } 
- //                           if (robosens_basalFactor == 1 + (percentageOverTarget_Last8Hours / 3 / 100)) {
- //                                 robosens_basal_status = "On8hr";
- //                          } 
-//    }       
+           
 
 //   NEW BASAL FACTOR: SET THE ROBOSENS BASAL FACTOR
 //   IF Current, 4HR, 8HR and 24HR AVG BG ABOVE RANGE   
@@ -770,7 +750,7 @@ if (enable_Automation_1) {
       robosens_basalFactor = 1 + (robosens_basalFactor / 100);
    
       // Set Robosens Basal Status
-            robosens_basal_status = "On:" + (totalBasalfactorFraction*100) + "%";   
+            robosens_basal_status = "On:" + (totalBasalfactorFraction * 100) + "%";   
 
       
    }
@@ -893,7 +873,7 @@ if (enable_Automation_1) {
 
      // Adjust by RS power setting 
      if (robosens_sigmoidFactor > 1) {
-         robosens_sigmoidFactor = (((robosens_sigmoidFactor - 1) * (robosens_power/100)) + 1);
+         robosens_sigmoidFactor = ((robosens_sigmoidFactor - 1) * (robosens_power/100)) + 1;
      }
                                   
 }
@@ -909,7 +889,7 @@ if (enable_Automation_1) {
                     // Adjust by dCR power setting    
                     var dCR_sigmoid_factor = robosens_sigmoidFactor;
                     if (dCR_sigmoid_factor > 1) {
-                     dCR_sigmoid_factor = (((dCR_sigmoid_factor - 1) * (dCR_power/100)) + 1);
+                     dCR_sigmoid_factor =(((dCR_sigmoid_factor - 1) * (dCR_power/100)) + 1;
                     }         
                    new_cr = (robosens_isf / dCR_sigmoid_factor / nightboost_cr_ratio) / robosens_csf;
                    new_cr = round(new_cr,1);
