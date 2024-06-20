@@ -40,7 +40,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_robosens = true;
       var robosens_power = 100 // percent
   var enable_nightProtect = true; 
-  var enable_dynamic_cr = false;
+  var enable_dynamic_cr = true;
       var dCR_power = 10 // percent
   
    var enable_new_sigmoidTDDFactor = true;
@@ -913,7 +913,7 @@ if (enable_Automation_1) {
                     }         
                    new_cr = (robosens_isf / dCR_sigmoid_factor / nightboost_cr_ratio) / robosens_csf;
                    new_cr = round(new_cr,1);
-                      } 
+               } 
              check_csf = (robosens_isf / robosens_sigmoidFactor / nightboost_cr_ratio) / new_cr;
 
           new_isf = robosens_isf / robosens_sigmoidFactor / new_dynISF_ratio;
