@@ -38,10 +38,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_RoboSurfer = true;
  
   var enable_robosens = true;
-      var robosens_power = 100 // percent
+      var robosens_power = 100; // percent
   var enable_nightProtect = true; 
   var enable_dynamic_cr = true;
-      var dCR_power = 10 // percent
+      var dCR_power = 10; // percent
   
    var enable_new_sigmoidTDDFactor = true;
   var enable_Automation_1 = true; 
