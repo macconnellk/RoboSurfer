@@ -890,7 +890,7 @@ if (enable_Automation_1) {
                     // Adjust by dCR power setting    
                     var dCR_sigmoid_factor = robosens_sigmoidFactor;
                     if (dCR_sigmoid_factor > 1) {
-                     dCR_sigmoid_factor =(((dCR_sigmoid_factor - 1) * (dCR_power/100)) + 1;
+                     dCR_sigmoid_factor = ((dCR_sigmoid_factor - 1) * (dCR_power/100)) + 1;
                     }         
                    new_cr = (robosens_isf / dCR_sigmoid_factor / nightboost_cr_ratio) / robosens_csf;
                    new_cr = round(new_cr,1);
