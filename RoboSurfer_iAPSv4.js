@@ -764,7 +764,7 @@ if (enable_Automation_1) {
       robosens_basalFactor = 1 + (robosens_basalFactor / 100);
    
       // Set Robosens Basal Status
-            robosens_basal_status = "On:" + totalBasalfactorFraction;   
+            robosens_basal_status = "On:" + (totalBasalfactorFraction*100) + "%";   
 
       
    }
