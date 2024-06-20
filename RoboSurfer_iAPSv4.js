@@ -36,13 +36,19 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    
 //Turn RoboSurfer and functions on or off
   var enable_RoboSurfer = true;
-  var enable_robosens = true; 
+ 
+  var enable_robosens = true;
+      var robosens_power = 100 // percent
   var enable_nightProtect = true; 
-  var enable_dynamic_cr = false; 
-  var enable_new_sigmoidTDDFactor = true;
+  var enable_dynamic_cr = false;
+      var dCR_power = 10 // percent
+  
+   var enable_new_sigmoidTDDFactor = true;
   var enable_Automation_1 = true; 
   var enable_smb_delivery_ratio_scaling = false;
   var enable_Mealboost = true; 
+
+   
 
          // Sensor Safety: if data gaps or high BG delta, disable SMBs, UAMs, and smb_delivery_ratio_scaling. 
             // Calculate glucose rate of change per minute using same data
@@ -884,22 +890,28 @@ if (enable_Automation_1) {
 
      //Respect min/max ratios
      robosens_sigmoidFactor = Math.max(Math.min(robosens_maximumRatio, robosens_sigmoidFactor), robosens_sigmoidFactor, robosens_minimumRatio);
-   
+
+     // Adjust by RS power setting 
+     if (robosens_sigmoidFactor > 1) {
+         robosens_sigmoidFactor = (((robosens_sigmoidFactor - 1) * (robosens_power/100)) + 1);
      }
                                   
 }
 
 // Robosens ISF and CR Adjustment: Mutiply ISF By Robosens Factor   
              // If carbs have been entered in last 10 minutes, turn off dynamic cr
-
             // Check if lastCarbTime is less than or equal to 10 minutes from now
-            
              if (now_milliseconds <= lastCarbTimePlus10Mins && lastCarbTime != 0) {
                     enable_dynamic_cr = false;
              }
        
              if (enable_dynamic_cr == true) { 
-                   new_cr = (robosens_isf / robosens_sigmoidFactor / nightboost_cr_ratio) / robosens_csf;
+                    // Adjust by dCR power setting    
+                    var dCR_sigmoid_factor = robosens_sigmoidFactor;
+                    if (dCR_sigmoid_factor > 1) {
+                     dCR_sigmoid_factor = (((dCR_sigmoid_factor - 1) * (dCR_power/100)) + 1);
+                    }         
+                   new_cr = (robosens_isf / dCR_sigmoid_factor / nightboost_cr_ratio) / robosens_csf;
                    new_cr = round(new_cr,1);
                       } 
              check_csf = (robosens_isf / robosens_sigmoidFactor / nightboost_cr_ratio) / new_cr;
