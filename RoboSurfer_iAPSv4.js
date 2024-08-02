@@ -701,8 +701,7 @@ if (enable_Automation_1) {
        percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - target_averageGlucose_Last24Hours) / target_averageGlucose_Last24Hours) * 100;
  }
 
-// Calculate percentage under range for each time period
-// For 4hr and 8hr use bottom of range.  For 24hr, use single-number 24hr target    
+// Calculate percentage under range for each time period    
  if (averageGlucose_Last4Hours < user_bottomtargetAverageGlucose) {
        percentageOverTarget_Last4Hours = ((averageGlucose_Last4Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
  }
@@ -711,8 +710,8 @@ if (enable_Automation_1) {
        percentageOverTarget_Last8Hours = ((averageGlucose_Last8Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
  }
 
- if (averageGlucose_Last24Hours < user_targetAverageGlucoseLast24Hours) {   
-       percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - user_targetAverageGlucoseLast24Hours) / user_targetAverageGlucoseLast24Hours) * 100;
+ if (averageGlucose_Last24Hours < user_bottomtargetAverageGlucose) {   
+       percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
  
  }
            
