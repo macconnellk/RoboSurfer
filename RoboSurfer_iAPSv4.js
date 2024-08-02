@@ -757,7 +757,7 @@ if (enable_Automation_1) {
    // IF 24HR AVG BELOW TARGET RANGE, REDUCE BASAL BY % UNDER TARGET (MIN OF 8HR or 24HR)
       // NIGHTPROTECT: IF IT'S NIGHTTIME AND BG IS UNDER NIGHTPROTECT THRESHOLD, REDUCE BASAL BY MIN OF 8HR OR A SET NIGHTPROTECT FACTOR 
     
-   if (averageGlucose_Last24Hours < user_targetAverageGlucoseLast24Hours) {  
+   if (averageGlucose_Last24Hours < user_bottomtargetAverageGlucose) {  
         
          robosens_basalFactor = Math.min(
           1 + (percentageOverTarget_Last8Hours / 100),
