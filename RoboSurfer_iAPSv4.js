@@ -45,6 +45,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   
    var enable_new_sigmoidTDDFactor = true;
   var enable_Automation_1 = true; 
+  var enable_Automation_1_ROC = false;
   var enable_smb_delivery_ratio_scaling = false;
   var enable_Mealboost = true; 
 
@@ -483,7 +484,7 @@ if (enable_Automation_1) {
          // Once ROC levels off, reveerts to baseline Nightboost even if BG high    
              
             //Increased Rate of Change (1.6mg/dl per minute)  (Was Threshold 5, Max2.2)
-             if (glucoseRateOfChange_3Periods > 1.6) {
+             if (glucoseRateOfChange_3Periods > 1.6 && enable_Automation_1_ROC) {
              
                 //105-139 (Max: 2.2, AF 1)
                 if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
@@ -511,8 +512,7 @@ if (enable_Automation_1) {
              }
                 
             //High Rate of Change (4mg/dl per minute) (Was Threshold 6)
-             if (glucoseRateOfChange_2Periods > 4 || glucoseRateOfChange_3Periods > 4) {  
-
+             if ((glucoseRateOfChange_2Periods > 4 || glucoseRateOfChange_3Periods > 4) && enable_Automation_1_ROC) {
                    //105-139 (Max: 2.35, AF 1)
                   if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
                         // Set Nightboost Threshold 4 Factors with Acceleration    
