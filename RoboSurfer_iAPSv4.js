@@ -470,8 +470,8 @@ if (enable_Automation_1) {
             new_max_COB = Automation_1_COB_Max; 
             min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; //
             
-             // Set Nightboost Threshold 2 Factors (Was Threshold 2, 1.6)
-                  Automation_Status = Automation_1_name + " OnMax1.5";   
+             // Set Nightboost Threshold 2 Factors (Was Threshold 2, 1.4)
+                  Automation_Status = Automation_1_name + " OnMax1.4";   
                   var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
                   var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
                   var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
@@ -558,10 +558,10 @@ if (enable_Automation_1) {
             //LESS AGGRESSIVE TIME: Increased Rate of Change (1.6mg/dl per minute)
              if (glucoseRateOfChange_3Periods > 1.6) {
              
-                //105-139 (Max: 1.6, AF 1) (Was Threshold 2, 1.6)
+                //105-139 (Max: 1.6, AF 1) (Was Threshold 2, 1.4)
                 if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
                       // Set Nightboost Threshold 2 Factors    
-                     Automation_Status = Automation_1_name + " OnROCMax1.2(Less Aggressive";   
+                     Automation_Status = Automation_1_name + " OnROCMax1.4(Less Aggressive";   
                      NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
                      NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
                      NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
@@ -573,7 +573,7 @@ if (enable_Automation_1) {
                   // 140+ ((Max: 1.6, AF 1)
                   if (myGlucose >= Automation_1_BGThreshold_2) {
                      // Set Nightboost Threshold 2 Factors    
-                     Automation_Status = Automation_1_name + " OnROCMax1.2(Less Aggressive)";
+                     Automation_Status = Automation_1_name + " OnROCMax1.4(Less Aggressive)";
                      NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
                      NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
                      NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
