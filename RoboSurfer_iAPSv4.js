@@ -40,12 +40,12 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_robosens = true;
       var robosens_power = 100; // percent
   var enable_nightProtect = true; 
-  var enable_dynamic_cr = false;
-      var dCR_power = 10; // percent
+  var enable_dynamic_cr = true;
+      var dCR_power = 25; // percent
   
    var enable_new_sigmoidTDDFactor = true;
   var enable_Automation_1 = true; 
-  var enable_Automation_1_ROC = false;
+  var enable_Automation_1_ROC = true;
   var enable_smb_delivery_ratio_scaling = false;
   var enable_Mealboost = true; 
 
@@ -269,7 +269,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       // Automation #1 Thresholds
       // Define the start time and end time
       const start_time = new Date(now);
-      start_time.setHours(20, 0, 0); // Assuming the start time is 8:00 PM
+      start_time.setHours(21, 0, 0); // Assuming the start time is 9:00 PM
 
       const end_time = new Date(now);
       end_time.setHours(1, 0, 0); // Assuming the end time is 12:00 AM
@@ -277,7 +277,6 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       const less_aggressive_time = new Date(now);
       less_aggressive_time.setHours(23, 0, 0); // Assuming the end time is 11:00 PM 
        
-      var nightboost_cr_ratio = 1;
       var Automation_1_BGThreshold_1 = 105; // BG over 
       var Automation_1_BGThreshold_2 = 140; // BG over
       var Automation_1_BGThreshold_3 = 160; // BG over 
@@ -304,8 +303,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
          //Automation 1 Sigmoid - Threshold 3 
          var Automation_1_minimumRatio_3 = .5;
-         var Automation_1_maximumRatio_3 = 1.6;
-         var Automation_1_adjustmentFactor_3 = .75;
+         var Automation_1_maximumRatio_3 = 1.5;
+         var Automation_1_adjustmentFactor_3 = .5;
 
          //Automation 1 Sigmoid - Threshold 4 
          var Automation_1_minimumRatio_4 = .5;
@@ -331,9 +330,9 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var Automation_1_SMB_UAM_Minutes_Increase = 15; // Standard Automation #1 SMB/UAM Increase
          var Automation_1_SMB_UAM_Minutes_Increase_HIGH = 30; // High BG Automation #1 SMB/UAM Increase
          var Automation_1_SMB_UAM_Minutes_Increase_ACCEL = 45; // High BG Rate of Change Automation #1 SMB/UAM Increase
-         var Automation_1_SMB_DeliveryRatio_Increase_HIGH = .65; // High BG Rate of Change SMB Delivery Ratio
-         var Automation_1_SMB_DeliveryRatio_Increase_ACCEL = .75; // High BG Rate of Change SMB Delivery Ratio  
-         var Automation_1_min_hourly_carb_absorption = 20; // Automation #1 min_hourly_carb_absorption. Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
+         var Automation_1_SMB_DeliveryRatio_Increase_HIGH = .55; // High BG Rate of Change SMB Delivery Ratio
+         var Automation_1_SMB_DeliveryRatio_Increase_ACCEL = .6; // High BG Rate of Change SMB Delivery Ratio  
+         var Automation_1_min_hourly_carb_absorption = 25; // Automation #1 min_hourly_carb_absorption. Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
 
       // Automation_1 Initialized Function Variables    
       var Automation_Status = "Off";
@@ -484,7 +483,7 @@ if (enable_Automation_1) {
                 //105-139 (Max: 2.2, AF 1)
                 if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
                       // Set Nightboost Threshold 3 Factors    
-                     Automation_Status = Automation_1_name + " OnROCMax1.6";   
+                     Automation_Status = Automation_1_name + " OnROCMax1.5";   
                      NightBoost_Sigmoid_Min = Automation_1_minimumRatio_3;
                      NightBoost_Sigmoid_Max = Automation_1_maximumRatio_3;
                      NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_3;
@@ -496,7 +495,7 @@ if (enable_Automation_1) {
                   // 140+ ((Max: 2.1, AF 1)
                   if (myGlucose >= Automation_1_BGThreshold_2) {
                      // Set Nightboost Threshold 3 Factors    
-                     Automation_Status = Automation_1_name + " OnROCMax1.6";
+                     Automation_Status = Automation_1_name + " OnROCMax1.5";
                      NightBoost_Sigmoid_Min = Automation_1_minimumRatio_3;
                      NightBoost_Sigmoid_Max = Automation_1_maximumRatio_3;
                      NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_3;
@@ -511,7 +510,7 @@ if (enable_Automation_1) {
                    //105-139 (Max: 2.35, AF 1)
                   if ((myGlucose >= Automation_1_BGThreshold_1 && myGlucose < Automation_1_BGThreshold_2)) {  
                         // Set Nightboost Threshold 4 Factors with Acceleration    
-                        Automation_Status = Automation_1_name + " OnHighROCMax1.6";
+                        Automation_Status = Automation_1_name + " OnHighROCMax1.5";
                         NightBoost_Sigmoid_Min = Automation_1_minimumRatio_3;
                         NightBoost_Sigmoid_Max = Automation_1_maximumRatio_3;
                         NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_3;
@@ -523,7 +522,7 @@ if (enable_Automation_1) {
                    // 140+ ((Max: 2.35, AF 1)
                   if (myGlucose >= Automation_1_BGThreshold_2) {
                      // Set Nightboost Threshold 4 Factors with Acceleration    
-                     Automation_Status = Automation_1_name + " On HighROCMax1.6";
+                     Automation_Status = Automation_1_name + " On HighROCMax1.5";
                      NightBoost_Sigmoid_Min = Automation_1_minimumRatio_3;
                      NightBoost_Sigmoid_Max = Automation_1_maximumRatio_3;
                      NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_3;
@@ -583,7 +582,6 @@ if (enable_Automation_1) {
              
             // Run Sigmoid Function to get new_dynISF_ratio for Automation 1  
             new_dynISF_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, NightBoost_Sigmoid_AF, NightBoost_Sigmoid_Min, NightBoost_Sigmoid_Max, weightedAverage, average_total_data, past2hoursAverage);  // New Sigmoid autosens ratio for Automation #1 that replaces initial autosens ratio
-            nightboost_cr_ratio = new_dynISF_ratio;
              
             // Commenting out while using dynamic ISF with Robosens 
             // Define the new automation 1 CSF 
@@ -879,17 +877,18 @@ if (enable_Automation_1) {
              if (now_milliseconds <= lastCarbTimePlus10Mins && lastCarbTime != 0) {
                     enable_dynamic_cr = false;
              }
-       
+
+             // Dynamic CR is adjusted by Robosens only, not by Dynamic ISF or Nightboost
              if (enable_dynamic_cr == true) { 
                     // Adjust by dCR power setting    
-                    var dCR_sigmoid_factor = robosens_sigmoidFactor;
-                    if (dCR_sigmoid_factor > 1) {
-                     dCR_sigmoid_factor = ((dCR_sigmoid_factor - 1) * (dCR_power/100)) + 1;
-                    }         
-                   new_cr = (robosens_isf / dCR_sigmoid_factor / nightboost_cr_ratio) / robosens_csf;
-                   new_cr = round(new_cr,1);
+                    var dCR_robosens_factor = robosens_sigmoidFactor;
+                    if (dCR_robosens_factor > 1) {
+                     dCR_robosens_factor = ((dCR_robosens_factor - 1) * (dCR_power/100)) + 1;         
+                     new_cr = robosens_isf / dCR_robosens_factor / robosens_csf;
+                     new_cr = round(new_cr,1);
+                    }     
                } 
-             check_csf = (robosens_isf / robosens_sigmoidFactor / nightboost_cr_ratio) / new_cr;
+             check_csf = robosens_isf / robosens_sigmoidFactor / new_cr;
 
           new_isf = robosens_isf / robosens_sigmoidFactor / new_dynISF_ratio;
           new_isf = round(new_isf,0);
