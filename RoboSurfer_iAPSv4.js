@@ -49,7 +49,6 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_smb_delivery_ratio_scaling = false;
   var enable_Mealboost = true; 
 
-   
 
          // Sensor Safety: if data gaps or high BG delta, disable SMBs, UAMs, and smb_delivery_ratio_scaling. 
             // Calculate glucose rate of change per minute using same data
@@ -334,7 +333,6 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var Automation_1_SMB_UAM_Minutes_Increase_ACCEL = 45; // High BG Rate of Change Automation #1 SMB/UAM Increase
          var Automation_1_SMB_DeliveryRatio_Increase_HIGH = .65; // High BG Rate of Change SMB Delivery Ratio
          var Automation_1_SMB_DeliveryRatio_Increase_ACCEL = .75; // High BG Rate of Change SMB Delivery Ratio  
-         var Automation_1_COB_Max = 100; // Automation #1 COB_Max
          var Automation_1_min_hourly_carb_absorption = 20; // Automation #1 min_hourly_carb_absorption. Option to change carb absorption e.g. slower after bedtime after late meals. Assumes use of constant_carb_absorption function
 
       // Automation_1 Initialized Function Variables    
@@ -464,8 +462,7 @@ if (enable_Automation_1) {
 
           // Baseline Nightboost settings are below, regardless of ROC.  E.g. If it's after 8p and BG > 105, Sig Max is 1.5 and SMB/UAM is +15 mins
 
-            target = Automation_1_target; 
-            new_max_COB = Automation_1_COB_Max; 
+            target = Automation_1_target;  
             min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; //
             
              // Set Nightboost Threshold 2 Factors (Was Threshold 2, 1.4)
