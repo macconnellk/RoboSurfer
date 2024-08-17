@@ -291,7 +291,6 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
        
          // Automation_1 User-Defined Variables 
          var Automation_1_name = "Nightboost"; // Give the Automation a Name for use in return string
-         var Automation_1_ISF = 195; // (Was 110)
          var Automation_1_target = 120; // (Was 105)
          
          //Automation 1 Sigmoid - Threshold 1 
@@ -465,7 +464,6 @@ if (enable_Automation_1) {
 
           // Baseline Nightboost settings are below, regardless of ROC.  E.g. If it's after 8p and BG > 105, Sig Max is 1.5 and SMB/UAM is +15 mins
 
-            robosens_isf = Automation_1_ISF; // Set the starting Profile ISF to the Nightboost user-defined starting ISF
             target = Automation_1_target; 
             new_max_COB = Automation_1_COB_Max; 
             min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; //
