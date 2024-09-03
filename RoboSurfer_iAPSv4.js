@@ -40,7 +40,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_robosens = true;
       var robosens_power = 100; // percent
   var enable_nightProtect = true; 
-  var enable_dynamic_cr = true;
+  var enable_dynamic_cr = false;
       var dCR_power = 25; // percent
   
    var enable_new_sigmoidTDDFactor = true;
@@ -275,7 +275,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       end_time.setHours(1, 0, 0); // Assuming the end time is 12:00 AM
 
       const less_aggressive_time = new Date(now);
-      less_aggressive_time.setHours(23, 0, 0); // Assuming the end time is 11:00 PM 
+      less_aggressive_time.setHours(22, 0, 0); // Assuming the end time is 11:00 PM 
        
       var Automation_1_BGThreshold_1 = 105; // BG over 
       var Automation_1_BGThreshold_2 = 140; // BG over
