@@ -238,6 +238,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
                var robosens_adjustmentFactor = .5;
                var robosens_adjustmentFactor_safety_threshold = 2; 
                var robosens_sigmoidFactor = 1;
+               var robosens_maximumpercentbasaladjustment = 10
                var robosens_basalFactor = 1; 
                var robosens_sens_status = "Off";
                var robosens_basal_status = "Off";
@@ -738,7 +739,7 @@ if (enable_Automation_1) {
       }
 
       totalBasalfactorFraction = basalfactorFraction_4Hours + basalfactorFraction_8Hours + basalfactorFraction_12Hours + basalfactorFraction_16Hours + basalfactorFraction_20Hours + basalfactorFraction_24Hours;
-      robosens_basalFactor = round(percentageOverTarget_Last24Hours * totalBasalfactorFraction,0);     
+      robosens_basalFactor = round(robosens_maximumpercentbasaladjustment * totalBasalfactorFraction,0);     
       robosens_basalFactor = 1 + (robosens_basalFactor / 100);
    
       // Set Robosens Basal Status
