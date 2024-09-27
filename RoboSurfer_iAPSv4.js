@@ -712,7 +712,7 @@ if (enable_Automation_1) {
 
 //   NEW BASAL FACTOR: SET THE ROBOSENS BASAL FACTOR
 //   IF Current, 4HR, 8HR and 24HR AVG BG ABOVE RANGE   
-   if (averageGlucose_Last8Hours > target_averageGlucose_Last8Hours && averageGlucose_Last24Hours > target_averageGlucose_Last24Hours && averageGlucose_Last4Hours > target_averageGlucose_Last4Hours && myGlucose > target_averageGlucose_Last4Hours) { 
+//   if (averageGlucose_Last8Hours > target_averageGlucose_Last8Hours && averageGlucose_Last24Hours > target_averageGlucose_Last24Hours && averageGlucose_Last4Hours > target_averageGlucose_Last4Hours && myGlucose > target_averageGlucose_Last4Hours) { 
       // SUM 1/6 of 24hr for each period over target
       if (percentageOverTarget_Last4Hours > 0) {
             basalfactorFraction_4Hours = .17;
@@ -742,10 +742,10 @@ if (enable_Automation_1) {
       robosens_basalFactor = round(robosens_maximumpercentbasaladjustment * totalBasalfactorFraction,0);     
       robosens_basalFactor = 1 + (robosens_basalFactor / 100);
    
+   if (totalBasalfactorFraction > 0) {
       // Set Robosens Basal Status
             robosens_basal_status = "On:" + (totalBasalfactorFraction * 100) + "%";   
 
-      
    }
     
    // IF 24HR AVG BELOW TARGET RANGE, REDUCE BASAL BY % UNDER TARGET (MIN OF 8HR or 24HR)
