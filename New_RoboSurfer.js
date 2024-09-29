@@ -239,7 +239,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
                var robosens_adjustmentFactor = .5;
                var robosens_adjustmentFactor_safety_threshold = 2; 
                var robosens_sigmoidFactor = 1;
-               var robosens_basalFactor = 1; 
+               var robosens_Factor = 1; 
                var robosens_sens_status = "Off";
                var robosens_basal_status = "Off";
                var robosens_AF_adjustment = 0;
@@ -753,8 +753,8 @@ if (enable_Automation_1) {
       }
 
       totalBasalfactorFraction = basalfactorFraction_4Hours + basalfactorFraction_8Hours + basalfactorFraction_12Hours + basalfactorFraction_16Hours + basalfactorFraction_20Hours + basalfactorFraction_24Hours;
-      robosens_basalFactor = round(robosens_maximumpercentbasaladjustment * totalBasalfactorFraction,0);     
-      robosens_basalFactor = 1 + (robosens_basalFactor / 100);
+      robosens_Factor = round(robosens_maximumpercentbasaladjustment * totalBasalfactorFraction,0);     
+      robosens_Factor = 1 + (robosens_Factor / 100);
    
    if (totalBasalfactorFraction > 0) {
       // Set Robosens Basal Status
@@ -773,7 +773,7 @@ if (enable_Automation_1) {
                       (now >= nightProtect_start_time && now >= nightProtect_end_time && nightProtect_start_time > nightProtect_end_time))
                          && myGlucose < nightProtect_BGThreshold && percentageOverTarget_Last24Hours < 0) {
 
-                         robosens_basalFactor = nightProtect_basalFactor;
+                         robosens_Factor = nightProtect_basalFactor;
                          profile.enableUAM = false;
                          profile.enableSMB_always = false;
 
@@ -784,7 +784,7 @@ if (enable_Automation_1) {
             }
                  
    // Basal Robosens Adjustment
-         new_basal = new_basal * robosens_basalFactor;
+         new_basal = new_basal * robosens_Factor;
          new_basal = round_basal(new_basal);
          profile.current_basal = new_basal;   
        
@@ -801,16 +801,16 @@ if (enable_Automation_1) {
              // Dynamic CR is adjusted by Robosens only, not by Dynamic ISF or Nightboost
              if (enable_dynamic_cr == true) { 
                     // Adjust by dCR power setting    
-                    var dCR_robosens_factor = robosens_sigmoidFactor;
+                    var dCR_robosens_factor = robosens_Factor;
                     if (dCR_robosens_factor > 1) {
                      dCR_robosens_factor = ((dCR_robosens_factor - 1) * (dCR_power/100)) + 1;         
                      new_cr = robosens_isf / dCR_robosens_factor / robosens_csf;
                      new_cr = round(new_cr,1);
                     }     
                } 
-             check_csf = robosens_isf / robosens_sigmoidFactor / new_cr;
+             check_csf = robosens_isf / robosens_Factor / new_cr;
 
-          new_isf = robosens_isf / robosens_sigmoidFactor / new_dynISF_ratio;
+          new_isf = robosens_isf / robosens_Factor / new_dynISF_ratio;
           new_isf = round(new_isf,0);
 
        
@@ -913,7 +913,7 @@ if (enable_Mealboost) {
        
 // **************** End RoboSurfer Enhancements ****************
 
-return "Robosens Status(" + robosens_power + "%) Basal/ISF " + round(robosens_basalFactor,2) + "(" + robosens_basal_status + ")/" + round(robosens_sigmoidFactor, 2) + "(" + robosens_sens_status +  "). dISF ratio " + round(new_dynISF_ratio, 2) + ". Override" + logOverride + ". ISF was/now " + round(initial_isf, 2) + "/ " + round(profile.sens,2) + " Basal was/now " + old_basal + "/ " + profile.current_basal + ". dCR(" + dCR_power + "% " + enable_dynamic_cr + ") was/now " + initial_cr + "/ " + round(profile.carb_ratio, 2) + " CSF was/now "  + round(initial_csf, 2) + "/ " + round(check_csf, 2)+ ". SMB Deliv. Ratio " + profile.smb_delivery_ratio + " ROBOSENS Trg-" + user_bottomtargetAverageGlucose + "/Av/%Over 4Hr " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
+return "Robosens Status(" + robosens_power + "%) Basal/ISF " + round(robosens_Factor,2) + "(" + robosens_basal_status + ")/" + round(robosens_Factor, 2) + "(" + robosens_sens_status +  "). dISF ratio " + round(new_dynISF_ratio, 2) + ". Override" + logOverride + ". ISF was/now " + round(initial_isf, 2) + "/ " + round(profile.sens,2) + " Basal was/now " + old_basal + "/ " + profile.current_basal + ". dCR(" + dCR_power + "% " + enable_dynamic_cr + ") was/now " + initial_cr + "/ " + round(profile.carb_ratio, 2) + " CSF was/now "  + round(initial_csf, 2) + "/ " + round(check_csf, 2)+ ". SMB Deliv. Ratio " + profile.smb_delivery_ratio + " ROBOSENS Trg-" + user_bottomtargetAverageGlucose + "/Av/%Over 4Hr " + target_averageGlucose_Last4Hours + "/" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
 " 8Hr" + target_averageGlucose_Last8Hours + "/" + round(averageGlucose_Last8Hours, 0) + "/" + round(percentageOverTarget_Last8Hours, 0) + "%" + 
 " 24Hr" + target_averageGlucose_Last24Hours + "/" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RS Adj/AF " + round(robosens_AF_adjustment,2) + "/" + round(robosens_adjustmentFactor,2) + " RS Adj/MAX " + round(robosens_MAX_adjustment,2) + "/" + round(robosens_maximumRatio,2) + " Sensor Safety " + sensor_safety_status + " AUTOMATION1 " + Automation_Status + " " + start_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " to " + end_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + ". SMB Mins "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Mins "  + round(profile.maxUAMSMBBasalMinutes, 2) + " Max COB "  + round(profile.maxCOB, 2) + ". MinAbsorp((CI) "  + round(check_carb_absorption, 2) + "(" + profile.min_5m_carbimpact + ")" + "Mealboost " + Mealboost_Status + " SMB+" + Mealboost_SMB_change +" TDD " + round(past2hoursAverage, 2) + " 2week TDD " + round(average_total_data, 2);
    }
