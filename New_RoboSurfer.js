@@ -184,6 +184,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var basalfactorFraction_20Hours = 0;
          var basalfactorFraction_24Hours = 0;
          var totalBasalfactorFraction = 0;
+         var robosens_maximumPercentProfileAdjustment = 0; 
 
       // User-defined AUC targets for each time period in mg / dl / h (average glucose)
       // Define target average glucose levels for different time periods
@@ -238,7 +239,6 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
                var robosens_adjustmentFactor = .5;
                var robosens_adjustmentFactor_safety_threshold = 2; 
                var robosens_sigmoidFactor = 1;
-               var robosens_maximumpercentbasaladjustment = 10
                var robosens_basalFactor = 1; 
                var robosens_sens_status = "Off";
                var robosens_basal_status = "Off";
@@ -595,7 +595,7 @@ if (enable_Automation_1) {
 
  // **************** END ROBOSURFER ENHANCEMENT #3: AUTOMATION #1: "NIGHTBOOST ********************************
           
-// **************** ROBOSURFER ENHANCEMENT #4: ROBOSENS: ADJUSTS BASAL, ISF, CR BASED ON GLUCOSE AREA UNDER THE CURVE FOR 4, 8, and 24 Hours ****************
+// **************** ROBOSURFER ENHANCEMENT #4: ROBOSENS: ADJUSTS BASAL, ISF, CR BASED ON GLUCOSE AREA UNDER THE CURVE  ****************
 
 //Only use when enable_robosens = true.
  if (enable_robosens) { 
@@ -709,10 +709,24 @@ if (enable_Automation_1) {
  
  }
            
+//   ROBOSENS FACTOR: SET THE ROBOSENS FACTOR
 
-//   NEW BASAL FACTOR: SET THE ROBOSENS BASAL FACTOR
-//   IF Current, 4HR, 8HR and 24HR AVG BG ABOVE RANGE   
-//   if (averageGlucose_Last8Hours > target_averageGlucose_Last8Hours && averageGlucose_Last24Hours > target_averageGlucose_Last24Hours && averageGlucose_Last4Hours > target_averageGlucose_Last4Hours && myGlucose > target_averageGlucose_Last4Hours) { 
+       if (percentageOverTarget_Last24Hours > 60) {
+             var robosens_maximumPercentProfileAdjustment = 15;
+       } else if (percentageOverTarget_Last24Hours > 30)  {
+             var robosens_maximumPercentProfileAdjustment = 10;
+       } else if (percentageOverTarget_Last24Hours > 5)  {
+             var robosens_maximumPercentProfileAdjustment = 5;
+       } else if (percentageOverTarget_Last24Hours > 0)( {
+             var robosens_maximumPercentProfileAdjustment = 2.5;
+         } else if (percentageOverTarget_Last24Hours = 0) {
+            var robosens_maximumPercentProfileAdjustment = 0;
+        } else if (percentageOverTarget_Last24Hours < 95) {
+            var robosens_maximumPercentProfileAdjustment = -10;
+         } else {
+            var robosens_maximumPercentProfileAdjustment = -5; 
+         }
+    
       // SUM 1/6 of 24hr for each period over target
       if (percentageOverTarget_Last4Hours > 0) {
             basalfactorFraction_4Hours = .17;
@@ -748,17 +762,8 @@ if (enable_Automation_1) {
 
    }
     
-   // IF 24HR AVG BELOW TARGET RANGE, REDUCE BASAL BY % UNDER TARGET (MIN OF 8HR or 24HR)
-      // NIGHTPROTECT: IF IT'S NIGHTTIME AND BG IS UNDER NIGHTPROTECT THRESHOLD, REDUCE BASAL BY MIN OF 8HR OR A SET NIGHTPROTECT FACTOR 
-    
-   if (averageGlucose_Last24Hours < user_bottomtargetAverageGlucose) {  
-        
-         robosens_basalFactor = Math.min(
-          1 + (percentageOverTarget_Last8Hours / 100),
-          1 + (percentageOverTarget_Last24Hours / 100)
-         );
-         // Set Robosens Basal Status
-         robosens_basal_status = "On24hrLow";
+ 
+      // NIGHTPROTECT: IF IT'S NIGHTTIME AND BG IS UNDER NIGHTPROTECT THRESHOLD, REDUCE BASAL BY A SET NIGHTPROTECT FACTOR 
       
             if (enable_nightProtect) {
 
@@ -766,13 +771,9 @@ if (enable_Automation_1) {
                
                    if (((now >= nightProtect_start_time && now <= nightProtect_end_time) || (now <= nightProtect_start_time && now <= nightProtect_end_time && nightProtect_start_time > nightProtect_end_time) ||
                       (now >= nightProtect_start_time && now >= nightProtect_end_time && nightProtect_start_time > nightProtect_end_time))
-                         && myGlucose < nightProtect_BGThreshold) {
+                         && myGlucose < nightProtect_BGThreshold && percentageOverTarget_Last24Hours < 0) {
 
-                         robosens_basalFactor = Math.min(
-                            1 + (percentageOverTarget_Last8Hours / 100),
-                            nightProtect_basalFactor 
-                         );
-                          
+                         robosens_basalFactor = nightProtect_basalFactor;
                          profile.enableUAM = false;
                          profile.enableSMB_always = false;
 
@@ -781,95 +782,13 @@ if (enable_Automation_1) {
                       
                    }
             }
-      }           
-   
+                 
    // Basal Robosens Adjustment
          new_basal = new_basal * robosens_basalFactor;
          new_basal = round_basal(new_basal);
          profile.current_basal = new_basal;   
        
-    
- // ISF/CR FACTOR: Set the ROBOSENS RATIO Sigmoid Factor IF 4HR AVG BG ABOVE RANGE OR 4HR AND 8HR BELOW RANGE
-// DYNAMIC ROBOSENS SIGMOID Function
- if (averageGlucose_Last4Hours > target_averageGlucose_Last4Hours || (averageGlucose_Last4Hours < user_bottomtargetAverageGlucose && averageGlucose_Last8Hours < user_bottomtargetAverageGlucose)) {
-    
-      // SET ROBOSENS ADJUSTMENT FACTOR: Increase the basal sigmoid AF if the 8hr Percent Over Target is high
-      // Set RS AF using the exponential curve defined in Sheets, AF will increase exponentially as 8hr BG goes up
-      if (percentageOverTarget_Last8Hours > 0 ) {
-         robosens_AF_adjustment = .0007 * Math.pow(percentageOverTarget_Last8Hours,1.9223); // New approach   
-         robosens_adjustmentFactor = robosens_adjustmentFactor + robosens_AF_adjustment;
-         robosens_adjustmentFactor = Math.min(robosens_adjustmentFactor, robosens_adjustmentFactor_safety_threshold); // Restrict exponential adjustment by user-defined safety threshold
 
-         // robosens_AF_adjustment = percentageOverTarget_Last8Hours / 100; // Original approach
-         }
-
-      //  SET ROBOSENS MAX: Increase the basal sigmoid robosens max if the 24hr Percent Over Target is high
-      // Set RS Max using the exponential curve defined in Sheets, Max will increase exponentially as 24hr BG goes up
-      if (percentageOverTarget_Last24Hours > 0) {
-         robosens_MAX_adjustment = .0007 * Math.pow(percentageOverTarget_Last24Hours,1.9223); // New approach
-         robosens_maximumRatio = robosens_maximumRatio + robosens_MAX_adjustment;
-         robosens_maximumRatio = Math.min(robosens_maximumRatio, robosens_maximumRatio_safety_threshold); // Restrict exponential adjustment by user-defined safety threshold
-
-         // robosens_MAX_adjustment = percentageOverTarget_Last24Hours / 100; // Original approach
-         }
-
-      var robosens_ratioInterval = robosens_maximumRatio - robosens_minimumRatio;
-      var robosens_max_minus_one = robosens_maximumRatio - 1;
-      
-       // Dynamic deviation
-       // Sigmoid is based on 4 hour average bg. 
-       //   If current BG is over 160, use the max of 4,8,24 hour instead.  
-       //   If current BG is over 220, use max of now,4,8,24 instead. UPDATE: DISABLING THIS LOGIC DUE TO HIGH DOSES OVER 220  
-       // This is to tilt towards ongoing periods of resistance (8 or 24 hour) if current BG goes high. 
-             var deviation_bg = averageGlucose_Last4Hours;
-                    if (myGlucose > dynamic_deviation_high) {
-                          deviation_bg = Math.max(averageGlucose_Last4Hours, averageGlucose_Last8Hours, averageGlucose_Last24Hours);
-                     }
-
-                 // DISABLE   if (myGlucose > dynamic_deviation_veryhigh) {
-                 // DISABLE         deviation_bg = Math.max(myGlucose,averageGlucose_Last4Hours, averageGlucose_Last8Hours, averageGlucose_Last24Hours);
-                 // DISABLE   }
-
-                        // Set Robosens Sens Status
-                           robosens_sens_status = "On4hr"; 
-                           if (deviation_bg == averageGlucose_Last8Hours) {
-                                  robosens_sens_status = "On8hr";
-                           } 
-                            if (deviation_bg == averageGlucose_Last24Hours) {
-                                  robosens_sens_status = "On24hr";   
-                           } 
-    
-                  // DISABLE         if (deviation_bg == myGlucose) {
-                  // DISABLE               robosens_sens_status = "OnCurrentBG";
-                  // DISABLE        }      
-         
-         if (averageGlucose_Last4Hours > target_averageGlucose_Last4Hours) {
-             var robosens_deviation = (deviation_bg - target_averageGlucose_Last4Hours) * 0.0555;
-         }
-         
-         if (averageGlucose_Last4Hours < user_bottomtargetAverageGlucose) {
-             var robosens_deviation = (deviation_bg - user_bottomtargetAverageGlucose) * 0.0555;
-         }
-         
-         
-     //Makes sigmoid factor(y) = 1 when BG deviation(x) = 0.
-     var robosens_fix_offset = (Math.log10(1/robosens_max_minus_one - robosens_minimumRatio / robosens_max_minus_one) / Math.log10(Math.E));
-       
-     //Exponent used in sigmoid formula
-     var robosens_exponent = robosens_deviation * robosens_adjustmentFactor + robosens_fix_offset;
-    
-     // The sigmoid function
-     robosens_sigmoidFactor = robosens_ratioInterval / (1 + Math.exp(-robosens_exponent)) + robosens_minimumRatio;
-
-     //Respect min/max ratios
-     robosens_sigmoidFactor = Math.max(Math.min(robosens_maximumRatio, robosens_sigmoidFactor), robosens_sigmoidFactor, robosens_minimumRatio);
-
-     // Adjust by RS power setting 
-     if (robosens_sigmoidFactor > 1) {
-         robosens_sigmoidFactor = ((robosens_sigmoidFactor - 1) * (robosens_power/100)) + 1;
-     }
-
- } 
 }
 
 // Robosens ISF and CR Adjustment: Mutiply ISF By Robosens Factor   
