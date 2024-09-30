@@ -717,7 +717,7 @@ if (enable_Automation_1) {
              var robosens_maximumPercentProfileAdjustment = 10;
        } else if (percentageOverTarget_Last24Hours > 5)  {
              var robosens_maximumPercentProfileAdjustment = 5;
-       } else if (percentageOverTarget_Last24Hours > 0)( {
+       } else if (percentageOverTarget_Last24Hours > 0) {
              var robosens_maximumPercentProfileAdjustment = 2.5;
          } else if (percentageOverTarget_Last24Hours = 0) {
             var robosens_maximumPercentProfileAdjustment = 0;
