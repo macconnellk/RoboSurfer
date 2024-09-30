@@ -753,7 +753,7 @@ if (enable_Automation_1) {
       }
 
       totalBasalfactorFraction = basalfactorFraction_4Hours + basalfactorFraction_8Hours + basalfactorFraction_12Hours + basalfactorFraction_16Hours + basalfactorFraction_20Hours + basalfactorFraction_24Hours;
-      robosens_Factor = round(robosens_maximumpercentbasaladjustment * totalBasalfactorFraction,0);     
+      robosens_Factor = round(robosens_maximumPercentProfileAdjustment * totalBasalfactorFraction,0);     
       robosens_Factor = 1 + (robosens_Factor / 100);
    
    if (totalBasalfactorFraction > 0) {
