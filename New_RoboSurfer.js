@@ -177,13 +177,20 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var percentageOverTarget_Last16Hours = 0;
          var percentageOverTarget_Last20Hours = 0;
          var percentageOverTarget_Last24Hours = 0;
-         var basalfactorFraction_4Hours = 0;
-         var basalfactorFraction_8Hours = 0;
-         var basalfactorFraction_12Hours = 0;
-         var basalfactorFraction_16Hours = 0;
-         var basalfactorFraction_20Hours = 0;
-         var basalfactorFraction_24Hours = 0;
-         var totalBasalfactorFraction = 0;
+         var basalfactorFraction_4HoursOver = 0;
+         var basalfactorFraction_8HoursOver = 0;
+         var basalfactorFraction_12HoursOver = 0;
+         var basalfactorFraction_16HoursOver = 0;
+         var basalfactorFraction_20HoursOver = 0;
+         var basalfactorFraction_24HoursOver = 0;
+         var totalBasalfactorFractionOver = 0;
+         var basalfactorFraction_4HoursUnder = 0;
+         var basalfactorFraction_8HoursUnder = 0;
+         var basalfactorFraction_12HoursUnder = 0;
+         var basalfactorFraction_16HoursUnder = 0;
+         var basalfactorFraction_20HoursUnder = 0;
+         var basalfactorFraction_24HoursUnder = 0;
+         var totalBasalfactorFractionUnder = 0;
          var robosens_maximumPercentProfileAdjustment = 0; 
 
       // User-defined AUC targets for each time period in mg / dl / h (average glucose)
@@ -729,41 +736,68 @@ if (enable_Automation_1) {
     
       // SUM 1/6 of 24hr for each period over target
       if (percentageOverTarget_Last4Hours > 0) {
-            basalfactorFraction_4Hours = .17;
+            basalfactorFraction_4HoursOver = .17;
       }
 
       if (percentageOverTarget_Last8Hours > 0) {
-            basalfactorFraction_8Hours = .17;
+            basalfactorFraction_8HoursOver = .17;
       }
 
       if (percentageOverTarget_Last12Hours > 0) {
-            basalfactorFraction_12Hours = .17;
+            basalfactorFraction_12HoursOver = .17;
       }
       
       if (percentageOverTarget_Last16Hours > 0) {
-            basalfactorFraction_16Hours = .17;
+            basalfactorFraction_16HoursOver = .17;
       }
 
       if (percentageOverTarget_Last20Hours > 0) {
-            basalfactorFraction_20Hours = .16;
+            basalfactorFraction_20HoursOver = .16;
       }
 
       if (percentageOverTarget_Last24Hours > 0) {
-            basalfactorFraction_24Hours = .16;
+            basalfactorFraction_24HoursOver = .16;
       }     
-   
+
+// SUM 1/6 of 24hr for each period under target
+      if (percentageOverTarget_Last4Hours < 0) {
+            basalfactorFraction_4HoursUnder = .17;
+      }
+
+      if (percentageOverTarget_Last8Hours < 0) {
+            basalfactorFraction_8HoursUnder = .17;
+      }
+
+      if (percentageOverTarget_Last12Hours < 0) {
+            basalfactorFraction_12HoursUnder = .17;
+      }
+      
+      if (percentageOverTarget_Last16Hours < 0) {
+            basalfactorFraction_16HoursUnder = .17;
+      }
+
+      if (percentageOverTarget_Last20Hours < 0) {
+            basalfactorFraction_20HoursUnder = .16;
+      }
+
+      if (percentageOverTarget_Last24Hours < 0) {
+            basalfactorFraction_24HoursUnder = .16;
+      }     
+    
    if (percentageOverTarget_Last24Hours < 0) {
-     // Adjust based on 24hr only
-      robosens_Factor = 1 + (robosens_maximumPercentProfileAdjustment / 100);
-      // Set Robosens Basal Status
-            robosens_basal_status = "On24hrLow:" + (totalBasalfactorFraction * 100) + "%";
-   }  else if (percentageOverTarget_Last24Hours > 0) {
-      // Adjust based on last 4, 8, 12, 16, 20, and 24 hrs
-      totalBasalfactorFraction = basalfactorFraction_4Hours + basalfactorFraction_8Hours + basalfactorFraction_12Hours + basalfactorFraction_16Hours + basalfactorFraction_20Hours + basalfactorFraction_24Hours;
-      robosens_Factor = round(robosens_maximumPercentProfileAdjustment * totalBasalfactorFraction,0);     
+     // Adjust based on last 4, 8, 12, 16, 20, and 24 hrs
+      totalBasalfactorFractionUnder = basalfactorFractionUnder_4Hours + basalfactorFractionUnder_8Hours + basalfactorFractionUnder_12Hours + basalfactorFractionUnder_16Hours + basalfactorFractionUnder_20Hours + basalfactorFractionUnder_24Hours;
+      robosens_Factor = round(robosens_maximumPercentProfileAdjustment * totalBasalfactorFractionUnder,0);     
       robosens_Factor = 1 + (robosens_Factor / 100);
       // Set Robosens Basal Status
-            robosens_basal_status = "On:" + (totalBasalfactorFraction * 100) + "%";   
+            robosens_basal_status = "OnLow:" + (totalBasalfactorFractionUnder * 100) + "%";
+   }  else if (percentageOverTarget_Last24Hours > 0) {
+      // Adjust based on last 4, 8, 12, 16, 20, and 24 hrs
+      totalBasalfactorFractionOver = basalfactorFractionOver_4Hours + basalfactorFractionOver_8Hours + basalfactorFractionOver_12Hours + basalfactorFractionOver_16Hours + basalfactorFractionOver_20Hours + basalfactorFractionOver_24Hours;
+      robosens_Factor = round(robosens_maximumPercentProfileAdjustment * totalBasalfactorFractionOver,0);     
+      robosens_Factor = 1 + (robosens_Factor / 100);
+      // Set Robosens Basal Status
+            robosens_basal_status = "On:" + (totalBasalfactorFractionOver * 100) + "%";   
    }  
  
       // NIGHTPROTECT: IF IT'S NIGHTTIME AND BG IS UNDER NIGHTPROTECT THRESHOLD, AND 24HR BG IS UNDER TARGET, REDUCE BASAL BY A SET NIGHTPROTECT FACTOR 
@@ -916,7 +950,7 @@ if (enable_Mealboost) {
        
 // **************** End RoboSurfer Enhancements ****************
 
-return "Robosens Status(" + robosens_power + "% Max Profile: " + robosens_maximumPercentProfileAdjustment + ") RS Factor " + round(robosens_Factor,2) + " (" + robosens_basal_status + "). dISF ratio " + round(new_dynISF_ratio, 2) + ". Override" + logOverride + ". ISF was/now " + round(initial_isf, 2) + "/ " + round(profile.sens,2) + " Basal was/now " + old_basal + "/ " + profile.current_basal + ". dCR(" + dCR_power + "% " + enable_dynamic_cr + ") was/now " + initial_cr + "/ " + round(profile.carb_ratio, 2) + " CSF was/now "  + round(initial_csf, 2) + "/ " + round(check_csf, 2)+ ". SMB Deliv. Ratio " + profile.smb_delivery_ratio + " ROBOSENS Av/%Over 4Hr:" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
+return "Robosens Status(" + robosens_power + "% Max Profile: " + robosens_maximumPercentProfileAdjustment + "%) RS Profile " + (round(robosens_Factor,2))*100 + "% (" + robosens_basal_status + "). dISF ratio " + round(new_dynISF_ratio, 2) + ". Override" + logOverride + ". ISF was/now " + round(initial_isf, 2) + "/ " + round(profile.sens,2) + " Basal was/now " + old_basal + "/ " + profile.current_basal + ". dCR(" + dCR_power + "% " + enable_dynamic_cr + ") was/now " + initial_cr + "/ " + round(profile.carb_ratio, 2) + " CSF was/now "  + round(initial_csf, 2) + "/ " + round(check_csf, 2)+ ". SMB Deliv. Ratio " + profile.smb_delivery_ratio + " ROBOSENS Av/%Over 4Hr:" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
 " 8Hr:" + round(averageGlucose_Last8Hours, 0) + "/" + round(percentageOverTarget_Last8Hours, 0) + "%" + " 12Hr:" + round(averageGlucose_Last12Hours, 0) + "/" + round(percentageOverTarget_Last12Hours, 0) + "%" + " 16Hr:" + round(averageGlucose_Last16Hours, 0) + "/" + round(percentageOverTarget_Last16Hours, 0) + "%" + " 20Hr:" + round(averageGlucose_Last20Hours, 0) + "/" + round(percentageOverTarget_Last20Hours, 0) + "%" +
 " 24Hr:" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RS Adj/AF " + round(robosens_AF_adjustment,2) + "/" + round(robosens_adjustmentFactor,2) + " RS Adj/MAX " + round(robosens_MAX_adjustment,2) + "/" + round(robosens_maximumRatio,2) + " Sensor Safety " + sensor_safety_status + " AUTOMATION1 " + Automation_Status + " " + start_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " to " + end_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + ". SMB Mins "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Mins "  + round(profile.maxUAMSMBBasalMinutes, 2) + " Max COB "  + round(profile.maxCOB, 2) + ". MinAbsorp((CI) "  + round(check_carb_absorption, 2) + "(" + profile.min_5m_carbimpact + ")" + "Mealboost " + Mealboost_Status + " SMB+" + Mealboost_SMB_change +" TDD " + round(past2hoursAverage, 2) + " 2week TDD " + round(average_total_data, 2);
    }
