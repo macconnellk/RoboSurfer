@@ -212,8 +212,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
                 const user_bottomtargetAverageGlucose = 110;
 
             //Define NightProtect Basal variables   
-               var nightProtect_BGThreshold = 120;
-               var nightProtect_basalFactor = .75;
+               var nightProtect_BGThreshold = 110;
+               var nightProtect_basalFactor = .85;
                // Define the start time and end time
                const nightProtect_start_time = new Date(now);
                nightProtect_start_time.setHours(21, 0, 0); // The start time is 9:00 PM
@@ -721,7 +721,7 @@ if (enable_Automation_1) {
              var robosens_maximumPercentProfileAdjustment = 2.5;
          } else if (percentageOverTarget_Last24Hours = 0) {
             var robosens_maximumPercentProfileAdjustment = 0;
-        } else if (percentageOverTarget_Last24Hours < 95) {
+        } else if (percentageOverTarget_Last24Hours < -10) {
             var robosens_maximumPercentProfileAdjustment = -10;
          } else {
             var robosens_maximumPercentProfileAdjustment = -5; 
@@ -750,20 +750,23 @@ if (enable_Automation_1) {
 
       if (percentageOverTarget_Last24Hours > 0) {
             basalfactorFraction_24Hours = .16;
-      }
-
+      }     
+   
+   if (percentageOverTarget_Last24Hours < 0) {
+     // Adjust based on 24hr only
+      robosens_Factor = 1 + (robosens_maximumPercentProfileAdjustment / 100);
+      // Set Robosens Basal Status
+            robosens_basal_status = "On24hrLow:" + (totalBasalfactorFraction * 100) + "%";
+   }  else if (percentageOverTarget_Last24Hours > 0) {
+      // Adjust based on last 4, 8, 12, 16, 20, and 24 hrs
       totalBasalfactorFraction = basalfactorFraction_4Hours + basalfactorFraction_8Hours + basalfactorFraction_12Hours + basalfactorFraction_16Hours + basalfactorFraction_20Hours + basalfactorFraction_24Hours;
       robosens_Factor = round(robosens_maximumPercentProfileAdjustment * totalBasalfactorFraction,0);     
       robosens_Factor = 1 + (robosens_Factor / 100);
-   
-   if (totalBasalfactorFraction > 0) {
       // Set Robosens Basal Status
             robosens_basal_status = "On:" + (totalBasalfactorFraction * 100) + "%";   
-
-   }
-    
+   }  
  
-      // NIGHTPROTECT: IF IT'S NIGHTTIME AND BG IS UNDER NIGHTPROTECT THRESHOLD, REDUCE BASAL BY A SET NIGHTPROTECT FACTOR 
+      // NIGHTPROTECT: IF IT'S NIGHTTIME AND BG IS UNDER NIGHTPROTECT THRESHOLD, AND 24HR BG IS UNDER TARGET, REDUCE BASAL BY A SET NIGHTPROTECT FACTOR 
       
             if (enable_nightProtect) {
 
