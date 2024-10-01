@@ -786,14 +786,14 @@ if (enable_Automation_1) {
     
    if (percentageOverTarget_Last24Hours < 0) {
      // Adjust based on last 4, 8, 12, 16, 20, and 24 hrs
-      totalBasalfactorFractionUnder = basalfactorFractionUnder_4Hours + basalfactorFractionUnder_8Hours + basalfactorFractionUnder_12Hours + basalfactorFractionUnder_16Hours + basalfactorFractionUnder_20Hours + basalfactorFractionUnder_24Hours;
+      totalBasalfactorFractionUnder = basalfactorFraction_4HoursUnder + basalfactorFraction_8HoursUnder + basalfactorFraction_12HoursUnder + basalfactorFraction_16HoursUnder + basalfactorFraction_20HoursUnder + basalfactorFraction_24HoursUnder;
       robosens_Factor = round(robosens_maximumPercentProfileAdjustment * totalBasalfactorFractionUnder,0);     
       robosens_Factor = 1 + (robosens_Factor / 100);
       // Set Robosens Basal Status
             robosens_basal_status = "OnLow:" + (totalBasalfactorFractionUnder * 100) + "%";
    }  else if (percentageOverTarget_Last24Hours > 0) {
       // Adjust based on last 4, 8, 12, 16, 20, and 24 hrs
-      totalBasalfactorFractionOver = basalfactorFractionOver_4Hours + basalfactorFractionOver_8Hours + basalfactorFractionOver_12Hours + basalfactorFractionOver_16Hours + basalfactorFractionOver_20Hours + basalfactorFractionOver_24Hours;
+      totalBasalfactorFractionOver = basalfactorFraction_4HoursOver + basalfactorFraction_8HoursOver + basalfactorFraction_12HoursOver + basalfactorFraction_16HoursOver + basalfactorFraction_20HoursOver + basalfactorFraction_24HoursOver;
       robosens_Factor = round(robosens_maximumPercentProfileAdjustment * totalBasalfactorFractionOver,0);     
       robosens_Factor = 1 + (robosens_Factor / 100);
       // Set Robosens Basal Status
