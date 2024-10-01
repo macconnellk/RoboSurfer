@@ -703,6 +703,7 @@ if (enable_Automation_1) {
  }
 
 // Calculate percentage under range for each time period    
+    
  if (averageGlucose_Last4Hours < user_bottomtargetAverageGlucose) {
        percentageOverTarget_Last4Hours = ((averageGlucose_Last4Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
  }
@@ -711,7 +712,19 @@ if (enable_Automation_1) {
        percentageOverTarget_Last8Hours = ((averageGlucose_Last8Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
  }
 
- if (averageGlucose_Last24Hours < user_bottomtargetAverageGlucose) {   
+if (averageGlucose_Last12Hours < user_bottomtargetAverageGlucose) {
+       percentageOverTarget_Last12Hours = ((averageGlucose_Last12Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
+ }
+
+ if (averageGlucose_Last16Hours < user_bottomtargetAverageGlucose) {   
+        percentageOverTarget_Last16Hours = ((averageGlucose_Last16Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
+ }
+
+ if (averageGlucose_Last20Hours < user_bottomtargetAverageGlucose) {   
+        percentageOverTarget_Last20Hours = ((averageGlucose_Last20Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
+ } 
+    
+if (averageGlucose_Last24Hours < user_bottomtargetAverageGlucose) {   
        percentageOverTarget_Last24Hours = ((averageGlucose_Last24Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
  
  }
