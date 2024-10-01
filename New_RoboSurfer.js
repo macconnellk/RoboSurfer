@@ -215,8 +215,10 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
              // 24 hour average top of range targets 
                const user_targetAverageGlucoseLast24Hours = 124;
 
-            // 4, 8, 24, bottom of range target
-                const user_bottomtargetAverageGlucose = 105;
+            // 4, 8 bottom of range target
+                const user_shortTermBottomtargetAverageGlucose = 105;
+           // 12, 16, 20, 24, bottom of range target
+                const user_bottomtargetAverageGlucose = 110;
 
             //Define NightProtect Basal variables   
                var nightProtect_BGThreshold = 110;
@@ -704,11 +706,11 @@ if (enable_Automation_1) {
 
 // Calculate percentage under range for each time period    
     
- if (averageGlucose_Last4Hours < user_bottomtargetAverageGlucose) {
+ if (averageGlucose_Last4Hours < user_shortTermBottomtargetAverageGlucose) {
        percentageOverTarget_Last4Hours = ((averageGlucose_Last4Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
  }
 
- if (averageGlucose_Last8Hours < user_bottomtargetAverageGlucose) {   
+ if (averageGlucose_Last8Hours < user_shortTermBottomtargetAverageGlucose) {   
        percentageOverTarget_Last8Hours = ((averageGlucose_Last8Hours - user_bottomtargetAverageGlucose) / user_bottomtargetAverageGlucose) * 100;
  }
 
