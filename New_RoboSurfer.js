@@ -285,7 +285,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       end_time.setHours(1, 0, 0); // Assuming the end time is 12:00 AM
 
       const less_aggressive_time = new Date(now);
-      less_aggressive_time.setHours(22, 0, 0); // Assuming the end time is 11:00 PM 
+      less_aggressive_time.setHours(23, 0, 0); // Assuming the end time is 11:00 PM 
        
       var Automation_1_BGThreshold_1 = 105; // BG over 
       var Automation_1_BGThreshold_2 = 140; // BG over
@@ -308,7 +308,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
          //Automation 1 Sigmoid - Threshold 2 (Was 1.6)
          var Automation_1_minimumRatio_2 = .5;
-         var Automation_1_maximumRatio_2 = 1.3;
+         var Automation_1_maximumRatio_2 = 1.4;
          var Automation_1_adjustmentFactor_2 = .5;
 
          //Automation 1 Sigmoid - Threshold 3 
