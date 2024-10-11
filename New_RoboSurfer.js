@@ -733,9 +733,9 @@ if (averageGlucose_Last24Hours < user_bottomtargetAverageGlucose) {
            
 //   ROBOSENS FACTOR: SET THE ROBOSENS FACTOR
 
-       if (percentageOverTarget_Last24Hours > 60) {
+       if (percentageOverTarget_Last24Hours > 25) {
              var robosens_maximumPercentProfileAdjustment = 15;
-       } else if (percentageOverTarget_Last24Hours > 30)  {
+       } else if (percentageOverTarget_Last24Hours > 15)  {
              var robosens_maximumPercentProfileAdjustment = 10;
        } else if (percentageOverTarget_Last24Hours > 5)  {
              var robosens_maximumPercentProfileAdjustment = 5;
