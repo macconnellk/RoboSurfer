@@ -216,9 +216,9 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
                const user_targetAverageGlucoseLast24Hours = 124;
 
             // 4, 8 bottom of range target
-                const user_shortTermBottomtargetAverageGlucose = 103;
+                const user_shortTermBottomtargetAverageGlucose = 108;
            // 12, 16, 20, 24, bottom of range target
-                const user_bottomtargetAverageGlucose = 108;
+                const user_bottomtargetAverageGlucose = 110;
 
             //Define NightProtect Basal variables   
                var nightProtect_BGThreshold = 105;
