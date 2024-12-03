@@ -98,6 +98,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
    //  Initialize log variables  
    var log_protectionmechanism = "Off";
+   var log_profileAlert = "";    
    
 //  Initialize APS state variables
    var myGlucose = glucose[0].glucose;
@@ -192,6 +193,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var basalfactorFraction_24HoursUnder = 0;
          var totalBasalfactorFractionUnder = 0;
          var robosens_maximumPercentProfileAdjustment = 0; 
+         
 
       // User-defined AUC targets for each time period in mg / dl / h (average glucose)
       // Define target average glucose levels for different time periods
@@ -865,7 +867,9 @@ if (averageGlucose_Last24Hours < user_bottomtargetAverageGlucose) {
           new_isf = robosens_isf / robosens_Factor / new_dynISF_ratio;
           new_isf = round(new_isf,0);
 
-       
+          if (robosens_Factor > 1.05 || robosens_Factor < .95) {
+              log_profileAlert = "ACTION: START NEW PROFILE +/- 5%"
+          }
 // *************** END ROBOSENS ***************************************       
        
           
@@ -965,7 +969,7 @@ if (enable_Mealboost) {
        
 // **************** End RoboSurfer Enhancements ****************
 
-return "Robosens Status(" + robosens_power + "% Max Profile: " + robosens_maximumPercentProfileAdjustment + "%) RS Profile " + round((robosens_Factor*100),0) + "% (" + robosens_basal_status + "). dISF ratio " + round(new_dynISF_ratio, 2) + ". Override" + logOverride + ". ISF was/now " + round(initial_isf, 2) + "/ " + round(profile.sens,2) + " Basal was/now " + old_basal + "/ " + profile.current_basal + ". dCR(" + dCR_power + "% " + enable_dynamic_cr + ") was/now " + initial_cr + "/ " + round(profile.carb_ratio, 2) + " CSF was/now "  + round(initial_csf, 2) + "/ " + round(check_csf, 2)+ ". SMB Deliv. Ratio " + profile.smb_delivery_ratio + " ROBOSENS Av/%Over 4Hr:" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
+return log_profileAlert + "Robosens Status(" + robosens_power + "% Max Profile: " + robosens_maximumPercentProfileAdjustment + "%) RS Profile " + round((robosens_Factor*100),0) + "% (" + robosens_basal_status + "). dISF ratio " + round(new_dynISF_ratio, 2) + ". Override" + logOverride + ". ISF was/now " + round(initial_isf, 2) + "/ " + round(profile.sens,2) + " Basal was/now " + old_basal + "/ " + profile.current_basal + ". dCR(" + dCR_power + "% " + enable_dynamic_cr + ") was/now " + initial_cr + "/ " + round(profile.carb_ratio, 2) + " CSF was/now "  + round(initial_csf, 2) + "/ " + round(check_csf, 2)+ ". SMB Deliv. Ratio " + profile.smb_delivery_ratio + " ROBOSENS Av/%Over 4Hr:" + round(averageGlucose_Last4Hours, 0) + "/" + round(percentageOverTarget_Last4Hours, 0) + "%" + 
 " 8Hr:" + round(averageGlucose_Last8Hours, 0) + "/" + round(percentageOverTarget_Last8Hours, 0) + "%" + " 12Hr:" + round(averageGlucose_Last12Hours, 0) + "/" + round(percentageOverTarget_Last12Hours, 0) + "%" + " 16Hr:" + round(averageGlucose_Last16Hours, 0) + "/" + round(percentageOverTarget_Last16Hours, 0) + "%" + " 20Hr:" + round(averageGlucose_Last20Hours, 0) + "/" + round(percentageOverTarget_Last20Hours, 0) + "%" +
 " 24Hr:" + round(averageGlucose_Last24Hours, 0) + "/" + round(percentageOverTarget_Last24Hours, 0) + "%" + " RS Adj/AF " + round(robosens_AF_adjustment,2) + "/" + round(robosens_adjustmentFactor,2) + " RS Adj/MAX " + round(robosens_MAX_adjustment,2) + "/" + round(robosens_maximumRatio,2) + " Sensor Safety " + sensor_safety_status + " AUTOMATION1 " + Automation_Status + " " + start_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + " to " + end_time.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'}) + ". SMB Mins "  + round(profile.maxSMBBasalMinutes, 2) + " UAM Mins "  + round(profile.maxUAMSMBBasalMinutes, 2) + " Max COB "  + round(profile.maxCOB, 2) + ". MinAbsorp((CI) "  + round(check_carb_absorption, 2) + "(" + profile.min_5m_carbimpact + ")" + "Mealboost " + Mealboost_Status + " SMB+" + Mealboost_SMB_change +" TDD " + round(past2hoursAverage, 2) + " 2week TDD " + round(average_total_data, 2);
    }
