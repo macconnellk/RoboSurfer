@@ -262,7 +262,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 //  Initialize Sigmoid Enhanced with TDD Response function variables
    var minimumRatio = .99;
    var maximumRatio = 1.1; //was 1.25
-   var adjustmentFactor = .75;
+   var adjustmentFactor = .5; //was .75
    var past2hoursAverage = dynamicVariables.past2hoursAverage;
    var average_total_data = dynamicVariables.average_total_data;
    var weightedAverage = dynamicVariables.weightedAverage;
