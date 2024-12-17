@@ -735,14 +735,16 @@ if (averageGlucose_Last24Hours < user_bottomtargetAverageGlucose) {
            
 //   ROBOSENS FACTOR: SET THE ROBOSENS FACTOR
 
-       if (percentageOverTarget_Last24Hours > 25) {
-             var robosens_maximumPercentProfileAdjustment = 15;
-       } else if (percentageOverTarget_Last24Hours > 15)  {
+       if (percentageOverTarget_Last24Hours > 20) {
              var robosens_maximumPercentProfileAdjustment = 10;
-       } else if (percentageOverTarget_Last24Hours > 5)  {
+       } else if (percentageOverTarget_Last24Hours > 15)  {
+             var robosens_maximumPercentProfileAdjustment = 7.5;
+       } else if (percentageOverTarget_Last24Hours > 10)  {
              var robosens_maximumPercentProfileAdjustment = 5;
-       } else if (percentageOverTarget_Last24Hours > 0) {
+       } else if (percentageOverTarget_Last24Hours > 5)  {
              var robosens_maximumPercentProfileAdjustment = 2.5;
+       } else if (percentageOverTarget_Last24Hours > 0) {
+             var robosens_maximumPercentProfileAdjustment = 1.5;
          } else if (percentageOverTarget_Last24Hours === 0) {
             var robosens_maximumPercentProfileAdjustment = 0;
         } else if (percentageOverTarget_Last24Hours < -10) {
