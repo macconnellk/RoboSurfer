@@ -136,7 +136,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       if (overrideTarget >=80) {
          var target = overrideTarget;
          }
-      var initial_isf = initial_isf / overridePercentage;
+      var initial_isf = round((initial_isf / overridePercentage), 0);
+      var initial_cr = round((initial_cr / overridePercentage),2);
       var initial_csf = initial_isf / initial_cr; 
       var current_basal = round_basal(current_basal * overridePercentage);
       if (smbisOff) {
