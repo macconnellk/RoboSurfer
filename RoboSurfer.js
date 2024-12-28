@@ -117,9 +117,13 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    // Adjust for Profiles       
    var logOverride = "Off"
    var useOverride = dynamicVariables.useOverride; 
+   var adjustISF = dynamicVariables.isf;
+   var adjustCR = dynamicVariables.isf;    
    var overridePercentage = dynamicVariables.overridePercentage / 100;   
    var overrideTarget = dynamicVariables.overrideTarget;
-   var smbisOff = dynamicVariables.smbisOff;  
+   var smbisOff = dynamicVariables.smbisOff;
+   var overrideMaxIOB = dynamicVariables.overrideMaxIOB;
+   var profilesMaxIOB = dynamicVariables.maxIOB;    
 
    if (useOverride && overridePercentage == .87) {
          enable_robosens = false;
@@ -133,18 +137,23 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
        
    if (useOverride) {
       logOverride = "On";
+      // Basal is already adjusted by the Profile amount by iAPS in the urrent-basal variable, no adjustment here necessary
       if (overrideTarget >=80) {
          var target = overrideTarget;
          }
-      var initial_isf = round((initial_isf / overridePercentage), 0);
-      var initial_cr = round((initial_cr / overridePercentage),2);
+      if (adjustISF) {
+         var initial_isf = round((initial_isf / overridePercentage), 0);
+         }
+      if (adjustCR) {
+         var initial_cr = round((initial_cr / overridePercentage),2);
+         }
       var initial_csf = initial_isf / initial_cr; 
-      var current_basal = round_basal(current_basal * overridePercentage);
       if (smbisOff) {
          profile.enableUAM = false;
          profile.enableSMB_always = false;
          }
-      
+      if (overrideMaxIOB) {
+         profile.max_iob = profilesMaxIOB;
       dynamicVariables.useOverride = false;
       dynamicVariables.overridePercentage = 100;     
       }  
