@@ -843,9 +843,7 @@ if (averageGlucose_Last24Hours < user_bottomtargetAverageGlucose) {
    // Basal Robosens Adjustment
          new_basal = new_basal * robosens_Factor;
          new_basal = round_basal(new_basal);
-         profile.current_basal = new_basal;   
-       
-
+            
 }
 
 // Robosens ISF and CR Adjustment: Mutiply ISF By Robosens Factor   
@@ -956,8 +954,9 @@ if (enable_Mealboost) {
 
 // *************** END MEALBOOST ***************************************      
        
-//******************* Set the Profile with the New ISF and CR Settings *****************************
+//******************* Set the Profile with the New Basal, ISF, and CR Settings *****************************
        
+      profile.current_basal = new_basal;
       profile.sens = new_isf;    
       profile.carb_ratio = new_cr; 
       profile.maxSMBBasalMinutes = new_maxSMB;   
