@@ -154,6 +154,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          }
       if (overrideMaxIOB) {
          profile.max_iob = profilesMaxIOB;
+         }
       dynamicVariables.useOverride = false;
       dynamicVariables.overridePercentage = 100;     
       }  
