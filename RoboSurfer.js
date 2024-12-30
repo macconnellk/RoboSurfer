@@ -484,11 +484,12 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
                          profile.enableUAM = false;
                          profile.enableSMB_always = false; 
                          target = target + 10;
+                         robosens_basal_status = "SLEEP MODE ON";
 
           // If IOB is negative at night (meaning basal has been too high due to settings or RoboSens), 
           // Turn off RS and Nightboost and Set a Hypo Protect Mode with even higher target and less insulin 
 
-                      if iob <0 {
+                      if (iob <0) {
                          enable_robosens = false;
                          enable_Automation_1 = false; 
                          enable_Automation_1_ROC = false;
@@ -500,6 +501,7 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
                          new_cr = round((initial_cr / .9),2);
                          robosens_cr = round((initial_cr / .9),2);
                          new_dynISF_ratio = 1;
+                         robosens_basal_status = "SLEEP MODE ON; NEGATIVE BASAL MODE ON";
                       }
        
     }
