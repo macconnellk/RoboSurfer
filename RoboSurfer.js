@@ -137,7 +137,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
        
    if (useOverride) {
       logOverride = "On";
-      // Basal is already adjusted by the Profile amount by iAPS in the urrent-basal variable, no adjustment here necessary
+      // Basal is already adjusted by the Profile amount by iAPS in the current-basal variable, no adjustment here necessary
       if (overrideTarget >=80) {
          var target = overrideTarget;
          }
@@ -391,7 +391,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          var Mealboost_SMB_DeliveryRatio_Increase_ACCEL = .85; // High BG Rate of Change SMB Delivery Ratio  
        
 
-//  **************** ROBOSURFER ENHANCEMENT #1: Dynamic ISF Sigmoid- ADJUSTS ISF BASED PN CURRENT BG  ****************
+//  **************** ROBOSURFER ENHANCEMENT #1: Dynamic ISF Sigmoid- ADJUSTS ISF BASED ON CURRENT BG  ****************
      
 function sigmoidFunction(enable_new_sigmoidTDDFactor, adjustmentFactor, 
 minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage) {        
@@ -471,7 +471,40 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
 
 // **************** END ROBOSURFER ENHANCEMENT #2: DYNAMIC SMB DELIVERY RATIO **********************************************
        
-// **************** ROBOSURFER ENHANCEMENT #3: AUTOMATION #1: "NIGHTBOOST: ADJUSTS ISF BASED ON TIME, CURRENT BG, and BG RATE OF CHANGE ****************
+// **************** ROBOSURFER ENHANCEMENT #3: AUTOMATION #1: 
+// SLEEP MODE: ADJUSTS SMBs and OTHER FUNCTIONS BASED ON TIME, BG, and IOB
+
+   // Current settings: IF BETWEEN 9pm and 3am, and BG under 140 [USE SAME BG THRESHOLD AS NIGHTBOOST TO ALTERNATE IF NEEDED)
+               
+    if (((now >= nightProtect_start_time && now <= nightProtect_end_time) || (now <= nightProtect_start_time && now <= nightProtect_end_time && nightProtect_start_time > nightProtect_end_time) ||
+          (now >= nightProtect_start_time && now >= nightProtect_end_time && nightProtect_start_time > nightProtect_end_time))
+          && myGlucose <= Automation_1_BGThreshold_2) {
+
+                         // Turn off SMBs and Raise Target and treshold slightly
+                         profile.enableUAM = false;
+                         profile.enableSMB_always = false; 
+                         target = target + 10;
+
+          // If IOB is negative at night (meaning basal has been too high due to settings or RoboSens), 
+          // Turn off RS and Nightboost and Set a Hypo Protect Mode with even higher target and less insulin 
+
+                      if iob <0 {
+                         enable_robosens = false;
+                         enable_Automation_1 = false; 
+                         enable_Automation_1_ROC = false;
+                         target = target + 20;
+                         // Set BASAL, ISF, AND CR to 90% and reset Sigmoid factor to 1
+                         new_basal = round((current_basal * .9),2);
+                         new_isf = round((initial_isf / .9), 0);
+                         robosens_isf = round((initial_isf / .9), 0);
+                         new_cr = round((initial_cr / .9),2);
+                         robosens_cr = round((initial_cr / .9),2);
+                         new_dynISF_ratio = 1;
+                      }
+       
+    }
+       
+// "NIGHTBOOST: ADJUSTS ISF BASED ON TIME, CURRENT BG, and BG RATE OF CHANGE ****************
 //Only use when enable_Automation_1 = true
 // This function will replace the values determined in the prior Dynamic ISF and Delivery Ratio functions        
 if (enable_Automation_1) { 
@@ -479,10 +512,10 @@ if (enable_Automation_1) {
             // Check if the current time is within the specified range, greater than BG threshold and COB threshold
           if (((now >= start_time && now <= end_time) || (now <= start_time && now <= end_time && start_time > end_time) ||
              (now >= start_time && now >= end_time && start_time > end_time))
-             && myGlucose > Automation_1_BGThreshold_1 && cob >= Automation_1_CarbThreshold) 
+             && myGlucose > Automation_1_BGThreshold_2 && cob >= Automation_1_CarbThreshold) 
           {
 
-          // Baseline Nightboost settings are below, regardless of ROC.  E.g. If it's after 8p and BG > 105, Sig Max is 1.5 and SMB/UAM is +15 mins
+          // Baseline Nightboost settings are below, regardless of ROC.  E.g. If it's after 8p and BG > 140, Sig Max is 1.5 and SMB/UAM is +15 mins
 
             target = Automation_1_target;  
             min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; //
