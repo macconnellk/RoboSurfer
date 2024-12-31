@@ -490,17 +490,17 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
           // If IOB is negative at night (meaning basal has been too high due to settings or RoboSens), 
           // Turn off RS and Nightboost and Set a Hypo Protect Mode with even higher target and less insulin 
 
-                      if (iob <0) {
+                      if (iob <= .05) {
                          enable_robosens = false;
                          enable_Automation_1 = false; 
                          enable_Automation_1_ROC = false;
                          target = target + 20;
                          // Set BASAL, ISF, AND CR to 90% and reset Sigmoid factor to 1
-                         new_basal = round((current_basal * .9),2);
-                         new_isf = round((initial_isf / .9), 0);
-                         robosens_isf = round((initial_isf / .9), 0);
-                         new_cr = round((initial_cr / .9),2);
-                         robosens_cr = round((initial_cr / .9),2);
+                         new_basal = round((current_basal * .95),2);
+                         new_isf = round((initial_isf / .95), 0);
+                         robosens_isf = round((initial_isf / .95), 0);
+                         new_cr = round((initial_cr / .95),2);
+                         robosens_cr = round((initial_cr / .95),2);
                          new_dynISF_ratio = 1;
                          log_sleepmode = "SLEEP MODE ON; NEGATIVE BASAL MODE ON";
                       }
