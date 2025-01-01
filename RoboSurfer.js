@@ -42,7 +42,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_nightProtect = true; 
   var enable_dynamic_cr = true;
       var dCR_power = 25; // percent
-  
+  var enable_sigmoid_isf = false;
    var enable_new_sigmoidTDDFactor = true;
   var enable_Automation_1 = true; 
   var enable_Automation_1_ROC = true;
@@ -442,9 +442,9 @@ minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAvera
 }        
 
 // **************** Initial call of the Sigmoid function to set a new autosens ratio ****************
-
+if (enable_sigmoid_isf) {
     new_dynISF_ratio = sigmoidFunction(enable_new_sigmoidTDDFactor, adjustmentFactor, minimumRatio, maximumRatio, weightedAverage, average_total_data, past2hoursAverage);  
-    
+    }
       
 
 //  **************** END ROBOSURFER ENHANCEMENT #1: Dynamic ISF Sigmoid  ****************
