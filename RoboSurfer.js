@@ -521,7 +521,7 @@ if (enable_Automation_1) {
           // Baseline Nightboost settings are below, regardless of ROC.  E.g. If it's after 8p and BG > 140, Sig Max is 1.5 and SMB/UAM is +15 mins
 
             target = Automation_1_target;  
-            min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; //
+         //DISABLE  min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; 
             
              // Set Nightboost Threshold 2 Factors (Was Threshold 2, 1.3)
                   Automation_Status = Automation_1_name + " OnMax1.4";   
