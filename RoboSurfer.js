@@ -45,7 +45,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_sigmoid_isf = false;
    var enable_new_sigmoidTDDFactor = true;
   var enable_Automation_1 = true; 
-  var enable_Automation_1_ROC = true;
+  var enable_Automation_1_ROC = false;
   var enable_smb_delivery_ratio_scaling = false;
   var enable_Mealboost = true; 
 
