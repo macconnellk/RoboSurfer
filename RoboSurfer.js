@@ -273,7 +273,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
        
 //  Initialize Sigmoid Enhanced with TDD Response function variables
    var minimumRatio = .99;
-   var maximumRatio = 1.1; //was 1.25
+   var maximumRatio = 1.05; //was 1.25
    var adjustmentFactor = .5; //was .75
    var past2hoursAverage = dynamicVariables.past2hoursAverage;
    var average_total_data = dynamicVariables.average_total_data;
@@ -317,32 +317,32 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
          
          //Automation 1 Sigmoid - Threshold 1 
          var Automation_1_minimumRatio_1 = .5;
-         var Automation_1_maximumRatio_1 = 1.2;
+         var Automation_1_maximumRatio_1 = 1.05;
          var Automation_1_adjustmentFactor_1 = .5;
 
          //Automation 1 Sigmoid - Threshold 2 (Was 1.6)
          var Automation_1_minimumRatio_2 = .5;
-         var Automation_1_maximumRatio_2 = 1.4;
+         var Automation_1_maximumRatio_2 = 1.1;
          var Automation_1_adjustmentFactor_2 = .5;
 
          //Automation 1 Sigmoid - Threshold 3 
          var Automation_1_minimumRatio_3 = .5;
-         var Automation_1_maximumRatio_3 = 1.5;
+         var Automation_1_maximumRatio_3 = 1.15;
          var Automation_1_adjustmentFactor_3 = .5;
 
          //Automation 1 Sigmoid - Threshold 4 
          var Automation_1_minimumRatio_4 = .5;
-         var Automation_1_maximumRatio_4 = 2;
+         var Automation_1_maximumRatio_4 = 1.22;
          var Automation_1_adjustmentFactor_4 = 1;
 
         //Automation 1 Sigmoid - Threshold 5 
          var Automation_1_minimumRatio_5 = .5;
-         var Automation_1_maximumRatio_5 = 2.2;
+         var Automation_1_maximumRatio_5 = 1.25;
          var Automation_1_adjustmentFactor_5 = 1;
 
          //Automation 1 Sigmoid - Threshold 6 
          var Automation_1_minimumRatio_6 = .5;
-         var Automation_1_maximumRatio_6 = 2.35;
+         var Automation_1_maximumRatio_6 = 1.3;
          var Automation_1_adjustmentFactor_6 = 1;
        
           //Automation 1 Dynamic CR 
@@ -524,7 +524,7 @@ if (enable_Automation_1) {
          //DISABLE  min_hourly_carb_absorption = Automation_1_min_hourly_carb_absorption; 
             
              // Set Nightboost Threshold 2 Factors (Was Threshold 2, 1.3)
-                  Automation_Status = Automation_1_name + " OnMax1.4";   
+                  Automation_Status = Automation_1_name + " OnMax1.1";   
                   var NightBoost_Sigmoid_Min = Automation_1_minimumRatio_2;
                   var NightBoost_Sigmoid_Max = Automation_1_maximumRatio_2;
                   var NightBoost_Sigmoid_AF = Automation_1_adjustmentFactor_2;
