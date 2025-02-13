@@ -42,7 +42,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
   var enable_nightProtect = true; 
   var enable_dynamic_cr = true;
       var dCR_power = 25; // percent
-  var enable_sigmoid_isf = false;
+  var enable_sigmoid_isf = true;
    var enable_new_sigmoidTDDFactor = true;
   var enable_Automation_1 = true; 
   var enable_Automation_1_ROC = false;
@@ -273,8 +273,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
        
 //  Initialize Sigmoid Enhanced with TDD Response function variables
    var minimumRatio = .99;
-   var maximumRatio = 1.05; //was 1.25
-   var adjustmentFactor = .5; //was .75
+   var maximumRatio = 1.075; //was 1.25
+   var adjustmentFactor = .35; //was .75
    var past2hoursAverage = dynamicVariables.past2hoursAverage;
    var average_total_data = dynamicVariables.average_total_data;
    var weightedAverage = dynamicVariables.weightedAverage;
