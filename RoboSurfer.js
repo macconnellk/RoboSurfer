@@ -37,7 +37,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 //Turn RoboSurfer and functions on or off
   var enable_RoboSurfer = true;
  
-  var enable_robosens = true;
+  var enable_robosens = false;
       var robosens_power = 100; // percent
   var enable_nightProtect = true; 
   var enable_dynamic_cr = true;
