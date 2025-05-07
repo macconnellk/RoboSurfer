@@ -1,4 +1,4 @@
-function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoir, clock, dynamicVariables) {
+function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoir, clock) {
 
    // Define various functions used later on, in the main function
          // Round Basal
@@ -117,22 +117,22 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
 
    // Adjust for Profiles       
    var logOverride = "Off"
-   var useOverride = dynamicVariables.useOverride; 
-   var adjustISF = dynamicVariables.isf;
-   var adjustCR = dynamicVariables.isf;    
-   var overridePercentage = dynamicVariables.overridePercentage / 100;   
-   var overrideTarget = dynamicVariables.overrideTarget;
-   var smbisOff = dynamicVariables.smbisOff;
-   var overrideMaxIOB = dynamicVariables.overrideMaxIOB;
-   var profilesMaxIOB = dynamicVariables.maxIOB;    
+   var useOverride = profile.dynamicVariables.useOverride; 
+   var adjustISF = profile.dynamicVariables.isf;
+   var adjustCR = profile.dynamicVariables.isf;    
+   var overridePercentage = profile.dynamicVariables.overridePercentage / 100;   
+   var overrideTarget = profile.dynamicVariables.overrideTarget;
+   var smbisOff = profile.dynamicVariables.smbisOff;
+   var overrideMaxIOB = profile.dynamicVariables.overrideMaxIOB;
+   var profilesMaxIOB = profile.dynamicVariables.maxIOB;    
 
    if (useOverride && overridePercentage == .87) {
          enable_robosens = false;
          useOverride = false;
          current_basal = round((current_basal / .87),2);
          profile.current_basal = current_basal;
-         dynamicVariables.useOverride = false;
-         dynamicVariables.overridePercentage = 100;
+         profile.dynamicVariables.useOverride = false;
+         profile.dynamicVariables.overridePercentage = 100;
          logOverride = "Robosens Off";
          }
        
@@ -156,8 +156,8 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
       if (overrideMaxIOB) {
          profile.max_iob = profilesMaxIOB;
          }
-      dynamicVariables.useOverride = false;
-      dynamicVariables.overridePercentage = 100;     
+      profile.dynamicVariables.useOverride = false;
+      profile.dynamicVariables.overridePercentage = 100;     
       }  
 
  //  Initialize general RoboSurfer function variables      
@@ -275,9 +275,9 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var minimumRatio = .99;
    var maximumRatio = 1.075; //was 1.25
    var adjustmentFactor = .35; //was .75
-   var past2hoursAverage = dynamicVariables.past2hoursAverage;
-   var average_total_data = dynamicVariables.average_total_data;
-   var weightedAverage = dynamicVariables.weightedAverage;
+   var past2hoursAverage = profile.dynamicVariables.past2hoursAverage;
+   var average_total_data = profile.dynamicVariables.average_total_data;
+   var weightedAverage = profile.dynamicVariables.weightedAverage;
        // Sensitivity Protection Mechanism: If 24hr TDD is less than 2-Week TDD (more sensitive), set weighted average TDD to the 24hr TDD value)
          if (past2hoursAverage < average_total_data) {
             weightedAverage = past2hoursAverage;
