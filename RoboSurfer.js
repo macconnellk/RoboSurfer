@@ -119,7 +119,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
    var logOverride = "Off"
    var useOverride = profile.dynamicVariables.useOverride; 
    var adjustISF = profile.dynamicVariables.isf;
-   var adjustCR = profile.dynamicVariables.isf;    
+   var adjustCR = profile.dynamicVariables.cr;    
    var overridePercentage = profile.dynamicVariables.overridePercentage / 100;   
    var overrideTarget = profile.dynamicVariables.overrideTarget;
    var smbisOff = profile.dynamicVariables.smbisOff;
