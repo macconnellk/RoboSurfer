@@ -250,7 +250,7 @@ function applyCarbSafety(lastCarbTime, currentBG, cob, target, profile) {
         
         // Calculate minutes since carbs for logging
         var minutesSinceCarbs = Math.round((nowMs - lastCarbTime) / CONFIG.time.minutesToMs);
-        carbSafetyStatus = "On(Recent Carbs + BG<" + CONFIG.carbSafety.bgThreshold + " + COB>" + CONFIG.carbSafety.cobThreshold + ") CarbsAgo:" + minutesSinceCarbs + "min COB:" + round(cob, 1);
+        carbSafetyStatus = "On: SMBs disabled 30min, target +" + CONFIG.carbSafety.targetIncrease + " (CarbsAgo:" + minutesSinceCarbs + "min, COB:" + round(cob, 1) + ")";
         
         return { status: carbSafetyStatus, newTarget: newTarget, active: true };
     }
@@ -476,11 +476,12 @@ var profilesMaxIOB = profile.dynamicVariables ? profile.dynamicVariables.maxIOB 
 if (useOverride) {
     logOverride = "On";
     
+    // CRITICAL: These must reassign the existing variables, not create new ones
     if (overrideTarget >= 80) target = overrideTarget;
     if (adjustISF) initialISF = round(initialISF / overridePercentage, 0);
     if (adjustCR) initialCR = round(initialCR / overridePercentage, 2);
     
-    // Recalculate CSF after potential ISF/CR changes
+    // Recalculate CSF AFTER potential ISF/CR changes
     initialCSF = initialISF / initialCR;
     
     if (smbisOff) {
@@ -530,21 +531,21 @@ if (useOverride) {
     profile.dynamicVariables.overridePercentage = 100;
 }
 
-// Initialize working variables (after potential profile override changes)
+// Initialize working variables AFTER profile overrides (using potentially modified initial values)
 var dynamicISFRatio = 1;
-var newISF = initialISF;
-var newCR = initialCR;
+var newISF = initialISF;  // Must use potentially modified initialISF
+var newCR = initialCR;    // Must use potentially modified initialCR
 var newMaxSMB = maxSMB;
 var newMaxUAM = maxUAM;
 var newMaxCOB = maxCOB;
 var checkCSF = 0;
-var hypoMode = false; // Declare early for later use
+var hypoMode = false;
 
 // Feature enable flags (can be dynamically disabled by safety functions)
 var enableAutomation1 = CONFIG.enableAutomation1;
 var enableMealboost = CONFIG.enableMealboost;
 
-// Initialize result variables early
+// Initialize result variables with proper defaults
 var sensorSafety = { status: "Off", disableFeatures: false };
 var carbSafety = { status: "Off", newTarget: target, active: false };
 var sleepMode = { status: "", newTarget: target, hypoMode: false };
@@ -560,7 +561,7 @@ var timeDiff3Periods = (glucose0Time - glucose3Time) / CONFIG.time.minutesToMs;
 var glucoseRateOfChange2Periods = (glucose[0].glucose - glucose[2].glucose) / timeDiff2Periods;
 var glucoseRateOfChange3Periods = (glucose[0].glucose - glucose[3].glucose) / timeDiff3Periods;
 
-// Apply safety functions IN ORDER (matching original sequence)
+// Apply safety functions IN ORDER - target gets modified cumulatively
 sensorSafety = applySensorSafety(glucose, profile);
 
 // Sensor safety disables features BEFORE they run (matching original)
@@ -570,11 +571,11 @@ if (sensorSafety.disableFeatures) {
 }
 
 carbSafety = applyCarbSafety(lastCarbTime, currentBG, cob, target, profile);
-target = carbSafety.newTarget; // Apply carb safety target change first
+target = carbSafety.newTarget; // Update target with carb safety changes
 
 sleepMode = applySleepMode(now, currentBG, iobValue, profile, target);
-target = sleepMode.newTarget; // Apply sleep mode target change
-logSleepMode = sleepMode.status; // Capture sleep mode status for logging
+target = sleepMode.newTarget; // Update target with sleep mode changes  
+logSleepMode = sleepMode.status;
 
 // Handle hypo mode from sleep mode (matching original exact logic)
 if (sleepMode.hypoMode) {
