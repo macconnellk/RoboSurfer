@@ -43,7 +43,8 @@ const CONFIG = {
     carbSafety: {
         targetIncrease: 30,
         timeWindowMinutes: 30,
-        bgThreshold: 161
+        bgThreshold: 161,
+        cobThreshold: 65
     },
     
     // Dynamic ISF Sigmoid
@@ -228,13 +229,14 @@ function applySensorSafety(glucose, profile) {
     return { status: sensorSafetyStatus, disableFeatures: false };
 }
 
-function applyCarbSafety(lastCarbTime, currentBG, target, profile) {
+function applyCarbSafety(lastCarbTime, currentBG, cob, target, profile) {
     var carbSafetyStatus = "Off";
     var nowMs = Date.now();
     var carbTimeThreshold = lastCarbTime + (CONFIG.carbSafety.timeWindowMinutes * CONFIG.time.minutesToMs);
     
-    // Check if carbs were entered recently AND BG is under threshold
-    if (nowMs <= carbTimeThreshold && lastCarbTime != 0 && currentBG < CONFIG.carbSafety.bgThreshold) {
+    // Check if carbs were entered recently AND BG is under threshold AND COB > threshold
+    if (nowMs <= carbTimeThreshold && lastCarbTime != 0 && 
+        currentBG < CONFIG.carbSafety.bgThreshold && cob > CONFIG.carbSafety.cobThreshold) {
         
         // Disable SMBs and UAMs
         profile.enableUAM = false;
@@ -245,7 +247,7 @@ function applyCarbSafety(lastCarbTime, currentBG, target, profile) {
         
         // Calculate minutes since carbs for logging
         var minutesSinceCarbs = Math.round((nowMs - lastCarbTime) / CONFIG.time.minutesToMs);
-        carbSafetyStatus = "On(Recent Carbs + BG<" + CONFIG.carbSafety.bgThreshold + ") CarbsAgo:" + minutesSinceCarbs + "min";
+        carbSafetyStatus = "On(Recent Carbs + BG<" + CONFIG.carbSafety.bgThreshold + " + COB>" + CONFIG.carbSafety.cobThreshold + ") CarbsAgo:" + minutesSinceCarbs + "min COB:" + round(cob, 1);
         
         return { status: carbSafetyStatus, newTarget: newTarget, active: true };
     }
@@ -519,7 +521,7 @@ if (sensorSafety.disableFeatures) {
     enableMealboost = false;
 }
 
-var carbSafety = applyCarbSafety(lastCarbTime, currentBG, target, profile);
+var carbSafety = applyCarbSafety(lastCarbTime, currentBG, cob, target, profile);
 target = carbSafety.newTarget; // Apply carb safety target change first
 
 var sleepMode = applySleepMode(now, currentBG, iobValue, profile, target);
