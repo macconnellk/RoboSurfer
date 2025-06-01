@@ -45,8 +45,8 @@ var CONFIG = {
     // Carb Safety
     carbSafety: {
         targetIncrease: 30,
-        timeWindowMinutes: 30,
-        bgThreshold: 161,
+        timeWindowMinutes: 60,
+        bgThreshold: 160,
         cobThreshold: 65
     },
     
