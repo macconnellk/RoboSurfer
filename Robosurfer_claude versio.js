@@ -290,7 +290,7 @@ function applySleepMode(currentTime, currentBG, iob, profile, target) {
     return { status: sleepModeStatus, newTarget: target, hypoMode: false };
 }
 
-function applyNightboost(currentTime, currentBG, cob, target, maxSMB, maxUAM, originalSMBDeliveryRatio, profile) {
+function applyNightboost(currentTime, currentBG, cob, target, maxSMB, maxUAM, profile) {
     var automationStatus = "Off";
     var newTarget = target;
     var newMaxSMB = maxSMB;
@@ -323,8 +323,9 @@ function applyNightboost(currentTime, currentBG, cob, target, maxSMB, maxUAM, or
                 af: CONFIG.automation1.threshold1.adjustmentFactor // 0.5
             };
             // SMB/UAM settings remain the same (+15)
-            // Reset SMB delivery ratio to original value (matching original exactly)
-            profile.smb_delivery_ratio = round(originalSMBDeliveryRatio, 2);
+            // Reset SMB delivery ratio to original value (get fresh value from profile)
+            var originalDeliveryRatio = profile.smb_delivery_ratio || 0.3;
+            profile.smb_delivery_ratio = round(originalDeliveryRatio, 2);
         }
     }
     
@@ -496,6 +497,40 @@ if (useOverride) {
     profile.dynamicVariables.overridePercentage = 100;
 }
 
+// Handle profile overrides (complete logic from original)
+var logOverride = "Off";
+var useOverride = profile.dynamicVariables ? profile.dynamicVariables.useOverride : false;
+var adjustISF = profile.dynamicVariables ? profile.dynamicVariables.isf : false;
+var adjustCR = profile.dynamicVariables ? profile.dynamicVariables.cr : false;
+var overridePercentage = profile.dynamicVariables ? (profile.dynamicVariables.overridePercentage / 100) : 1;
+var overrideTarget = profile.dynamicVariables ? profile.dynamicVariables.overrideTarget : target;
+var smbisOff = profile.dynamicVariables ? profile.dynamicVariables.smbisOff : false;
+var overrideMaxIOB = profile.dynamicVariables ? profile.dynamicVariables.overrideMaxIOB : false;
+var profilesMaxIOB = profile.dynamicVariables ? profile.dynamicVariables.maxIOB : profile.max_iob;
+
+if (useOverride) {
+    logOverride = "On";
+    
+    if (overrideTarget >= 80) target = overrideTarget;
+    if (adjustISF) initialISF = round(initialISF / overridePercentage, 0);
+    if (adjustCR) initialCR = round(initialCR / overridePercentage, 2);
+    
+    // Recalculate CSF after potential ISF/CR changes
+    initialCSF = initialISF / initialCR;
+    
+    if (smbisOff) {
+        profile.enableUAM = false;
+        profile.enableSMB_always = false;
+    }
+    if (overrideMaxIOB) {
+        profile.max_iob = profilesMaxIOB;
+    }
+    
+    // Reset override flags
+    profile.dynamicVariables.useOverride = false;
+    profile.dynamicVariables.overridePercentage = 100;
+}
+
 // Initialize working variables (after potential profile override changes)
 var dynamicISFRatio = 1;
 var newISF = initialISF;
@@ -554,7 +589,7 @@ if (CONFIG.enableSigmoidISF) {
 // Apply Nightboost if enabled (this REPLACES the dynamic ISF ratio when active, matching original)
 var nightboostResult = { status: "Off", sigmoidParams: null };
 if (enableAutomation1) {
-    nightboostResult = applyNightboost(now, currentBG, cob, target, maxSMB, maxUAM, originalSMBDeliveryRatio, profile);
+    nightboostResult = applyNightboost(now, currentBG, cob, target, maxSMB, maxUAM, profile);
     
     if (nightboostResult.sigmoidParams) {
         target = nightboostResult.newTarget;
