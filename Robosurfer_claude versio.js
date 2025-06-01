@@ -464,7 +464,6 @@ var logProfileAlert = "";
 var logSleepMode = "";
 
 // Handle profile overrides (complete logic from original)
-var logOverride = "Off";
 var useOverride = profile.dynamicVariables ? profile.dynamicVariables.useOverride : false;
 var adjustISF = profile.dynamicVariables ? profile.dynamicVariables.isf : false;
 var adjustCR = profile.dynamicVariables ? profile.dynamicVariables.cr : false;
@@ -539,10 +538,18 @@ var newMaxSMB = maxSMB;
 var newMaxUAM = maxUAM;
 var newMaxCOB = maxCOB;
 var checkCSF = 0;
+var hypoMode = false; // Declare early for later use
 
 // Feature enable flags (can be dynamically disabled by safety functions)
 var enableAutomation1 = CONFIG.enableAutomation1;
 var enableMealboost = CONFIG.enableMealboost;
+
+// Initialize result variables early
+var sensorSafety = { status: "Off", disableFeatures: false };
+var carbSafety = { status: "Off", newTarget: target, active: false };
+var sleepMode = { status: "", newTarget: target, hypoMode: false };
+var nightboostResult = { status: "Off", sigmoidParams: null };
+var mealboostResult = { status: "Off", smbChange: 0 };
 
 // Calculate rate of change values - ensure all time calculations use proper variables
 var glucose0Time = new Date(glucose[0].dateString).getTime();
@@ -554,7 +561,7 @@ var glucoseRateOfChange2Periods = (glucose[0].glucose - glucose[2].glucose) / ti
 var glucoseRateOfChange3Periods = (glucose[0].glucose - glucose[3].glucose) / timeDiff3Periods;
 
 // Apply safety functions IN ORDER (matching original sequence)
-var sensorSafety = applySensorSafety(glucose, profile);
+sensorSafety = applySensorSafety(glucose, profile);
 
 // Sensor safety disables features BEFORE they run (matching original)
 if (sensorSafety.disableFeatures) {
@@ -562,15 +569,14 @@ if (sensorSafety.disableFeatures) {
     enableMealboost = false;
 }
 
-var carbSafety = applyCarbSafety(lastCarbTime, currentBG, cob, target, profile);
+carbSafety = applyCarbSafety(lastCarbTime, currentBG, cob, target, profile);
 target = carbSafety.newTarget; // Apply carb safety target change first
 
-var sleepMode = applySleepMode(now, currentBG, iobValue, profile, target);
+sleepMode = applySleepMode(now, currentBG, iobValue, profile, target);
 target = sleepMode.newTarget; // Apply sleep mode target change
 logSleepMode = sleepMode.status; // Capture sleep mode status for logging
 
 // Handle hypo mode from sleep mode (matching original exact logic)
-var hypoMode = false;
 if (sleepMode.hypoMode) {
     enableAutomation1 = false; // Disable nightboost in hypo mode
     currentBasal = round(currentBasal * sleepMode.newBasalFactor, 2); // 95% of current basal
@@ -587,7 +593,6 @@ if (CONFIG.enableSigmoidISF) {
 }
 
 // Apply Nightboost if enabled (this REPLACES the dynamic ISF ratio when active, matching original)
-var nightboostResult = { status: "Off", sigmoidParams: null };
 if (enableAutomation1) {
     nightboostResult = applyNightboost(now, currentBG, cob, target, maxSMB, maxUAM, profile);
     
@@ -605,7 +610,6 @@ if (enableAutomation1) {
 }
 
 // Apply Mealboost if enabled (uses ORIGINAL SMB values, may override nightboost)
-var mealboostResult = { status: "Off", smbChange: 0 };
 if (enableMealboost) {
     mealboostResult = applyMealboost(now, currentBG, cob, glucoseRateOfChange2Periods, 
                                    glucoseRateOfChange3Periods, maxSMB, maxUAM, profile);
@@ -639,7 +643,7 @@ if (newCR > 0 && newISF > 0) {
 }
 
 // Apply constant carb absorption
-var minHourlyCarbAbsorption = profile.min_5m_carbimpact;
+var minHourlyCarbAbsorption = profile.min_5m_carbimpact || 0; // Add safety fallback
 applyConstantCarbAbsorption(minHourlyCarbAbsorption, newISF, newCR, profile);
 
 // Calculate carb absorption check
