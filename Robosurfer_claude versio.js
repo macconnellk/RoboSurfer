@@ -1,5 +1,8 @@
 function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoir, clock) {
 
+// DECLARE NOW IMMEDIATELY - before any other code
+var now = new Date();
+
    // Define utility functions
          function round_basal(basal) {
              var lowest_rate_scale = 20;
@@ -506,9 +509,12 @@ var checkCSF = 0;
 var enableAutomation1 = CONFIG.enableAutomation1;
 var enableMealboost = CONFIG.enableMealboost;
 
-// Calculate rate of change values
-var timeDiff2Periods = (new Date(glucose[0].dateString).getTime() - new Date(glucose[2].dateString).getTime()) / CONFIG.time.minutesToMs;
-var timeDiff3Periods = (new Date(glucose[0].dateString).getTime() - new Date(glucose[3].dateString).getTime()) / CONFIG.time.minutesToMs;
+// Calculate rate of change values - ensure all time calculations use proper variables
+var glucose0Time = new Date(glucose[0].dateString).getTime();
+var glucose2Time = new Date(glucose[2].dateString).getTime();
+var glucose3Time = new Date(glucose[3].dateString).getTime();
+var timeDiff2Periods = (glucose0Time - glucose2Time) / CONFIG.time.minutesToMs;
+var timeDiff3Periods = (glucose0Time - glucose3Time) / CONFIG.time.minutesToMs;
 var glucoseRateOfChange2Periods = (glucose[0].glucose - glucose[2].glucose) / timeDiff2Periods;
 var glucoseRateOfChange3Periods = (glucose[0].glucose - glucose[3].glucose) / timeDiff3Periods;
 
