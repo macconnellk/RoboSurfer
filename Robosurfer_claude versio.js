@@ -23,7 +23,7 @@ function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoi
           }
 
 // **************** ROBOSURFER CONFIGURATION ****************
-const CONFIG = {
+var CONFIG = {
     // Main feature toggles
     enableRoboSurfer: true,
     enableNightProtect: true,
@@ -132,9 +132,9 @@ const CONFIG = {
 
 function isTimeInWindow(currentTime, startHour, endHour) {
     // Create time objects for start and end times
-    const start = new Date(currentTime);
+    var start = new Date(currentTime);
     start.setHours(startHour, 0, 0, 0);
-    const end = new Date(currentTime);
+    var end = new Date(currentTime);
     end.setHours(endHour, 0, 0, 0);
     
     // Match the original complex logic exactly
@@ -255,11 +255,11 @@ function applyCarbSafety(lastCarbTime, currentBG, cob, target, profile) {
     return { status: carbSafetyStatus, newTarget: target, active: false };
 }
 
-function applySleepMode(now, currentBG, iob, profile, target) {
+function applySleepMode(currentTime, currentBG, iob, profile, target) {
     var sleepModeStatus = "";
     
     // Sleep mode uses nightProtect timing but checks against Automation_1_BGThreshold_2 (140)
-    if (isTimeInWindow(now, CONFIG.nightProtect.startHour, CONFIG.nightProtect.endHour) && 
+    if (isTimeInWindow(currentTime, CONFIG.nightProtect.startHour, CONFIG.nightProtect.endHour) && 
         currentBG <= CONFIG.automation1.bgThreshold2) {  // Uses 140, not 105
         
         // Turn off SMBs and raise target by 10
@@ -287,7 +287,7 @@ function applySleepMode(now, currentBG, iob, profile, target) {
     return { status: sleepModeStatus, newTarget: target, hypoMode: false };
 }
 
-function applyNightboost(now, currentBG, cob, target, maxSMB, maxUAM, originalSMBDeliveryRatio, profile) {
+function applyNightboost(currentTime, currentBG, cob, target, maxSMB, maxUAM, originalSMBDeliveryRatio, profile) {
     var automationStatus = "Off";
     var newTarget = target;
     var newMaxSMB = maxSMB;
@@ -295,7 +295,7 @@ function applyNightboost(now, currentBG, cob, target, maxSMB, maxUAM, originalSM
     var sigmoidParams = null;
     
     // Check if conditions are met for Nightboost (matches original exactly)
-    if (isTimeInWindow(now, CONFIG.automation1.startHour, CONFIG.automation1.endHour) &&
+    if (isTimeInWindow(currentTime, CONFIG.automation1.startHour, CONFIG.automation1.endHour) &&
         currentBG > CONFIG.automation1.bgThreshold2 && 
         cob >= CONFIG.automation1.carbThreshold) {
         
@@ -312,7 +312,7 @@ function applyNightboost(now, currentBG, cob, target, maxSMB, maxUAM, originalSM
         newMaxUAM = maxUAM + CONFIG.automation1.smbUAMIncrease; // +15
         
         // Check for less aggressive time (OVERRIDES the default settings)
-        if (isTimeInWindow(now, CONFIG.automation1.lessAggressiveHour, CONFIG.automation1.endHour)) {
+        if (isTimeInWindow(currentTime, CONFIG.automation1.lessAggressiveHour, CONFIG.automation1.endHour)) {
             automationStatus = CONFIG.automation1.name + " On1.2(LessAggressive)"; // Match original status string exactly
             sigmoidParams = {
                 min: CONFIG.automation1.threshold1.minimumRatio,   // 0.5
@@ -334,21 +334,21 @@ function applyNightboost(now, currentBG, cob, target, maxSMB, maxUAM, originalSM
     };
 }
 
-function applyMealboost(now, currentBG, cob, roc2Periods, roc3Periods, originalMaxSMB, originalMaxUAM, profile) {
+function applyMealboost(currentTime, currentBG, cob, roc2Periods, roc3Periods, originalMaxSMB, originalMaxUAM, profile) {
     var mealboostStatus = "Off";
     var newMaxSMB = originalMaxSMB;  
     var newMaxUAM = originalMaxUAM;
     
     // Use the SAME complex time logic as original (even though it's not needed for 0:00-18:59)
-    const mealboostStart = new Date(now);
+    var mealboostStart = new Date(currentTime);
     mealboostStart.setHours(CONFIG.mealboost.startHour, 0, 0, 0);
-    const mealboostEnd = new Date(now);
+    var mealboostEnd = new Date(currentTime);
     mealboostEnd.setHours(CONFIG.mealboost.endHour, CONFIG.mealboost.endMinute, 0, 0);
     
     // Match original complex time checking exactly
-    if (((now >= mealboostStart && now <= mealboostEnd) || 
-         (now <= mealboostStart && now <= mealboostEnd && mealboostStart > mealboostEnd) ||
-         (now >= mealboostStart && now >= mealboostEnd && mealboostStart > mealboostEnd)) &&
+    if (((currentTime >= mealboostStart && currentTime <= mealboostEnd) || 
+         (currentTime <= mealboostStart && currentTime <= mealboostEnd && mealboostStart > mealboostEnd) ||
+         (currentTime >= mealboostStart && currentTime >= mealboostEnd && mealboostStart > mealboostEnd)) &&
         currentBG > CONFIG.mealboost.bgThreshold) {
         
         // Check for increased rate of change (1.6mg/dl per minute)
