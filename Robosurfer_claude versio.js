@@ -45,8 +45,8 @@ var CONFIG = {
     // Carb Safety
     carbSafety: {
         targetIncrease: 30,
-        timeWindowMinutes: 60,
-        bgThreshold: 160,
+        timeWindowMinutes: 30,
+        bgThreshold: 161,
         cobThreshold: 65
     },
     
@@ -263,7 +263,7 @@ function applySleepMode(currentTime, currentBG, iob, profile, target) {
     
     // Sleep mode uses nightProtect timing but checks against Automation_1_BGThreshold_2 (140)
     if (isTimeInWindow(currentTime, CONFIG.nightProtect.startHour, CONFIG.nightProtect.endHour) && 
-        currentBG <= CONFIG.automation1.bgThreshold2) {  // Uses 140, not 105
+        currentBG <= CONFIG.automation1.bgThreshold2) {  // Uses 140
         
         // Turn off SMBs and raise target by 10
         profile.enableUAM = false;
@@ -271,16 +271,41 @@ function applySleepMode(currentTime, currentBG, iob, profile, target) {
         var newTarget = target + CONFIG.nightProtect.targetIncrease; // Add 10 first
         sleepModeStatus = "SLEEP MODE ON";
         
-        // Check for negative IOB (hypo protection)
-        if (iob <= CONFIG.nightProtect.hypoIOBThreshold) { // 0.05
-            newTarget = newTarget + CONFIG.nightProtect.hypoTargetIncrease; // Add 20 MORE to already modified target
-            sleepModeStatus = "SLEEP MODE ON; NEGATIVE BASAL MODE ON";
+        // Check for negative IOB (graduated hypo protection)
+        if (iob <= CONFIG.nightProtect.hypoIOBThreshold) { // Now 0.1 instead of 0.05
+            newTarget = newTarget + CONFIG.nightProtect.hypoTargetIncrease; // Add 40 MORE (total +50)
+            
+            // Graduated basal factor based on IOB level and current BG
+            var basalFactor;
+            var grad = CONFIG.nightProtect.graduatedResponse;
+            
+            if (currentBG > grad.recoveryBG) {
+                // BG > 140: Return to near-normal basal to allow IOB recovery
+                basalFactor = grad.recoveryFactor; // 0.95
+                sleepModeStatus = "SLEEP MODE ON; NEGATIVE BASAL MODE ON (Recovery)";
+            } else if (iob <= grad.severeIOB) {
+                // Very negative IOB: Most aggressive protection
+                basalFactor = grad.severeFactor; // 0.6
+                sleepModeStatus = "SLEEP MODE ON; NEGATIVE BASAL MODE ON (Severe)";
+            } else if (iob <= grad.moderateIOB) {
+                // Moderate negative IOB
+                basalFactor = grad.moderateFactor; // 0.75
+                sleepModeStatus = "SLEEP MODE ON; NEGATIVE BASAL MODE ON (Moderate)";
+            } else if (iob <= grad.mildIOB) {
+                // Mild negative IOB
+                basalFactor = grad.mildFactor; // 0.85
+                sleepModeStatus = "SLEEP MODE ON; NEGATIVE BASAL MODE ON (Mild)";
+            } else {
+                // Light negative IOB
+                basalFactor = grad.lightFactor; // 0.9
+                sleepModeStatus = "SLEEP MODE ON; NEGATIVE BASAL MODE ON (Light)";
+            }
             
             return { 
                 status: sleepModeStatus, 
                 newTarget: newTarget, 
                 hypoMode: true,
-                newBasalFactor: 0.95  // 95% of current basal
+                newBasalFactor: basalFactor
             };
         }
         
@@ -476,12 +501,12 @@ var profilesMaxIOB = profile.dynamicVariables ? profile.dynamicVariables.maxIOB 
 if (useOverride) {
     logOverride = "On";
     
-    // CRITICAL: These must reassign the existing variables, not create new ones
+    // NOTE: Basal is already adjusted by iAPS in the current_basal variable, no adjustment needed here
     if (overrideTarget >= 80) target = overrideTarget;
     if (adjustISF) initialISF = round(initialISF / overridePercentage, 0);
     if (adjustCR) initialCR = round(initialCR / overridePercentage, 2);
     
-    // Recalculate CSF AFTER potential ISF/CR changes
+    // Recalculate CSF after potential ISF/CR changes
     initialCSF = initialISF / initialCR;
     
     if (smbisOff) {
@@ -492,7 +517,7 @@ if (useOverride) {
         profile.max_iob = profilesMaxIOB;
     }
     
-    // Reset override flags
+    // Reset override flags after processing
     profile.dynamicVariables.useOverride = false;
     profile.dynamicVariables.overridePercentage = 100;
 }
@@ -577,10 +602,10 @@ sleepMode = applySleepMode(now, currentBG, iobValue, profile, target);
 target = sleepMode.newTarget; // Update target with sleep mode changes  
 logSleepMode = sleepMode.status;
 
-// Handle hypo mode from sleep mode (matching original exact logic)
+// Handle hypo mode from sleep mode (using graduated basal factors)
 if (sleepMode.hypoMode) {
     enableAutomation1 = false; // Disable nightboost in hypo mode
-    currentBasal = round(currentBasal * sleepMode.newBasalFactor, 2); // 95% of current basal
+    currentBasal = round(currentBasal * sleepMode.newBasalFactor, 2); // Use graduated factor
     newISF = round(initialISF / 0.95, 0); // Stronger ISF (divide by 0.95)
     newCR = round(initialCR / 0.95, 2); // Stronger CR (divide by 0.95)
     dynamicISFRatio = 1; // Reset sigmoid factor
