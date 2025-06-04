@@ -277,27 +277,26 @@ function applySleepMode(currentTime, currentBG, iob, profile, target) {
             
             // Graduated basal factor based on IOB level and current BG
             var basalFactor;
-            var grad = CONFIG.nightProtect.graduatedResponse;
             
-            if (currentBG > grad.recoveryBG) {
+            if (currentBG > 140) {
                 // BG > 140: Return to near-normal basal to allow IOB recovery
-                basalFactor = grad.recoveryFactor; // 0.95
+                basalFactor = 0.95;
                 sleepModeStatus = "SLEEP MODE ON; NEGATIVE BASAL MODE ON (Recovery)";
-            } else if (iob <= grad.severeIOB) {
+            } else if (iob <= -0.2) {
                 // Very negative IOB: Most aggressive protection
-                basalFactor = grad.severeFactor; // 0.6
+                basalFactor = 0.6;
                 sleepModeStatus = "SLEEP MODE ON; NEGATIVE BASAL MODE ON (Severe)";
-            } else if (iob <= grad.moderateIOB) {
+            } else if (iob <= -0.1) {
                 // Moderate negative IOB
-                basalFactor = grad.moderateFactor; // 0.75
+                basalFactor = 0.75;
                 sleepModeStatus = "SLEEP MODE ON; NEGATIVE BASAL MODE ON (Moderate)";
-            } else if (iob <= grad.mildIOB) {
+            } else if (iob <= -0.05) {
                 // Mild negative IOB
-                basalFactor = grad.mildFactor; // 0.85
+                basalFactor = 0.85;
                 sleepModeStatus = "SLEEP MODE ON; NEGATIVE BASAL MODE ON (Mild)";
             } else {
                 // Light negative IOB
-                basalFactor = grad.lightFactor; // 0.9
+                basalFactor = 0.9;
                 sleepModeStatus = "SLEEP MODE ON; NEGATIVE BASAL MODE ON (Light)";
             }
             
