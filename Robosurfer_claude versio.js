@@ -441,8 +441,14 @@ function applyDynamicCR(lastCarbTime, dynamicISFRatio, initialCR) {
 }
 
 function applyConstantCarbAbsorption(minHourlyCarbAbsorption, newISF, newCR, profile) {
+    // Simple time check for after 5:30 PM - use 8 as hourly absorption value
+    var eveningTime = new Date(now);
+    eveningTime.setHours(17, 30, 0, 0);
+    var useEveningValue = now >= eveningTime;
+    var effectiveHourlyAbsorption = useEveningValue ? 8 : minHourlyCarbAbsorption;
+    
     // Convert hourly to 5-minute absorption
-    var min5mCarbAbsorption = minHourlyCarbAbsorption / CONFIG.time.fiveMinutesToHour;
+    var min5mCarbAbsorption = effectiveHourlyAbsorption / CONFIG.time.fiveMinutesToHour;
     
     // Calculate dynamic min_5m_carbimpact with safety checks
     var min5mCarbImpact = 0;
