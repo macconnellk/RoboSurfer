@@ -123,7 +123,14 @@ var CONFIG = {
         deliveryRatioHigh: 0.75,
         deliveryRatioAccel: 0.85
     },
-    
+
+   // Carb Absorption Time-Based Settings
+    carbAbsorption: {
+        eveningStartHour: 17,        // 5:00 PM (24-hour format)
+        eveningStartMinute: 30,      // 30 minutes (so 5:30 PM total)
+        eveningAbsorptionValue: 17    // Hourly carb absorption value after evening time
+    },
+   
     // Time conversion constants
     time: {
         minutesToMs: 60 * 1000,
@@ -441,11 +448,11 @@ function applyDynamicCR(lastCarbTime, dynamicISFRatio, initialCR) {
 }
 
 function applyConstantCarbAbsorption(minHourlyCarbAbsorption, newISF, newCR, profile) {
-    // Simple time check for after 5:30 PM - use 8 as hourly absorption value
+    // Simple time check for after evening time - use configured hourly absorption value
     var eveningTime = new Date(now);
-    eveningTime.setHours(17, 30, 0, 0);
+    eveningTime.setHours(CONFIG.carbAbsorption.eveningStartHour, CONFIG.carbAbsorption.eveningStartMinute, 0, 0);
     var useEveningValue = now >= eveningTime;
-    var effectiveHourlyAbsorption = useEveningValue ? 8 : minHourlyCarbAbsorption;
+    var effectiveHourlyAbsorption = useEveningValue ? CONFIG.carbAbsorption.eveningAbsorptionValue : minHourlyCarbAbsorption;
     
     // Convert hourly to 5-minute absorption
     var min5mCarbAbsorption = effectiveHourlyAbsorption / CONFIG.time.fiveMinutesToHour;
