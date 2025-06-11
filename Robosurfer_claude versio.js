@@ -496,6 +496,8 @@ var maxCOB = profile.maxCOB;
 var maxSMB = profile.maxSMBBasalMinutes;
 var maxUAM = profile.maxUAMSMBBasalMinutes;
 var lastCarbTime = meal.lastCarbTime || 0;
+var past2hoursAverage = profile.dynamicVariables.past2hoursAverage;
+var average_total_data = profile.dynamicVariables.average_total_data;   
 // Initialize log variables
 var logProfileAlert = "";
 var logSleepMode = "";
@@ -723,6 +725,7 @@ return logSleepMode + logProfileAlert + ". dISF ratio " + round(dynamicISFRatio,
        " UAM Mins " + round(profile.maxUAMSMBBasalMinutes, 2) + 
        " Max COB " + round(profile.maxCOB, 2) + 
        ". MinAbsorp(CI) " + round(checkCarbAbsorption, 2) + "(" + profile.min_5m_carbimpact + ")" + 
-       " Mealboost " + mealboostResult.status + " SMB+" + mealboostResult.smbChange;
+       " Mealboost " + mealboostResult.status + " SMB+" + mealboostResult.smbChange + 
+      " TDD " + round(past2hoursAverage, 2) + " 2week TDD " + round(average_total_data, 2);
 
 }
