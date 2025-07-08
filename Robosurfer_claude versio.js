@@ -536,40 +536,6 @@ if (useOverride) {
     profile.dynamicVariables.overridePercentage = 100;
 }
 
-// Handle profile overrides (complete logic from original)
-var logOverride = "Off";
-var useOverride = profile.dynamicVariables ? profile.dynamicVariables.useOverride : false;
-var adjustISF = profile.dynamicVariables ? profile.dynamicVariables.isf : false;
-var adjustCR = profile.dynamicVariables ? profile.dynamicVariables.cr : false;
-var overridePercentage = profile.dynamicVariables ? (profile.dynamicVariables.overridePercentage / 100) : 1;
-var overrideTarget = profile.dynamicVariables ? profile.dynamicVariables.overrideTarget : target;
-var smbisOff = profile.dynamicVariables ? profile.dynamicVariables.smbisOff : false;
-var overrideMaxIOB = profile.dynamicVariables ? profile.dynamicVariables.overrideMaxIOB : false;
-var profilesMaxIOB = profile.dynamicVariables ? profile.dynamicVariables.maxIOB : profile.max_iob;
-
-if (useOverride) {
-    logOverride = "On";
-    
-    if (overrideTarget >= 80) target = overrideTarget;
-    if (adjustISF) initialISF = round(initialISF / overridePercentage, 0);
-    if (adjustCR) initialCR = round(initialCR / overridePercentage, 2);
-    
-    // Recalculate CSF after potential ISF/CR changes
-    initialCSF = initialISF / initialCR;
-    
-    if (smbisOff) {
-        profile.enableUAM = false;
-        profile.enableSMB_always = false;
-    }
-    if (overrideMaxIOB) {
-        profile.max_iob = profilesMaxIOB;
-    }
-    
-    // Reset override flags
-    profile.dynamicVariables.useOverride = false;
-    profile.dynamicVariables.overridePercentage = 100;
-}
-
 // Initialize working variables AFTER profile overrides (using potentially modified initial values)
 var dynamicISFRatio = 1;
 var newISF = initialISF;  // Must use potentially modified initialISF
