@@ -502,7 +502,8 @@ var average_total_data = profile.dynamicVariables.average_total_data;
 var logProfileAlert = "";
 var logSleepMode = "";
 
-// Handle profile overrides (complete logic from original)
+// Handle profile overrides (remove duplicate blocks)
+var logOverride = "Off";  
 var useOverride = profile.dynamicVariables ? profile.dynamicVariables.useOverride : false;
 var adjustISF = profile.dynamicVariables ? profile.dynamicVariables.isf : false;
 var adjustCR = profile.dynamicVariables ? profile.dynamicVariables.cr : false;
