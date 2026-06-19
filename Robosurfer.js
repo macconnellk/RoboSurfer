@@ -1,3 +1,6 @@
+# middleware.js — Camp Mode Carb Absorption Gate applied
+
+```javascript
 function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoir, clock) {
 
 // DECLARE NOW IMMEDIATELY - before any other code
@@ -40,6 +43,14 @@ var CONFIG = {
         hypoIOBThreshold: 0.1
     },
     
+    // Camp Mode — elevated carb absorption floor during active/snack-heavy hours
+    campMode: {
+        enabled: true,               // set false to disable without removing config
+        startHour: 9,
+        endHour: 17,
+        minHourlyCarbAbsorption: 50  // g/hr; clears phantom COB before dinner
+    },
+
     // Time conversion constants
     time: {
         fiveMinutesToHour: 60 / 5
@@ -212,7 +223,13 @@ if (sleepMode.hypoMode) {
 }
 
 // **************** APPLY DYNAMIC CARB ABSORPTION ****************
-applyDynamicCarbAbsorption(minHourlyCarbAbsorption, newISF, newCR, profile);
+var inCampHours = CONFIG.campMode.enabled &&
+    isTimeInWindow(now, CONFIG.campMode.startHour, CONFIG.campMode.endHour);
+var effectiveMinHourlyCarbAbsorption = inCampHours
+    ? CONFIG.campMode.minHourlyCarbAbsorption
+    : minHourlyCarbAbsorption;
+var logCampMode = inCampHours ? "CAMP MODE ON (50g/hr floor)" : "";
+applyDynamicCarbAbsorption(effectiveMinHourlyCarbAbsorption, newISF, newCR, profile);
 
 // Calculate carb absorption check
 var checkCarbAbsorption = 0;
@@ -235,6 +252,7 @@ profile.carb_ratio = newCR;
 
 // **************** RETURN DETAILED STATUS ****************
 return logSleepMode + 
+       (logCampMode ? ". " + logCampMode : "") +
        ". Override " + logOverride + 
        ". ISF was/now " + round(initialISF, 2) + "/" + round(profile.sens, 2) + 
        " Basal was/now " + oldBasal + "/" + profile.current_basal + 
@@ -245,3 +263,4 @@ return logSleepMode +
        " TDD " + round(past2hoursAverage, 2) + " 2week TDD " + round(average_total_data, 2);
 
 }
+```
