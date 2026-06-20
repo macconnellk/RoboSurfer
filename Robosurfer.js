@@ -1,6 +1,3 @@
-# middleware.js — Camp Mode Carb Absorption Gate applied
-
-```javascript
 function middleware(iob, currenttemp, glucose, profile, autosens, meal, reservoir, clock) {
 
 // DECLARE NOW IMMEDIATELY - before any other code
