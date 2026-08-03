@@ -14,6 +14,7 @@ extension Bolus {
         @State private var keepForNextWiew: Bool = false
         @State private var remoteBolusAlert: Alert?
         @State private var isRemoteBolusAlertPresented: Bool = false
+        @State private var guardExpanded = false
 
         private enum Config {
             static let dividerHeight: CGFloat = 2
@@ -72,10 +73,11 @@ extension Bolus {
             } else { return 0 }
         }
 
-        /// Percentage the falling glucose guard has removed from the recommendation.
-        private var guardReduction: String {
-            let reduction = (1 - state.trendGuardScale) * 100
-            return NSDecimalNumber(decimal: reduction).intValue.description + "%"
+        /// Whole-percent reduction applied by the falling glucose guard. Reported as an
+        /// integer so the row can be suppressed when the reduction rounds below one percent,
+        /// which would otherwise render as "0%".
+        private var guardReductionPercent: Int {
+            NSDecimalNumber(decimal: (1 - state.trendGuardScale) * 100).intValue
         }
 
         var body: some View {
@@ -250,24 +252,25 @@ extension Bolus {
                 }
 
                 Section {
-                    Toggle(isOn: $state.trendGuardEnabled) {
-                        Text("Reduce dose for falling glucose")
-                    }
-                    .onChange(of: state.trendGuardEnabled) {
-                        state.insulinCalculated = state.calculateInsulin()
-                    }
-
-                    if state.trendGuardEnabled, state.trendGuardScale < 1 {
+                    // Outside the disclosure: when the guard acts you see it without expanding.
+                    if state.trendGuardEnabled, guardReductionPercent >= 1 {
                         HStack {
                             Text("Reduced for falling glucose")
                             Spacer()
-                            Text(guardReduction)
+                            Text("\(guardReductionPercent)%")
                         }
                         .font(.footnote)
                         .foregroundStyle(.orange)
                     }
 
-                    DisclosureGroup("Guard settings") {
+                    DisclosureGroup(isExpanded: $guardExpanded) {
+                        Toggle(isOn: $state.trendGuardEnabled) {
+                            Text("Reduce dose for falling glucose")
+                        }
+                        .onChange(of: state.trendGuardEnabled) {
+                            state.insulinCalculated = state.calculateInsulin()
+                        }
+
                         HStack {
                             Text("Delta weight")
                             Spacer()
@@ -278,6 +281,16 @@ extension Bolus {
                             Spacer()
                             DecimalTextField("0.75", value: $state.trendGuardFloor, formatter: formatter)
                         }
+                    } label: {
+                        // The OFF marker stays on the collapsed label so a disabled guard
+                        // cannot be silently forgotten.
+                        HStack {
+                            Text("Falling Glucose Guard")
+                            if !state.trendGuardEnabled {
+                                Spacer()
+                                Text("OFF").foregroundStyle(.orange)
+                            }
+                        }
                     }
                     .onChange(of: state.trendGuardDeltaWeight) {
                         state.insulinCalculated = state.calculateInsulin()
@@ -285,7 +298,7 @@ extension Bolus {
                     .onChange(of: state.trendGuardFloor) {
                         state.insulinCalculated = state.calculateInsulin()
                     }
-                } header: { Text("Falling Glucose Guard") }
+                }
             }
             .interactiveDismissDisabled()
             .compactSectionSpacing()
