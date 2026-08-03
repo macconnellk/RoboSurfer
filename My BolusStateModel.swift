@@ -104,6 +104,9 @@ extension Bolus {
         /// Multiplier produced by the most recent calculation. 1 when the guard did not engage.
         @Published var trendGuardScale: Decimal = 1
 
+        /// Units removed by the falling glucose guard. Negative. Zero when inert.
+        @Published var trendGuardDelta: Decimal = 0
+
         private enum GuardKeys {
             static let enabled = "trendGuardEnabled"
             static let deltaWeight = "trendGuardDeltaWeight"
@@ -293,10 +296,15 @@ extension Bolus {
 
             // Applied to the final recommendation rather than to any single component,
             // because the carb term dominates at a large ISF and scaling anything smaller
-            // has no practical effect.
+            // has no practical effect. trendGuardDelta is captured before the scale is
+            // applied so the Calculations popup can name the reduction rather than folding
+            // it into the Factors plug.
             trendGuardScale = fallingGlucoseScale()
             if trendGuardScale < 1 {
+                trendGuardDelta = insulinCalculated * (trendGuardScale - 1)
                 insulinCalculated *= trendGuardScale
+            } else {
+                trendGuardDelta = 0
             }
 
             // A blend of Oref0 predictions and the Swift calculator {
@@ -368,6 +376,44 @@ extension Bolus {
             return guardFloor + (1 - guardFloor) * curve
         }
 
+        /// Appends a machine-readable marker to the carb note when the falling glucose guard
+        /// has altered the recommendation.
+        ///
+        /// CarbsEntry.note is uploaded to Nightscout as `foodType` on the Carb Correction
+        /// treatment, which is the only durable, already-wired channel a manual bolus has.
+        /// Without it a scaled dose is indistinguishable from a manual override in the
+        /// nightly review, and the meal window cannot be attributed.
+        ///
+        /// The asterisk records that the delivered amount diverged from the recommendation,
+        /// so the review can separate "the guard reduced this" from "the guard reduced this
+        /// and then it was overridden by hand".
+        private func annotateGuardReduction() {
+            let reduction = NSDecimalNumber(decimal: (1 - trendGuardScale) * 100).intValue
+            guard reduction >= 1, carbToStore.first != nil else { return }
+
+            let overridden = abs(amount - insulinCalculated) >= minBolus
+            let token = "[TG-\(reduction)\(overridden ? "*" : "")]"
+
+            let entry = carbToStore[0]
+            let existing = entry.note ?? ""
+
+            // CarbsEntry.note is `let`, so the entry is rebuilt rather than mutated.
+            // createdAt is preserved exactly: Nightscout treatment dedup keys on it.
+            carbToStore[0] = CarbsEntry(
+                id: entry.id,
+                createdAt: entry.createdAt,
+                actualDate: entry.actualDate,
+                carbs: entry.carbs,
+                fat: entry.fat,
+                protein: entry.protein,
+                fiber: entry.fiber,
+                note: existing.isEmpty ? token : existing + " " + token,
+                enteredBy: entry.enteredBy,
+                isFPU: entry.isFPU,
+                micronutrient: entry.micronutrient
+            )
+        }
+
         /// When COB module fail
         var recentCarbs: Decimal {
             var temporaryCarbs: Decimal = 0
@@ -416,6 +462,7 @@ extension Bolus {
             unlockmanager.unlock()
                 .sink { _ in } receiveValue: { [weak self] _ in
                     guard let self = self else { return }
+                    self.annotateGuardReduction()
                     self.save()
                     self.apsManager.enactBolus(amount: maxAmount, isSMB: false)
                     self.showModal(for: nil)
@@ -564,6 +611,7 @@ extension Bolus {
                     InsulinRequired(agent: NSLocalizedString("IOB", comment: ""), amount: iobInsulinReduction),
                     InsulinRequired(agent: NSLocalizedString("Glucose", comment: ""), amount: targetDifferenceInsulin),
                     InsulinRequired(agent: NSLocalizedString("Trend", comment: ""), amount: fifteenMinInsulin),
+                    InsulinRequired(agent: NSLocalizedString("Falling BG", comment: ""), amount: trendGuardDelta),
                     InsulinRequired(agent: NSLocalizedString("Factors", comment: ""), amount: 0),
                     InsulinRequired(agent: NSLocalizedString("Amount", comment: ""), amount: insulinCalculated)
                 ] :
@@ -571,13 +619,16 @@ extension Bolus {
                         InsulinRequired(agent: NSLocalizedString("Carbs", comment: ""), amount: wholeCobInsulin),
                         InsulinRequired(agent: NSLocalizedString("IOB", comment: ""), amount: iobInsulinReduction),
                         InsulinRequired(agent: NSLocalizedString("Glucose", comment: ""), amount: targetDifferenceInsulin),
+                        InsulinRequired(agent: NSLocalizedString("Falling BG", comment: ""), amount: trendGuardDelta),
                         InsulinRequired(agent: NSLocalizedString("Factors", comment: ""), amount: 0),
                         InsulinRequired(agent: NSLocalizedString("Amount", comment: ""), amount: insulinCalculated)
                     ]
                 let total = prepareData.dropLast().map(\.amount).reduce(0, +)
                 if total > 0 {
+                    // Factors is the balancing plug. Its index is one later than the row count
+                    // would suggest because the Falling BG row sits immediately ahead of it.
                     let factor = -1 * (total - insulinCalculated)
-                    prepareData[!disable15MinTrend ? 4 : 3]
+                    prepareData[!disable15MinTrend ? 5 : 4]
                         .amount = abs(factor) >= minBolus ? factor : 0
                 }
                 data = prepareData
