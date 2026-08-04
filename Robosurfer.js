@@ -38,19 +38,6 @@ var CONFIG = {
         targetIncrease: 10,
         hypoTargetIncrease: 40,
         hypoIOBThreshold: 0.1
-    },
-    
-    // Camp Mode — elevated carb absorption floor during active/snack-heavy hours
-    campMode: {
-        enabled: true,               // set false to disable without removing config
-        startHour: 9,
-        endHour: 17,
-        minHourlyCarbAbsorption: 50  // g/hr; clears phantom COB before dinner
-    },
-
-    // Time conversion constants
-    time: {
-        fiveMinutesToHour: 60 / 5
     }
 };
 
@@ -119,25 +106,6 @@ function applySleepMode(currentTime, currentBG, iob, profile, target) {
     return { status: sleepModeStatus, newTarget: target, hypoMode: false };
 }
 
-// **************** CARB ABSORPTION ****************
-
-function applyDynamicCarbAbsorption(minHourlyCarbAbsorption, newISF, newCR, profile) {
-    // Convert hourly to 5-minute absorption
-    var min5mCarbAbsorption = minHourlyCarbAbsorption / CONFIG.time.fiveMinutesToHour;
-    
-    // Calculate dynamic min_5m_carbimpact with safety checks
-    var min5mCarbImpact = 0;
-    if (newISF > 0 && newCR > 0) {
-        min5mCarbImpact = (min5mCarbAbsorption * newISF) / newCR;
-    } else {
-        min5mCarbImpact = profile.min_5m_carbimpact; // Fallback to original value
-    }
-    
-    profile.min_5m_carbimpact = round(min5mCarbImpact, 2);
-    
-    return min5mCarbImpact;
-}
-
 // **************** MAIN MIDDLEWARE FUNCTION ****************
 
 // Safety check for glucose array
@@ -156,10 +124,13 @@ var target = profile.min_bg;
 var initialISF = profile.sens;
 var initialCR = profile.carb_ratio;
 var initialCSF = initialISF / initialCR;
+// ISF/CR as prepare/profile.js left them; used to back-compute the carb floor for
+// reporting. Captured here because initialISF/initialCR are mutated by overrides below.
+var reportISF = profile.sens;
+var reportCR = profile.carb_ratio;
 var currentBasal = profile.current_basal;
 var oldBasal = currentBasal;
 var iobValue = iob[0].iob;
-var minHourlyCarbAbsorption = profile.min_5m_carbimpact || 0;
 var past2hoursAverage = profile.dynamicVariables.past2hoursAverage;
 var average_total_data = profile.dynamicVariables.average_total_data;
 
@@ -219,22 +190,6 @@ if (sleepMode.hypoMode) {
     hypoMode = true;
 }
 
-// **************** APPLY DYNAMIC CARB ABSORPTION ****************
-var inCampHours = CONFIG.campMode.enabled &&
-    (now.getDay() >= 1 && now.getDay() <= 5) &&
-    isTimeInWindow(now, CONFIG.campMode.startHour, CONFIG.campMode.endHour);
-var effectiveMinHourlyCarbAbsorption = inCampHours
-    ? CONFIG.campMode.minHourlyCarbAbsorption
-    : minHourlyCarbAbsorption;
-var logCampMode = inCampHours ? "CAMP MODE ON (50g/hr floor)" : "";
-applyDynamicCarbAbsorption(effectiveMinHourlyCarbAbsorption, newISF, newCR, profile);
-
-// Calculate carb absorption check
-var checkCarbAbsorption = 0;
-if (profile.min_5m_carbimpact && profile.carb_ratio > 0 && profile.sens > 0) {
-    checkCarbAbsorption = ((profile.min_5m_carbimpact * profile.carb_ratio) / profile.sens) * CONFIG.time.fiveMinutesToHour;
-}
-
 // Calculate CSF
 var checkCSF = 0;
 if (newCR > 0 && newISF > 0) {
@@ -248,16 +203,26 @@ profile.current_basal = currentBasal;
 profile.sens = newISF;
 profile.carb_ratio = newCR;
 
+// **************** CARB FLOOR (REPORTING ONLY) ****************
+// min_5m_carbimpact is derived in prepare/profile.js from the preference read as
+// grams per hour, and meal.js consumed it several steps before this middleware runs.
+// Recomputing here would have no effect and would report a figure not in force.
+// Back-computes the applied floor using the ISF/CR prepare/profile.js used:
+//   g/hr = min_5m_carbimpact * CR / ISF * 12
+var carbFloorGramsPerHour = (reportISF > 0 && reportCR > 0)
+    ? profile.min_5m_carbimpact * reportCR / reportISF * 12
+    : 0;
+
 // **************** RETURN DETAILED STATUS ****************
 return logSleepMode + 
-       (logCampMode ? ". " + logCampMode : "") +
        ". Override " + logOverride + 
        ". ISF was/now " + round(initialISF, 2) + "/" + round(profile.sens, 2) + 
        " Basal was/now " + oldBasal + "/" + profile.current_basal + 
        ". CR was/now " + initialCR + "/" + round(profile.carb_ratio, 2) + 
        " CSF was/now " + round(initialCSF, 2) + "/" + round(checkCSF, 2) + 
        ". Max IOB " + round(profile.max_iob, 2) +
-       ". MinAbsorp(CI) " + round(checkCarbAbsorption, 2) + "(" + profile.min_5m_carbimpact + ")" + 
-       " TDD " + round(past2hoursAverage, 2) + " 2week TDD " + round(average_total_data, 2);
+       ". Carb floor " + round(carbFloorGramsPerHour, 1) + " g/hr (impact " + profile.min_5m_carbimpact + 
+       ", ISF " + round(reportISF, 0) + ", CR " + round(reportCR, 1) + ")" +
+       ". TDD " + round(past2hoursAverage, 2) + " 2week TDD " + round(average_total_data, 2);
 
 }
