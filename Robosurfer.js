@@ -65,6 +65,10 @@ function applySleepMode(currentTime, currentBG, iob, profile, target) {
         // Turn off SMBs and raise target by 10
         profile.enableUAM = false;
         profile.enableSMB_always = false;
+        profile.enableSMB_with_COB = false;
+        profile.enableSMB_after_carbs = false;
+        profile.enableSMB_with_temptarget = false;
+        profile.enableSMB_high_bg = false;
         var newTarget = target + CONFIG.sleepMode.targetIncrease;
         sleepModeStatus = "SLEEP MODE ON";
         
@@ -162,6 +166,10 @@ if (useOverride) {
     if (smbisOff) {
         profile.enableUAM = false;
         profile.enableSMB_always = false;
+        profile.enableSMB_with_COB = false;
+        profile.enableSMB_after_carbs = false;
+        profile.enableSMB_with_temptarget = false;
+        profile.enableSMB_high_bg = false;
     }
     if (overrideMaxIOB) {
         profile.max_iob = profilesMaxIOB;
@@ -202,6 +210,9 @@ if (newCR > 0 && newISF > 0) {
 profile.current_basal = currentBasal;
 profile.sens = newISF;
 profile.carb_ratio = newCR;
+profile.min_bg = target;
+profile.max_bg = target;
+profile.target_bg = target;
 
 // **************** CARB FLOOR (REPORTING ONLY) ****************
 // min_5m_carbimpact is derived in prepare/profile.js from the preference read as
