@@ -233,7 +233,7 @@ return logSleepMode +
        " CSF was/now " + round(initialCSF, 2) + "/" + round(checkCSF, 2) + 
        ". Max IOB " + round(profile.max_iob, 2) +
        ". Carb floor " + round(carbFloorGramsPerHour, 1) + " g/hr (impact " + profile.min_5m_carbimpact + 
-       ", ISF " + round(reportISF, 0) + ", CR " + round(reportCR, 1) + ")" +
+       " ISF " + round(reportISF, 0) + " CR " + round(reportCR, 1) + ")" +
        ". TDD " + round(past2hoursAverage, 2) + " 2week TDD " + round(average_total_data, 2);
 
 }
